@@ -2,7 +2,7 @@ import { SimpleGrid, Text, useColorModeValue } from "@chakra-ui/react";
 import Card from "components/card/Card.js";
 
 import React from "react";
-import Information from "../profile/components/Information";
+import Information from "../expanses/components/Information";
 
 const EmployeeFullDetail = () => {
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");

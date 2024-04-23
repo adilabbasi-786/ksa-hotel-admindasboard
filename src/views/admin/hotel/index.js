@@ -1,6 +1,6 @@
 import { Box } from "@chakra-ui/react";
 import React from "react";
-import Hotels from "../profile/components/Hotels";
+import Hotels from "./Hotels";
 
 import {
   BrowserRouter as Router,

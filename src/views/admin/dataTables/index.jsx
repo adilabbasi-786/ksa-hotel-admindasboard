@@ -16,9 +16,9 @@ const Employer = () => {
     <Router>
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
         <Switch>
-          <Route exact path="/admin/emp-tables/add">
+          {/* <Route exact path="/admin/emp-tables/add">
             <AddEmpoyee />
-          </Route>
+          </Route> */}
           <Route path="/admin/emp-tables">
             <DropDown onSelectHotel={handleSelectHotel} />
             {selectedHotel && <EmployeesData selectedHotel={selectedHotel} />}

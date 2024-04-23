@@ -15,7 +15,7 @@ import {
 import MainDashboard from "views/admin/default";
 import Hotel from "views/admin/hotel";
 import NFTMarketplace from "views/admin/marketplace";
-import Profile from "views/admin/profile";
+import Expanses from "views/admin/expanses";
 import DataTables from "views/admin/dataTables";
 import RTL from "views/admin/rtl";
 
@@ -49,11 +49,11 @@ const routes = [
     component: DataTables,
   },
   {
-    name: "Profile",
+    name: "Expanses",
     layout: "/admin",
-    path: "/profile",
+    path: "/expanse",
     icon: <Icon as={MdPerson} width="20px" height="20px" color="inherit" />,
-    component: Profile,
+    component: Expanses,
   },
   {
     name: "signout",
@@ -64,7 +64,7 @@ const routes = [
   },
 
   {
-    name: "RTL Admin",
+    name: "Salaries",
     layout: "/rtl",
     path: "/rtl-default",
     icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,

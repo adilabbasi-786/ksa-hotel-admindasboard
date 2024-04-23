@@ -1,7 +1,7 @@
 import { SimpleGrid, Text, useColorModeValue } from "@chakra-ui/react";
 import Card from "components/card/Card.js";
 import React from "react";
-import Information from "views/admin/profile/components/Information";
+import Information from "views/admin/expanses/components/Information";
 
 const HotelDetail = () => {
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
@@ -41,6 +41,13 @@ const HotelDetail = () => {
           title="Social Media"
           value="Google, Facebook"
         />
+        <Information
+          boxShadow={cardShadow}
+          title="Hotel Rent"
+          value="1000SAR"
+        />
+        <Information boxShadow={cardShadow} title="Kafalat" value="5000SAR" />
+        <Information boxShadow={cardShadow} title="Total" value="15000SAR" />
       </SimpleGrid>
     </Card>
   );

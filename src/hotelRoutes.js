@@ -12,7 +12,6 @@ import {
 // Admin Imports
 import MainDashboard from "views/hoteladmin/default";
 import NFTMarketplace from "views/admin/marketplace";
-import Profile from "views/admin/profile";
 import DataTables from "views/hoteladmin/dataTables";
 import RTL from "views/admin/rtl";
 
