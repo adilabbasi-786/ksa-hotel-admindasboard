@@ -7,7 +7,9 @@ import {
   MdHome,
   MdLock,
   MdOutlineShoppingCart,
+  MdAttachMoney,
   MdOutlineHotel,
+  MdAppRegistration,
   MdLogout,
 } from "react-icons/md";
 
@@ -17,7 +19,8 @@ import Hotel from "views/admin/hotel";
 import NFTMarketplace from "views/admin/marketplace";
 import Expanses from "views/admin/expanses";
 import DataTables from "views/admin/dataTables";
-import RTL from "views/admin/rtl";
+import Salaries from "views/admin/salaries";
+import Profits from "views/admin/profits";
 
 // Auth Imports
 import SignInCentered from "views/auth/signout";
@@ -52,7 +55,9 @@ const routes = [
     name: "Expanses",
     layout: "/admin",
     path: "/expanse",
-    icon: <Icon as={MdPerson} width="20px" height="20px" color="inherit" />,
+    icon: (
+      <Icon as={MdAppRegistration} width="20px" height="20px" color="inherit" />
+    ),
     component: Expanses,
   },
   {
@@ -65,10 +70,21 @@ const routes = [
 
   {
     name: "Salaries",
-    layout: "/rtl",
-    path: "/rtl-default",
-    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
-    component: RTL,
+    layout: "/admin",
+    path: "/salaries",
+    icon: (
+      <Icon as={MdAttachMoney} width="20px" height="20px" color="inherit" />
+    ),
+    component: Salaries,
+  },
+  {
+    name: "Profits",
+    layout: "/admin",
+    path: "/profit",
+    icon: (
+      <Icon as={MdAttachMoney} width="20px" height="20px" color="inherit" />
+    ),
+    component: Profits,
   },
 ];
 
