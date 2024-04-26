@@ -13,6 +13,7 @@ import {
   Text,
   useColorModeValue,
   Flex,
+  VStack,
 } from "@chakra-ui/react";
 import Card from "components/card/Card.js";
 import Information from "views/admin/expanses/components/Information";
@@ -45,7 +46,6 @@ const ProfitTable = (props) => {
   };
 
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
-  const textColorSecondary = "gray.400";
   const cardShadow = useColorModeValue(
     "0px 18px 40px rgba(112, 144, 176, 0.12)",
     "unset"
@@ -53,22 +53,27 @@ const ProfitTable = (props) => {
 
   return (
     <>
-      <Card mb={{ base: "50px", "2xl": "20px" }}>
-        <Text
-          color={textColorPrimary}
-          fontWeight="bold"
-          fontSize="2xl"
+      <Card mb={{ base: "20px", lg: "50px" }}>
+        <VStack spacing={4}>
+          <Text
+            color={textColorPrimary}
+            fontWeight="bold"
+            fontSize={{ base: "xl", lg: "2xl" }}
+            mt="10px"
+            mb="4px"
+          >
+            Partner Profit Ratios
+          </Text>
+          <SimpleGrid columns={{ base: 1, md: 3 }} gap="20px" w="100%">
+            <Information boxShadow={cardShadow} title="Adil" value="50%" />
+            <Information boxShadow={cardShadow} title="Nouman" value="20%" />
+            <Information boxShadow={cardShadow} title="faheem" value="30%" />
+          </SimpleGrid>
+        </VStack>
+        <Flex
+          justifyContent={{ base: "center", md: "space-between" }}
           mt="10px"
-          mb="4px"
         >
-          Partner Profit Ratios
-        </Text>
-        <SimpleGrid columns="3" gap="20px">
-          <Information boxShadow={cardShadow} title="Adil" value="50%" />
-          <Information boxShadow={cardShadow} title="Nouman" value="20%" />
-          <Information boxShadow={cardShadow} title="faheem" value="30%" />
-        </SimpleGrid>
-        <Flex justifyContent="space-between" mt="10px">
           <Button
             colorScheme="blue"
             width="fit-content"
@@ -81,33 +86,39 @@ const ProfitTable = (props) => {
           </Button>
         </Flex>
       </Card>
-      <Card mb={{ base: "0px", "2xl": "20px" }}>
-        <div style={{ display: "flex" }}>
-          <Text mr="10px">select month</Text>
-          <input type="month" id="profitmonth" name="profitmonth" />
-        </div>
-        <Text
-          color={textColorPrimary}
-          fontWeight="bold"
-          fontSize="2xl"
-          mt="10px"
-          mb="4px"
-        >
-          Total Profit: 5041542
-        </Text>
-        <SimpleGrid columns="3" gap="20px">
-          <Information
-            boxShadow={cardShadow}
-            title="Partner 1"
-            value="502000"
-          />
-          <Information boxShadow={cardShadow} title="Partner-2" value="20103" />
-          <Information
-            boxShadow={cardShadow}
-            title="Partner-3"
-            value="305422"
-          />
-        </SimpleGrid>
+      <Card mb={{ base: "0px", lg: "20px" }}>
+        <Flex alignItems="center" mb="10px">
+          <Text mr={{ base: "5px", lg: "10px" }}>Select month</Text>
+          <Input type="month" id="profitmonth" name="profitmonth" />
+        </Flex>
+        <VStack spacing={4}>
+          <Text
+            color={textColorPrimary}
+            fontWeight="bold"
+            fontSize={{ base: "xl", lg: "2xl" }}
+            mt="10px"
+            mb="4px"
+          >
+            Total Profit: 5041542
+          </Text>
+          <SimpleGrid columns={{ base: 1, md: 3 }} gap="20px" w="100%">
+            <Information
+              boxShadow={cardShadow}
+              title="Partner 1"
+              value="502000"
+            />
+            <Information
+              boxShadow={cardShadow}
+              title="Partner-2"
+              value="20103"
+            />
+            <Information
+              boxShadow={cardShadow}
+              title="Partner-3"
+              value="305422"
+            />
+          </SimpleGrid>
+        </VStack>
       </Card>
       {/* Modal for adding a new partner */}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>

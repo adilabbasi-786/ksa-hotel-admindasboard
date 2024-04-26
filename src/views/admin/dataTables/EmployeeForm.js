@@ -16,6 +16,7 @@ import {
   ModalFooter,
   Text,
   useColorModeValue,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { MdUpload } from "react-icons/md";
 
@@ -23,30 +24,34 @@ import Dropzone from "views/admin/expanses/components/Dropzone";
 
 const EmployeeForm = ({ isOpen, onClose }) => {
   const brandColor = useColorModeValue("brand.500", "white");
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
     <Box p={10} bg="white">
       <FormControl width="300px" height="280px" mt={4} mb={-10}>
         <FormLabel>Employee picture</FormLabel>
         <Dropzone
-          w={{ base: "100%", "2xl": "268px" }}
+          w={{ base: "70%", "2xl": "268px" }}
           me="36px"
-          maxH={{ base: "100%", lg: "50%", "2xl": "100%" }}
-          minH={{ base: "100%", lg: "50%", "2xl": "100%" }}
+          mt="20px"
+          mb="20px"
+          maxH={{ base: "70%", lg: "30%", "2xl": "50%" }}
+          minH={{ base: "70%", lg: "30%", "2xl": "50%" }}
           content={
             <Box>
-              <Icon as={MdUpload} w="80px" h="80px" color={brandColor} />
+              <Icon as={MdUpload} w="80px" h="40px" color={brandColor} />
               <Text
-                fontSize="xl"
+                // fontSize="xl"
                 fontWeight="700"
                 color={brandColor}
                 textAlign="center"
+                fontSize="15px"
               >
                 Upload Files
               </Text>
               <Text
-                fontSize="sm"
-                fontWeight="500"
+                fontSize="10px"
+                fontWeight="100"
                 color="secondaryGray.500"
                 textAlign="center"
               >
@@ -56,48 +61,53 @@ const EmployeeForm = ({ isOpen, onClose }) => {
           }
         />
       </FormControl>
-      <Flex direction="row">
-        <FormControl flex="1" mr={4}>
+      <Flex direction={isMobile ? "column" : "row"}>
+        <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
           <FormLabel>Employee name</FormLabel>
           <Input placeholder="First name" />
         </FormControl>
-        <FormControl flex="1">
-          <FormLabel>passport Number</FormLabel>
-          <Input placeholder="Passport Number" />
-        </FormControl>
+        {!isMobile && (
+          <FormControl flex="1">
+            <FormLabel>passport Number</FormLabel>
+            <Input placeholder="Passport Number" />
+          </FormControl>
+        )}
       </Flex>
-      <Flex direction="row">
-        <FormControl mr={4}>
+      <Flex direction={isMobile ? "column" : "row"}>
+        <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
           <FormLabel>Passport Expiry</FormLabel>
           <Input placeholder="First name" />
         </FormControl>
-
-        <FormControl>
-          <FormLabel>Passport picture</FormLabel>
-          <Input placeholder="First name" />
-        </FormControl>
+        {!isMobile && (
+          <FormControl>
+            <FormLabel>Passport picture</FormLabel>
+            <Input placeholder="First name" />
+          </FormControl>
+        )}
       </Flex>
-      <Flex direction="row">
-        <FormControl mr={4}>
+      <Flex direction={isMobile ? "column" : "row"}>
+        <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
           <FormLabel>iqama number</FormLabel>
           <Input placeholder="First name" />
         </FormControl>
-
-        <FormControl>
-          <FormLabel>iqama Expiry</FormLabel>
-          <Input placeholder="First name" />
-        </FormControl>
+        {!isMobile && (
+          <FormControl>
+            <FormLabel>iqama Expiry</FormLabel>
+            <Input placeholder="First name" />
+          </FormControl>
+        )}
       </Flex>
-      <Flex direction="row">
-        <FormControl mr={4}>
+      <Flex direction={isMobile ? "column" : "row"}>
+        <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
           <FormLabel>iqama picture</FormLabel>
           <Input placeholder="First name" />
         </FormControl>
-
-        <FormControl>
-          <FormLabel>iqama Expiry</FormLabel>
-          <Input placeholder="First name" />
-        </FormControl>
+        {!isMobile && (
+          <FormControl>
+            <FormLabel>iqama Expiry</FormLabel>
+            <Input placeholder="First name" />
+          </FormControl>
+        )}
       </Flex>
 
       <Button colorScheme="blue" onClick={onClose} mt={4}>

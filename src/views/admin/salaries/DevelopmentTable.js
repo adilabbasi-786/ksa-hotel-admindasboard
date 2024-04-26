@@ -1,6 +1,6 @@
-/* eslint-disable */
 import {
   Flex,
+  Input,
   Progress,
   Table,
   Tbody,
@@ -59,14 +59,25 @@ export default function DevelopmentTable(props) {
       px="0px"
       overflowX={{ sm: "scroll", lg: "hidden" }}
     >
-      <Flex px="25px" justify="space-between" mb="20px" align="center">
+      <Flex
+        px={{ base: "15px", lg: "25px" }}
+        justify="space-between"
+        mb={{ base: "10px", lg: "20px" }}
+        align="center"
+        direction={{ base: "column", lg: "row" }}
+      >
+        <Flex alignItems="center" mb={{ base: "10px", lg: "0px" }}>
+          <Text mr={{ base: "3px", lg: "5px" }}>Select month</Text>
+          <Input type="month" id="profitmonth" name="profitmonth" />
+        </Flex>
         <Text
           color={textColor}
-          fontSize="22px"
+          fontSize={{ base: "18px", lg: "22px" }}
           fontWeight="700"
           lineHeight="100%"
+          mb={{ base: "10px", lg: "0px" }}
         >
-          kitchen Expanses
+          Salaries
         </Text>
         <Menu />
       </Flex>

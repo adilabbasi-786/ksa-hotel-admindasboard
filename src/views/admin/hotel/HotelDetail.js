@@ -28,7 +28,7 @@ const HotelDetail = () => {
         a hand. We get our heart broken by people we love, even that we give
         them all...
       </Text>
-      <SimpleGrid columns="2" gap="20px">
+      <SimpleGrid columns={{ base: 1, md: 2 }} gap="20px">
         <Information boxShadow={cardShadow} title="Hotel Name" value="Riyadh" />
         <Information boxShadow={cardShadow} title="Manager" value="nouman" />
         <Information

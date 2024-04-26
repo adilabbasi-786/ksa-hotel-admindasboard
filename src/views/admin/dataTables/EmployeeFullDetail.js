@@ -1,6 +1,5 @@
 import { SimpleGrid, Text, useColorModeValue } from "@chakra-ui/react";
 import Card from "components/card/Card.js";
-
 import React from "react";
 import Information from "../expanses/components/Information";
 
@@ -23,7 +22,7 @@ const EmployeeFullDetail = () => {
         Muhammad Adil
       </Text>
 
-      <SimpleGrid columns="2" gap="20px">
+      <SimpleGrid columns={{ base: 1, md: 2 }} gap="20px">
         <Information boxShadow={cardShadow} title=" Name" value="Riyadh" />
         <Information
           boxShadow={cardShadow}
