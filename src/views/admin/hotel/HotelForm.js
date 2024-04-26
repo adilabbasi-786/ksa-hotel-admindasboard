@@ -1,6 +1,7 @@
 import React from "react";
 import {
   Box,
+  Button,
   FormControl,
   FormLabel,
   Input,
@@ -19,6 +20,30 @@ const HotelForm = () => {
         <FormLabel>Location</FormLabel>
         <Input placeholder="Last name" />
       </FormControl>
+      <FormControl mt={4}>
+        <FormLabel>Hotel Rent</FormLabel>
+        <Input placeholder="Last name" />
+      </FormControl>
+      <FormControl mt={4}>
+        <FormLabel>Manager Name</FormLabel>
+        <Input placeholder="Last name" />
+      </FormControl>
+      <FormControl mt={4}>
+        <FormLabel>Manager User Name</FormLabel>
+        <Input placeholder="Last name" />
+      </FormControl>
+      <FormControl mt={4}>
+        <FormLabel>Manager Password</FormLabel>
+        <Input placeholder="Last name" />
+      </FormControl>
+      <Button
+        colorScheme="blue"
+        width="fit-content"
+        mt="10px"
+        alignSelf="flex-end"
+      >
+        Submit
+      </Button>
     </Box>
     // <Card
     //   align="center"

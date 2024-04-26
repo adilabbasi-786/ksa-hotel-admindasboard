@@ -52,7 +52,7 @@ const routes = [
     component: DataTables,
   },
   {
-    name: "Expanses",
+    name: "Daily Register",
     layout: "/admin",
     path: "/expanse",
     icon: (

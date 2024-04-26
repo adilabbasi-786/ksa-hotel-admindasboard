@@ -2,11 +2,12 @@ import React from "react";
 
 import { Icon } from "@chakra-ui/react";
 import {
-  MdBarChart,
   MdPerson,
   MdHome,
   MdLock,
   MdOutlineShoppingCart,
+  MdOutlineHotel,
+  MdBarChart,
 } from "react-icons/md";
 
 // Admin Imports
@@ -28,10 +29,10 @@ const routes = [
   },
 
   {
-    name: "Data Tables",
+    name: "Employees",
     layout: "/hotel",
     icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" />,
-    path: "/data-tables",
+    path: "/emp-table",
     component: DataTables,
   },
 
@@ -42,13 +43,6 @@ const routes = [
     icon: <Icon as={MdPerson} width="20px" height="20px" color="inherit" />,
     component: SignInCentered,
   },
-  // {
-  //   name: "RTL Admin",
-  //   layout: "/rtl",
-  //   path: "/rtl-default",
-  //   icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
-  //   component: RTL,
-  // },
 ];
 
 export default routes;
