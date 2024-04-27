@@ -6,26 +6,16 @@ import {
   Tbody,
   Td,
   Text,
-  Textarea,
   Th,
   Thead,
   Tr,
   useColorModeValue,
-  Center,
-  Button,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card";
-import { MdEdit } from "react-icons/md";
 import { AndroidLogo, AppleLogo, WindowsLogo } from "components/icons/Icons";
 import Menu from "components/menu/MainMenu";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import {
   useGlobalFilter,
   usePagination,
@@ -34,14 +24,7 @@ import {
 } from "react-table";
 
 export default function DevelopmentTable(props) {
-  const [showTodaySaleModal, setShowTodaySaleModal] = useState(false);
-  const [showAdvanceSalaryModal, setShowAdvanceSalaryModal] = useState(false);
-
-  const handleTodaySaleModalClose = () => setShowTodaySaleModal(false);
-  const handleAdvanceSalaryModalClose = () => setShowAdvanceSalaryModal(false);
   const { columnsData, tableData } = props;
-  const textColorSecondary = "gray.400";
-  const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => tableData, [tableData]);
@@ -76,40 +59,17 @@ export default function DevelopmentTable(props) {
       px="0px"
       overflowX={{ sm: "scroll", lg: "hidden" }}
     >
-      <Flex marginLeft="10px">
-        <div style={{ width: "250px", fontSize: "15px" }}>
-          <Button
-            colorScheme="blue"
-            width="fit-content"
-            alignSelf="flex-end"
-            onClick={() => setShowTodaySaleModal(true)}
-          >
-            View Today Sale
-          </Button>
-          <Text color={textColorPrimary} fontWeight="bold" mt="10px" mb="4px">
-            <Button
-              colorScheme="blue"
-              width="fit-content"
-              alignSelf="flex-end"
-              onClick={() => setShowAdvanceSalaryModal(true)}
-            >
-              View Advance Salary
-            </Button>
-          </Text>
-        </div>
+      <Flex px="25px" justify="space-between" mb="20px" align="center">
+        <Text
+          color={textColor}
+          fontSize="22px"
+          fontWeight="700"
+          lineHeight="100%"
+        >
+          kitchen Expanses
+        </Text>
+        <Menu />
       </Flex>
-      <Center>
-        <Flex px="25px" justify="center" mb="20px" align="center">
-          <Text
-            color={textColor}
-            fontSize="22px"
-            fontWeight="700"
-            lineHeight="100%"
-          >
-            Daily Expenses
-          </Text>
-        </Flex>
-      </Center>
       <Table {...getTableProps()} variant="simple" color="gray.500" mb="24px">
         <Thead>
           {headerGroups.map((headerGroup, index) => (
@@ -176,81 +136,16 @@ export default function DevelopmentTable(props) {
                       fontSize={{ sm: "14px" }}
                       minW={{ sm: "150px", md: "200px", lg: "auto" }}
                       borderColor="transparent"
-                      pr="0"
                     >
                       {data}
                     </Td>
                   );
                 })}
-                <Td>
-                  <Button>
-                    <MdEdit color={iconColor} />
-                  </Button>
-                </Td>
               </Tr>
             );
           })}
         </Tbody>
       </Table>
-      <Flex width="100%" justify="start">
-        <hr
-          style={{
-            width: "100%",
-            margin: "15px 0",
-            border: "1px solid black",
-          }}
-        />
-      </Flex>
-      <Text fontWeight="bold">Total Expenses: 504500</Text>
-      <Text fontWeight="bold">Total Sale: 500SAR</Text>
-      <Text fontWeight="bold">Total Advance: 100SAR</Text>
-      <Text fontWeight="bold">Total Deposit: 1000SAR</Text>
-      {/* Today Sale Modal */}
-      <Modal
-        isOpen={showTodaySaleModal}
-        onClose={handleTodaySaleModalClose}
-        size="sm"
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Today Sale</ModalHeader>
-          <ModalBody>
-            <Text color={textColorPrimary} fontWeight="bold">
-              5000SAR
-            </Text>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" onClick={handleTodaySaleModalClose}>
-              Close
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-      {/* Advance Salary Modal */}
-      <Modal
-        isOpen={showAdvanceSalaryModal}
-        onClose={handleAdvanceSalaryModalClose}
-        size="sm"
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Advance Salary</ModalHeader>
-          <ModalBody>
-            <Text color={textColorPrimary} fontWeight="bold">
-              Employee Name: Adil
-            </Text>
-            <Text color={textColorPrimary} fontWeight="bold">
-              Advance: 500SAR
-            </Text>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" onClick={handleAdvanceSalaryModalClose}>
-              Close
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </Card>
   );
 }

@@ -87,8 +87,8 @@ const ProfitTable = (props) => {
         </Flex>
       </Card>
       <Card mb={{ base: "0px", lg: "20px" }}>
-        <Flex alignItems="center" mb="10px">
-          <Text mr={{ base: "5px", lg: "10px" }}>Select month</Text>
+        <Flex alignItems="center" mb={{ base: "10px", lg: "0px" }}>
+          <Text mr={{ base: "3px", lg: "5px" }}>Select month</Text>
           <Input type="month" id="profitmonth" name="profitmonth" />
         </Flex>
         <VStack spacing={4}>

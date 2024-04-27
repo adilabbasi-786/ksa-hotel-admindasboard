@@ -21,6 +21,8 @@ import Expanses from "views/admin/expanses";
 import DataTables from "views/admin/dataTables";
 import Salaries from "views/admin/salaries";
 import Profits from "views/admin/profits";
+import Kafalat from "views/admin/hotelrentkafalat";
+import Charity from "views/admin/charity";
 
 // Auth Imports
 import SignInCentered from "views/auth/signout";
@@ -60,13 +62,6 @@ const routes = [
     ),
     component: Expanses,
   },
-  {
-    name: "signout",
-    layout: "/admin",
-    path: "/singout",
-    icon: <Icon as={MdLogout} width="20px" height="20px" color="inherit" />,
-    component: SignInCentered,
-  },
 
   {
     name: "Salaries",
@@ -85,6 +80,31 @@ const routes = [
       <Icon as={MdAttachMoney} width="20px" height="20px" color="inherit" />
     ),
     component: Profits,
+  },
+  {
+    name: "Hotel Rents/Kafalat",
+    layout: "/admin",
+    path: "/kafalat",
+    icon: (
+      <Icon as={MdAttachMoney} width="20px" height="20px" color="inherit" />
+    ),
+    component: Kafalat,
+  },
+  {
+    name: "Charity",
+    layout: "/admin",
+    path: "/charity",
+    icon: (
+      <Icon as={MdAttachMoney} width="20px" height="20px" color="inherit" />
+    ),
+    component: Charity,
+  },
+  {
+    name: "signout",
+    layout: "/admin",
+    path: "/singout",
+    icon: <Icon as={MdLogout} width="20px" height="20px" color="inherit" />,
+    component: SignInCentered,
   },
 ];
 

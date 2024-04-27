@@ -1,23 +1,12 @@
 import React, { useState } from "react";
-import { Button, Flex, Text, useColorModeValue } from "@chakra-ui/react";
+import { Button, Flex, Text } from "@chakra-ui/react";
 import { Card, Input } from "@material-ui/core";
 import DevelopmentTable from "../expanses/components/DevelopmentTable";
 import DatePickerComponent from "./DatePickerComponent";
 import AddNewItem from "./AddNewItem";
-import Banner from "./components/Banner";
-const getCurrentDate = () => {
-  const currentDate = new Date();
-  const year = currentDate.getFullYear();
-  const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-  const day = String(currentDate.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
+
 const KitchenExpanses = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [defaultDate, setDefaultDate] = useState(getCurrentDate());
-  const textColorSecondary = "gray.400";
-  const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
-
   const handleAddItem = (newItem) => {
     console.log("New item added:", newItem);
     // Implement logic to add new item to table data
@@ -75,41 +64,26 @@ const KitchenExpanses = () => {
       itemname: "taxi",
       quantity: "50kg",
       price: "300",
-      category: "rent",
     },
     {
       itemname: "Milk",
       quantity: "50kg",
       price: "300",
-      category: "oil",
     },
     {
       itemname: "Milk",
       quantity: "50kg",
       price: "300",
-      category: "dairy",
     },
   ];
 
   return (
     <>
-      <Flex
-        alignItems="center"
-        mb="10px"
-        width={{ base: "100%", lg: "30%" }} // Adjust width based on screen size
-      >
-        <Text mr={{ base: "3px", lg: "5px" }}>Select month</Text>
-        <Input
-          type="date" // Change type to "date" for date picker
-          id="expanseydate"
-          name="expansedate"
-          value={defaultDate}
-          onChange={(e) => setDefaultDate(e.target.value)}
-          fontSize="md" // Adjust the font size for mobile
-          width="100%" // Adjust the width for mobile
-        />
+      <Flex alignItems="center" mb="10px">
+        <Text mr={{ base: "5px", lg: "10px" }}>Select month</Text>
+        <Input type="date" id="register" name="profitmonth" />
       </Flex>
-      <Card>
+      {/* <Card>
         <Flex direction="column" justifyContent="space-between">
           <DevelopmentTable
             columnsData={columnsDataDevelopment}
@@ -125,7 +99,7 @@ const KitchenExpanses = () => {
             Add new Item
           </Button>
         </Flex>
-      </Card>
+      </Card> */}
       <AddNewItem
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

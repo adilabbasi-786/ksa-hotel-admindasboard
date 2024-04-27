@@ -14,6 +14,7 @@ import {
 import MainDashboard from "views/hoteladmin/default";
 import NFTMarketplace from "views/admin/marketplace";
 import DataTables from "views/hoteladmin/dataTables";
+import Expanse from "views/hoteladmin/expanses";
 import RTL from "views/admin/rtl";
 
 // Auth Imports
@@ -34,6 +35,13 @@ const routes = [
     icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" />,
     path: "/emp-table",
     component: DataTables,
+  },
+  {
+    name: "Daily Register",
+    layout: "/hotel",
+    icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" />,
+    path: "/register",
+    component: Expanse,
   },
 
   {

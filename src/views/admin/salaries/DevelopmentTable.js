@@ -1,7 +1,6 @@
 import {
   Flex,
   Input,
-  Progress,
   Table,
   Tbody,
   Td,
@@ -13,7 +12,6 @@ import {
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card";
-import { AndroidLogo, AppleLogo, WindowsLogo } from "components/icons/Icons";
 import Menu from "components/menu/MainMenu";
 import React, { useMemo } from "react";
 import {
@@ -50,14 +48,13 @@ export default function DevelopmentTable(props) {
   initialState.pageSize = 11;
 
   const textColor = useColorModeValue("secondaryGray.900", "white");
-  const iconColor = useColorModeValue("secondaryGray.500", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
   return (
     <Card
       direction="column"
       w="100%"
       px="0px"
-      overflowX={{ sm: "scroll", lg: "hidden" }}
+      overflowX="auto" // Adjust overflow property for horizontal scrolling
     >
       <Flex
         px={{ base: "15px", lg: "25px" }}
@@ -67,7 +64,7 @@ export default function DevelopmentTable(props) {
         direction={{ base: "column", lg: "row" }}
       >
         <Flex alignItems="center" mb={{ base: "10px", lg: "0px" }}>
-          <Text mr={{ base: "3px", lg: "5px" }}>Select month</Text>
+          <Text mr={{ base: "3px", lg: "2px" }}>Select month</Text>
           <Input type="month" id="profitmonth" name="profitmonth" />
         </Flex>
         <Text
@@ -92,14 +89,9 @@ export default function DevelopmentTable(props) {
                   key={index}
                   borderColor={borderColor}
                 >
-                  <Flex
-                    justify="space-between"
-                    align="center"
-                    fontSize={{ sm: "10px", lg: "12px" }}
-                    color="gray.400"
-                  >
+                  <Text fontSize={{ sm: "10px", lg: "12px" }} color="gray.400">
                     {column.render("Header")}
-                  </Flex>
+                  </Text>
                 </Th>
               ))}
             </Tr>
@@ -151,8 +143,8 @@ export default function DevelopmentTable(props) {
                     <Td
                       {...cell.getCellProps()}
                       key={index}
-                      fontSize={{ sm: "14px" }}
-                      minW={{ sm: "150px", md: "200px", lg: "auto" }}
+                      fontSize={{ sm: "12px" }} // Adjust font size for mobile
+                      textAlign={{ base: "center", lg: "left" }} // Align center for mobile
                       borderColor="transparent"
                     >
                       {data}

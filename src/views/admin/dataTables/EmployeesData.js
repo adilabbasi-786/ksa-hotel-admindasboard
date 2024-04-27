@@ -11,7 +11,7 @@ import {
   ModalBody,
   ModalFooter,
 } from "@chakra-ui/react";
-import Banner from "views/admin/expanses/components/Banner";
+import Banner from "./components/Banner";
 import banner from "assets/img/auth/banner.png";
 import EmployeeForm from "./EmployeeForm";
 
@@ -42,7 +42,8 @@ const EmployeesData = () => {
         mb="50px"
         w="180px"
         minW="140px"
-        mt={{ base: "20px", "2xl": "auto" }}
+        mt={{ base: "-10px", "1xl": "auto" }}
+        marginTop="-85px"
         variant="brand"
         fontWeight="500"
         onClick={handleOpenAddEmployeeModal}
