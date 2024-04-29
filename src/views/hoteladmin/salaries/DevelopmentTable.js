@@ -1,7 +1,8 @@
-/* eslint-disable */
+import React, { useMemo } from "react";
 import {
+  Button,
   Flex,
-  Progress,
+  Input,
   Table,
   Tbody,
   Td,
@@ -13,21 +14,33 @@ import {
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card";
-import { AndroidLogo, AppleLogo, WindowsLogo } from "components/icons/Icons";
 import Menu from "components/menu/MainMenu";
-import React, { useMemo } from "react";
+import AddSalary from "./AddSalary"; // Import AddSalary component
+import { MdEdit } from "react-icons/md";
 import {
   useGlobalFilter,
   usePagination,
   useSortBy,
   useTable,
 } from "react-table";
+import { useState } from "react";
 
-export default function ExpanseDevelopmentTable(props) {
-  const { columnsData, tableData } = props;
+export default function DevelopmentTable(props) {
+  const { columnsData, tableData, setIsAddSalaryModalOpen } = props; // Rename setIsModalOpen to setIsAddSalaryModalOpen
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => tableData, [tableData]);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+
+  const handleUnpaidClick = (rowData) => {
+    // Check if the salary status is unpaid
+    if (rowData.status === "unpaid") {
+      setSelectedEmployee(rowData); // Set the selected employee
+      setIsAddSalaryModalOpen(true); // Open the AddSalary modal
+    }
+  };
+
+  const iconColor = useColorModeValue("secondaryGray.500", "white");
 
   const tableInstance = useTable(
     {
@@ -50,29 +63,39 @@ export default function ExpanseDevelopmentTable(props) {
   initialState.pageSize = 11;
 
   const textColor = useColorModeValue("secondaryGray.900", "white");
-  const iconColor = useColorModeValue("secondaryGray.500", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
+
   return (
     <Card
       direction="column"
       w="100%"
       px="0px"
-      overflowX={{ sm: "scroll", lg: "hidden" }}
+      overflowX="auto" // Adjust overflow property for horizontal scrolling
     >
-      <Flex px="25px" justify="space-between" mb="20px" align="center">
+      <Flex
+        px={{ base: "15px", lg: "25px" }}
+        justify="space-between"
+        mb={{ base: "10px", lg: "20px" }}
+        align="center"
+        direction={{ base: "column", lg: "row" }}
+      >
+        <Flex alignItems="center" mb={{ base: "10px", lg: "0px" }}>
+          <Text mr={{ base: "3px", lg: "2px" }}>Select month</Text>
+          <Input type="month" id="profitmonth" name="profitmonth" />
+        </Flex>
         <Text
           color={textColor}
-          fontSize="22px"
+          fontSize={{ base: "18px", lg: "22px" }}
           fontWeight="700"
           lineHeight="100%"
+          mb={{ base: "10px", lg: "0px" }}
         >
-          kitchen Expanses
+          Salaries
         </Text>
         <Menu />
       </Flex>
       <Table {...getTableProps()} variant="simple" color="gray.500" mb="24px">
         <Thead>
-          {console.log("sss", headerGroups)}
           {headerGroups.map((headerGroup, index) => (
             <Tr {...headerGroup.getHeaderGroupProps()} key={index}>
               {headerGroup.headers.map((column, index) => (
@@ -82,14 +105,9 @@ export default function ExpanseDevelopmentTable(props) {
                   key={index}
                   borderColor={borderColor}
                 >
-                  <Flex
-                    justify="space-between"
-                    align="center"
-                    fontSize={{ sm: "10px", lg: "12px" }}
-                    color="gray.400"
-                  >
+                  <Text fontSize={{ sm: "10px", lg: "12px" }} color="gray.400">
                     {column.render("Header")}
-                  </Flex>
+                  </Text>
                 </Th>
               ))}
             </Tr>
@@ -102,53 +120,72 @@ export default function ExpanseDevelopmentTable(props) {
               <Tr {...row.getRowProps()} key={index}>
                 {row.cells.map((cell, index) => {
                   let data = "";
-                  if (cell.column.Header === "Items Name") {
+                  if (cell.column.Header === " Employee Name") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === "Category") {
+                  if (cell.column.Header === " Total Salary") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === "Quantity") {
+                  if (cell.column.Header === " Advance") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === "Price") {
+                  if (cell.column.Header === " Deducation") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === "Total Price") {
+                  if (cell.column.Header === " Total Paid salary") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
+                  if (cell.column.Header === " Status") {
+                    data = (
+                      <Text
+                        color={cell.value === "paid" ? "green.500" : "blue.500"} // Change color for unpaid status
+                        fontSize="sm"
+                        fontWeight="700"
+                        cursor={cell.value === "unpaid" ? "pointer" : "auto"} // Change cursor for unpaid status
+                        onClick={() => handleUnpaidClick(row.original)} // Handle click for unpaid status
+                      >
+                        {cell.value}
+                      </Text>
+                    );
+                  }
+
                   return (
                     <Td
                       {...cell.getCellProps()}
                       key={index}
-                      fontSize={{ sm: "14px" }}
-                      minW={{ sm: "150px", md: "200px", lg: "auto" }}
+                      fontSize={{ sm: "12px" }} // Adjust font size for mobile
+                      textAlign={{ base: "center", lg: "left" }} // Align center for mobile
                       borderColor="transparent"
                     >
                       {data}
                     </Td>
                   );
                 })}
+                <Td>
+                  <Button>
+                    <MdEdit color={iconColor} />
+                  </Button>
+                </Td>
               </Tr>
             );
           })}

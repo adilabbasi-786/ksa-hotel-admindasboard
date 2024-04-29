@@ -23,7 +23,7 @@ import {
   useTable,
 } from "react-table";
 
-export default function ExpanseDevelopmentTable(props) {
+export default function SalaryDevelopmentTable(props) {
   const { columnsData, tableData } = props;
 
   const columns = useMemo(() => columnsData, [columnsData]);

@@ -15,12 +15,15 @@ import MainDashboard from "views/hoteladmin/default";
 import NFTMarketplace from "views/admin/marketplace";
 import DataTables from "views/hoteladmin/dataTables";
 import Expanse from "views/hoteladmin/expanses";
+import Salary from "views/hoteladmin/salaries";
+import Charity from "views/hoteladmin/charity";
+import Rents from "views/hoteladmin/hotelrentkafalat";
 import RTL from "views/admin/rtl";
 
 // Auth Imports
 import SignInCentered from "views/auth/signout";
 
-const routes = [
+const hotelroutes = [
   {
     name: "Main Dashboard",
     layout: "/hotel",
@@ -43,6 +46,27 @@ const routes = [
     path: "/register",
     component: Expanse,
   },
+  {
+    name: "Salaries",
+    layout: "/hotel",
+    icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" />,
+    path: "/salary",
+    component: Salary,
+  },
+  {
+    name: "Charity",
+    layout: "/hotel",
+    icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" />,
+    path: "/charity",
+    component: Charity,
+  },
+  {
+    name: "Hotel Rents/Kafalat",
+    layout: "/hotel",
+    icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" />,
+    path: "/rents",
+    component: Rents,
+  },
 
   {
     name: "signout",
@@ -53,4 +77,4 @@ const routes = [
   },
 ];
 
-export default routes;
+export default hotelroutes;
