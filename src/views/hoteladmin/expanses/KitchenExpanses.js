@@ -36,6 +36,8 @@ const KitchenExpanses = () => {
   const [defaultDate, setDefaultDate] = useState(getCurrentDate());
   const [dailySaleAmount, setDailySaleAmount] = useState(0);
   const [dailyAdvanceAmount, setDailyAdvanceAmount] = useState(0);
+  const [dailyCashSaleAmount, setDailyCashSaleAmount] = useState(0);
+  const [dailyCardSaleAmount, setDailyCardSaleAmount] = useState(0);
 
   const isMobile = useBreakpointValue({ base: true, md: false });
   const textColor = useColorModeValue("secondaryGray.900", "white");
@@ -47,16 +49,22 @@ const KitchenExpanses = () => {
     console.log("New item added:", newItem);
     // Implement logic to add new item to table data
   };
-  const handleDailySaleAdd = () => {
-    // Logic to update total sale amount
-    // For example, add the daily sale amount to the existing total advance amount
-    setDailyAdvanceAmount((prevAmount) => prevAmount + dailySaleAmount);
-  };
+  // const handleDailySaleAdd = () => {
+  //   // Logic to update total sale amount
+  //   // For example, add the daily sale amount to the existing total advance amount
+  //   setDailyAdvanceAmount((prevAmount) => prevAmount + dailySaleAmount);
+  // };
 
   const handleAdvanceSalaryAdd = () => {
     // Logic to update total advance amount
     // For example, add the daily advance amount to the existing total advance amount
     setDailyAdvanceAmount((prevAmount) => prevAmount + dailyAdvanceAmount);
+  };
+  const handleDailySaleAdd = () => {
+    // Calculate total sale by summing up cash and credit sales
+    const totalSale = dailyCashSaleAmount + dailyCardSaleAmount;
+    // Perform any additional logic here
+    console.log("Total Sale:", totalSale);
   };
   // Define columns data
   const columnsDataDevelopment = [
@@ -129,7 +137,44 @@ const KitchenExpanses = () => {
       price: "300",
     },
   ];
-
+  const ColumnexpanseData = [
+    {
+      Header: "Items Name",
+      accessor: "itemname",
+    },
+    {
+      Header: "Category",
+      accessor: "category",
+    },
+    {
+      Header: "Price",
+      accessor: "price",
+    },
+    {
+      Header: "Quantity",
+      accessor: "quantity",
+    },
+    {
+      Header: "Total Price",
+      accessor: "totalprice",
+    },
+  ];
+  const expanseDataDevelopment = [
+    {
+      itemname: "Rent",
+      category: "other",
+      quantity: "1",
+      price: "3000",
+      totalprice: "3000",
+    },
+    {
+      itemname: "Rent",
+      category: "other",
+      quantity: "1",
+      price: "3000",
+      totalprice: "3000",
+    },
+  ];
   return (
     <>
       <Flex alignItems="center" mb="10px">
@@ -172,7 +217,14 @@ const KitchenExpanses = () => {
             onClick={() => setActive("Daily Expenses")}
             colorScheme={active === "Daily Expenses" ? "blue" : "gray"}
           >
-            Daily Expenses
+            Daily Kitchen Expanses
+          </Button>
+          <Button
+            mr="10px"
+            onClick={() => setActive("other Expenses")}
+            colorScheme={active === "other Expenses" ? "blue" : "gray"}
+          >
+            other Expanses
           </Button>
           <Button
             mr="10px"
@@ -234,15 +286,64 @@ const KitchenExpanses = () => {
             >
               Daily Sale
             </Text>
-
             <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
-              <FormLabel>Enter Daily sale</FormLabel>
-
+              <FormLabel>Daily Cash sale</FormLabel>
               <Input
-                placeholder="Enter sale"
-                onChange={(e) => setDailySaleAmount(e.target.value)}
+                type="number" // Change type to "number" for numeric input
+                placeholder="Enter cash sale"
+                onChange={(e) => setDailyCashSaleAmount(Number(e.target.value))}
               />
             </FormControl>
+            <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
+              <FormLabel>Daily Card Sale</FormLabel>
+              <Input
+                type="number" // Change type to "number" for numeric input
+                placeholder="Enter card sale"
+                onChange={(e) => setDailyCardSaleAmount(Number(e.target.value))}
+              />
+            </FormControl>
+            <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
+              <FormLabel>Total Sale</FormLabel>
+              <Input
+                value={dailyCashSaleAmount + dailyCardSaleAmount} // Display total sale
+                readOnly // Make input read-only
+              />
+            </FormControl>
+            <Button
+              colorScheme="blue"
+              width="fit-content"
+              marginTop="10px"
+              alignSelf="flex-end"
+              onClick={handleDailySaleAdd}
+            >
+              Add
+            </Button>
+          </Flex>
+        )}
+        {active === "other Expenses" && (
+          <Flex direction="column">
+            <Text
+              color={textColor}
+              fontSize="22px"
+              fontWeight="700"
+              lineHeight="100%"
+            >
+              Other Expenses
+            </Text>
+            <ExpanseDevelopmentTable
+              columnsData={ColumnexpanseData}
+              tableData={expanseDataDevelopment}
+              editableColumns={["price", "quantity"]}
+            />
+            {/* <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
+              <FormLabel>
+                Enter Daily sale:{" "}
+                <Input
+                  placeholder="Enter sale"
+                  onChange={(e) => setDailySaleAmount(e.target.value)}
+                />
+              </FormLabel>
+            </FormControl> */}
             <Button
               colorScheme="blue"
               width="fit-content"
@@ -272,6 +373,7 @@ const KitchenExpanses = () => {
               <FormLabel>Advance payment</FormLabel>
               <Input
                 placeholder="Advance payment"
+                type="number"
                 onChange={(e) => setDailyAdvanceAmount(e.target.value)}
               />
             </FormControl>

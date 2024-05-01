@@ -50,7 +50,7 @@ export function SidebarLinks(props) {
         );
       } else if (
         route.layout === "/admin" ||
-        route.layout === "/auth" ||
+        route.layout === "/hotel" ||
         route.layout === "/rtl"
       ) {
         return (

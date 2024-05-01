@@ -26,6 +26,7 @@ import { FaEthereum } from "react-icons/fa";
 import routes from "routes.js";
 import hotelroutes from "../../hotelRoutes";
 export default function HeaderLinks(props) {
+  console.log("gggg", window.location.href);
   const { secondary } = props;
   // Chakra Color Mode
   const navbarIcon = useColorModeValue("gray.400", "white");
@@ -51,7 +52,9 @@ export default function HeaderLinks(props) {
       p="10px"
       boxShadow={shadow}
     >
-      <SidebarResponsive routes={routes} />
+      <SidebarResponsive
+        routes={window.location.href.includes("admin") ? routes : hotelroutes}
+      />
     </Flex>
   );
 }

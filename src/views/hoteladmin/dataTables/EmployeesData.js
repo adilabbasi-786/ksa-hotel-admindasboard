@@ -36,13 +36,14 @@ const EmployeesData = () => {
   };
 
   return (
-    <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
+    <Box pt={{ base: "50px", md: "80px", xl: "80px" }}>
       <Button
         me="100%"
         mb="50px"
         w="180px"
         minW="140px"
-        mt={{ base: "20px", "2xl": "auto" }}
+        mt={{ base: "-10px", "1xl": "auto" }}
+        marginTop="-85px"
         variant="brand"
         fontWeight="500"
         onClick={handleOpenAddEmployeeModal}

@@ -77,6 +77,20 @@ const RentKafalat = (props) => {
                 title={`Hotel Rent for Month of ${defaultMonth}`}
                 value="1000SAR"
               />
+              <Text
+                color={textColorPrimary}
+                fontWeight="bold"
+                fontSize={{ base: "xl", lg: "2xl" }}
+                mt="10px"
+                mb="4px"
+              >
+                Hotel Tax
+                <Information
+                  boxShadow={cardShadow}
+                  title={`Hotel tax for Month of ${defaultMonth}`}
+                  value="10SAR"
+                />
+              </Text>
               <Button
                 colorScheme="red"
                 width="fit-content"

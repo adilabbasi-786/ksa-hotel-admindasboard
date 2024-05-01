@@ -8,15 +8,21 @@ import { HorizonLogo } from "components/icons/Icons";
 import { HSeparator } from "components/separator/Separator";
 
 export function SidebarBrand() {
+  let url = "/hotel/dashboard";
+  let text = "HOTEL";
+
   //   Chakra color mode
   let logoColor = useColorModeValue("navy.700", "white");
   let mainText = useColorModeValue("navy.700", "white");
-
+  if (window.location.href.includes("admin")) {
+    url = "/admin/dashboard";
+    text = "ADMIN";
+  }
   return (
     <Flex align="center" direction="column">
       <Link
         color={mainText}
-        href="/admin/dashboard"
+        href={url}
         bg="inherit"
         borderRadius="inherit"
         fontWeight="bold"
@@ -31,7 +37,7 @@ export function SidebarBrand() {
           boxShadow: "none",
         }}
       >
-        ADMIN DASHBOARD
+        {text} DASHBOARD
       </Link>
       {/* <HorizonLogo h="26px" w="175px" my="32px" color={logoColor} /> */}
       <HSeparator mb="20px" />
