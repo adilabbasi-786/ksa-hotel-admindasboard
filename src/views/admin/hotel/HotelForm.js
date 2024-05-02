@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -8,58 +8,134 @@ import {
   ModalBody,
   Stack,
 } from "@chakra-ui/react";
-import { Card } from "@material-ui/core";
+
 const HotelForm = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    location: "",
+    managerName: "",
+    managerEmail: "",
+    managerPassword: "",
+    kafalat: "",
+    hotelRent: "",
+  });
+
+  // Function to handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  };
+
+  // Function to handle form submission
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch("http://localhost:1337/api/hotel-names", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          data: formData,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to submit form data");
+      }
+      setFormData({
+        name: "",
+        location: "",
+        managerName: "",
+        managerEmail: "",
+        managerPassword: "",
+        kafalat: "",
+        hotelRent: "",
+      });
+      alert("Form submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting form data:", error);
+      alert("Failed to submit form data. Please try again later.");
+    }
+  };
+
   return (
     <Box p={4} bg="white">
       <FormControl>
         <FormLabel>Hotel name</FormLabel>
-        <Input placeholder="First name" />
+        <Input
+          placeholder="Hotel name"
+          name="name"
+          value={formData.name}
+          onChange={handleInputChange}
+        />
       </FormControl>
       <FormControl mt={4}>
         <FormLabel>Location</FormLabel>
-        <Input placeholder="Last name" />
-      </FormControl>
-      <FormControl mt={4}>
-        <FormLabel>Hotel Rent</FormLabel>
-        <Input placeholder="Last name" />
+        <Input
+          placeholder="Full address"
+          name="location"
+          value={formData.location}
+          onChange={handleInputChange}
+        />
       </FormControl>
       <FormControl mt={4}>
         <FormLabel>Manager Name</FormLabel>
-        <Input placeholder="Last name" />
+        <Input
+          placeholder="Manager Name"
+          name="managerName"
+          value={formData.managerName}
+          onChange={handleInputChange}
+        />
       </FormControl>
       <FormControl mt={4}>
-        <FormLabel>Manager User Name</FormLabel>
-        <Input placeholder="Last name" />
+        <FormLabel>Manager Email</FormLabel>
+        <Input
+          type="email"
+          placeholder="Manager Email"
+          name="managerEmail"
+          value={formData.managerEmail}
+          onChange={handleInputChange}
+        />
       </FormControl>
       <FormControl mt={4}>
         <FormLabel>Manager Password</FormLabel>
-        <Input placeholder="Last name" />
+        <Input
+          placeholder="Manager Password"
+          name="managerPassword"
+          value={formData.managerPassword}
+          onChange={handleInputChange}
+        />
+      </FormControl>
+      <FormControl mt={4}>
+        <FormLabel>Kafalat</FormLabel>
+        <Input
+          placeholder="Kafalat"
+          name="kafalat"
+          value={formData.kafalat}
+          onChange={handleInputChange}
+        />
+      </FormControl>
+      <FormControl mt={4}>
+        <FormLabel>Hotel Rent</FormLabel>
+        <Input
+          placeholder="Hotel Rent"
+          name="hotelRent"
+          value={formData.hotelRent}
+          onChange={handleInputChange}
+        />
       </FormControl>
       <Button
         colorScheme="blue"
         width="fit-content"
         mt="10px"
         alignSelf="flex-end"
+        onClick={handleSubmit}
       >
         Submit
       </Button>
     </Box>
-    // <Card
-    //   align="center"
-    //   direction="column"
-    //   w="100%"
-    //   maxW="max-content"
-    //   p="20px 15px"
-    //   h="max-content"
-    // >
-    //   <Stack spacing={3}>
-    //     <Input placeholder="extra small size" size="xs" borderRadius="10px" />
-    //     <Input placeholder="small size" size="sm" borderRadius="12px" />
-    //     <Input placeholder="medium size" size="md" borderRadius="14px" />
-    //     <Input placeholder="large size" size="lg" borderRadius="16px" />
-    //   </Stack>
-    // </Card>
   );
 };
 

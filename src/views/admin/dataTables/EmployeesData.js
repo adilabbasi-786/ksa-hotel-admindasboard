@@ -17,6 +17,7 @@ import EmployeeForm from "./EmployeeForm";
 
 // Importing the JSON data directly for demonstration purposes
 import tableDataDevelopment from "views/admin/dataTables/variables/tableDataDevelopment.json";
+import Drivers from "./Drivers";
 
 const EmployeesData = () => {
   const [employeeData, setEmployeeData] = useState([]);
@@ -50,6 +51,7 @@ const EmployeesData = () => {
       >
         Create new Employee
       </Button>
+      <Drivers />
       <Grid
         templateColumns={{
           base: "1fr",

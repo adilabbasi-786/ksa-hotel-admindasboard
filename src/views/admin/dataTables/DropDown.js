@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Box, Select, Button, SimpleGrid } from "@chakra-ui/react";
+import {
+  Box,
+  Select,
+  Button,
+  SimpleGrid,
+  Text,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import { useHistory } from "react-router-dom";
 import Card from "components/card/Card";
 
@@ -27,9 +34,12 @@ const DropDown = ({ onSelectHotel }) => {
       onSelectHotel(selectedHotel);
     }
   };
-
+  const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   return (
     <Card mb={{ base: "0px", "2xl": "20px" }}>
+      <Text color={textColorPrimary} fontWeight="bold" fontSize="xl" mt="10px">
+        Hotel Employee
+      </Text>
       <Select
         placeholder="Select Hotel"
         value={selectedHotel}

@@ -1,44 +1,14 @@
-// Chakra imports
-import { Button, Flex, Text, useColorModeValue } from "@chakra-ui/react";
-// Assets
-import Project1 from "assets/img/profile/Project1.png";
-import Project2 from "assets/img/profile/Project2.png";
-import Project3 from "assets/img/profile/Project3.png";
-// Custom components
-import Card from "components/card/Card.js";
-import React from "react";
-import { useHistory } from "react-router-dom";
+import { Box } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
 import HotelCard from "./HotelCard";
+import { useHistory } from "react-router-dom";
+import { Button, Flex, Text, useColorModeValue } from "@chakra-ui/react";
+import Card from "components/card/Card.js";
 
-const allHotel = [
-  {
-    id: 1,
-    name: "hotel1",
-    img: Project1,
-  },
-  {
-    id: 2,
-    name: "hotel2",
-    img: Project2,
-  },
-  {
-    id: 3,
-    name: "hotel3",
-    img: Project3,
-  },
-  {
-    id: 4,
-    name: "hotel4",
-    img: Project3,
-  },
-  {
-    id: 5,
-    name: "hotel5",
-    img: Project1,
-  },
-];
-export default function Hotels(props) {
+const Hotels = () => {
   const history = useHistory();
+  const [hotels, setHotels] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
@@ -46,8 +16,23 @@ export default function Hotels(props) {
     "0px 18px 40px rgba(112, 144, 176, 0.12)",
     "unset"
   );
+
+  useEffect(() => {
+    const getData = async () => {
+      let req = await fetch("http://localhost:1337/api/hotel-names?populate=*");
+      let res = await req.json();
+      setHotels(res.data);
+    };
+    getData();
+    console.log("data", getData);
+  }, []);
+
+  const handleCreateHotel = () => {
+    history.push("/admin/hotel/add");
+  };
+
   return (
-    <>
+    <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <Flex w="100%">
         <Button
           me="100%"
@@ -57,9 +42,7 @@ export default function Hotels(props) {
           mt={{ base: "20px", "2xl": "auto" }}
           variant="brand"
           fontWeight="500"
-          onClick={() => {
-            history.push("/admin/hotel/add");
-          }}
+          onClick={handleCreateHotel}
         >
           Create
         </Button>
@@ -75,19 +58,21 @@ export default function Hotels(props) {
         >
           All Hotels
         </Text>
-        {allHotel.map((hotel) => {
-          return (
+        {hotels &&
+          hotels?.map((hotel) => (
             <HotelCard
+              key={hotel?.id}
               boxShadow={cardShadow}
               mb="20px"
-              image={hotel.img}
-              ranking={hotel.id}
+              image={`http://localhost:1337${hotel?.attributes?.img?.data?.attributes?.url}`}
+              ranking={hotel?.id}
               link={`hotel/${hotel.id}`}
-              title={hotel.name}
+              title={hotel?.attributes?.name}
             />
-          );
-        })}
+          ))}
       </Card>
-    </>
+    </Box>
   );
-}
+};
+
+export default Hotels;

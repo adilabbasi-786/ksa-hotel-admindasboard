@@ -1,9 +1,27 @@
-import { SimpleGrid, Text, useColorModeValue } from "@chakra-ui/react";
+import { Button, SimpleGrid, Text, useColorModeValue } from "@chakra-ui/react";
 import Card from "components/card/Card.js";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Information from "views/admin/expanses/components/Information";
+import { useParams } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 const HotelDetail = () => {
+  const { id } = useParams();
+  const [hotel, setHotel] = useState("");
+  const history = useHistory();
+
+  useEffect(() => {
+    const getData = async () => {
+      let req = await fetch(
+        `http://localhost:1337/api/hotel-names?populate=*&[filters][id]=${id}`
+      );
+      let res = await req.json();
+      setHotel(res.data);
+    };
+    getData();
+    console.log("data", getData);
+  }, [id]);
+
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
   const cardShadow = useColorModeValue(
@@ -12,6 +30,15 @@ const HotelDetail = () => {
   );
   return (
     <Card mb={{ base: "0px", "2xl": "20px" }}>
+      <Button
+        colorScheme="blue"
+        width="fit-content"
+        mt="10px"
+        alignSelf="center"
+        onClick={() => history.push("/admin/hotel")}
+      >
+        Back
+      </Button>
       <Text
         color={textColorPrimary}
         fontWeight="bold"
@@ -29,12 +56,30 @@ const HotelDetail = () => {
         them all...
       </Text>
       <SimpleGrid columns={{ base: 1, md: 2 }} gap="20px">
-        <Information boxShadow={cardShadow} title="Hotel Name" value="Riyadh" />
-        <Information boxShadow={cardShadow} title="Manager" value="nouman" />
+        <Information
+          boxShadow={cardShadow}
+          title="Hotel Name"
+          value={hotel[0]?.attributes?.name}
+        />
+        <Information
+          boxShadow={cardShadow}
+          title="Manager"
+          value={hotel[0]?.attributes?.managerName}
+        />
         <Information
           boxShadow={cardShadow}
           title="Location"
-          value="Riyadh KSA"
+          value={hotel[0]?.attributes?.location}
+        />
+        <Information
+          boxShadow={cardShadow}
+          title="Manager Email"
+          value={hotel[0]?.attributes?.managerEmail}
+        />
+        <Information
+          boxShadow={cardShadow}
+          title="Manager Password"
+          value={hotel[0]?.attributes?.managerPassword}
         />
         <Information
           boxShadow={cardShadow}
@@ -44,9 +89,13 @@ const HotelDetail = () => {
         <Information
           boxShadow={cardShadow}
           title="Hotel Rent"
-          value="1000SAR"
+          value={hotel[0]?.attributes?.hotelRent}
         />
-        <Information boxShadow={cardShadow} title="Kafalat" value="5000SAR" />
+        <Information
+          boxShadow={cardShadow}
+          title="Kafalat"
+          value={hotel[0]?.attributes?.kafalat}
+        />
         <Information boxShadow={cardShadow} title="Total" value="15000SAR" />
       </SimpleGrid>
     </Card>
