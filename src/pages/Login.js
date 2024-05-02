@@ -13,10 +13,13 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
-
+import { useAuth } from "AuthContext";
+import { useHistory } from "react-router-dom";
 const defaultTheme = createTheme();
 
 const SignIn = () => {
+  const history = useHistory();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -40,7 +43,13 @@ const SignIn = () => {
       });
       const { jwt } = res.data;
       localStorage.setItem("jwt", jwt);
-      window.location.href = "/admin/dashboard";
+      const userData = { email: formData.email };
+      login(userData);
+      const redirectTo =
+        window.location.pathname !== "/"
+          ? window.location.pathname
+          : "/admin/dashboard";
+      history.push(redirectTo);
     } catch (error) {
       setError("Incorrect email or password");
     }

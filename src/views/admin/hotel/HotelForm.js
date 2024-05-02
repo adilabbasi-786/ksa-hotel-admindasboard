@@ -8,8 +8,9 @@ import {
   ModalBody,
   Stack,
 } from "@chakra-ui/react";
-
+import { useHistory } from "react-router-dom";
 const HotelForm = () => {
+  const history = useHistory();
   const [formData, setFormData] = useState({
     name: "",
     location: "",
@@ -54,6 +55,7 @@ const HotelForm = () => {
         hotelRent: "",
       });
       alert("Form submitted successfully!");
+      history.push("/admin/hotel");
     } catch (error) {
       console.error("Error submitting form data:", error);
       alert("Failed to submit form data. Please try again later.");
@@ -69,6 +71,7 @@ const HotelForm = () => {
           name="name"
           value={formData.name}
           onChange={handleInputChange}
+          required
         />
       </FormControl>
       <FormControl mt={4}>
@@ -102,6 +105,7 @@ const HotelForm = () => {
       <FormControl mt={4}>
         <FormLabel>Manager Password</FormLabel>
         <Input
+          type="password"
           placeholder="Manager Password"
           name="managerPassword"
           value={formData.managerPassword}
@@ -111,6 +115,7 @@ const HotelForm = () => {
       <FormControl mt={4}>
         <FormLabel>Kafalat</FormLabel>
         <Input
+          type="number"
           placeholder="Kafalat"
           name="kafalat"
           value={formData.kafalat}
@@ -120,6 +125,7 @@ const HotelForm = () => {
       <FormControl mt={4}>
         <FormLabel>Hotel Rent</FormLabel>
         <Input
+          type="number"
           placeholder="Hotel Rent"
           name="hotelRent"
           value={formData.hotelRent}

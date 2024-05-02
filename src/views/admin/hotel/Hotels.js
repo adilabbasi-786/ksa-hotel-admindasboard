@@ -62,6 +62,7 @@ const Hotels = () => {
           hotels?.map((hotel) => (
             <HotelCard
               key={hotel?.id}
+              id={hotel?.id}
               boxShadow={cardShadow}
               mb="20px"
               image={`http://localhost:1337${hotel?.attributes?.img?.data?.attributes?.url}`}
