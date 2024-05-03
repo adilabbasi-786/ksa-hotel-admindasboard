@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -13,13 +13,14 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
-import { useAuth } from "AuthContext";
 import { useHistory } from "react-router-dom";
+import { AuthContext } from "AuthContext";
 const defaultTheme = createTheme();
 
 const SignIn = () => {
   const history = useHistory();
-  const { login } = useAuth();
+  const auth = useContext(AuthContext);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -33,28 +34,30 @@ const SignIn = () => {
       [name]: value,
     }));
   };
+  // user ? history.push("/admin/dashboard") : history.push("/");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       const res = await axios.post("http://localhost:1337/api/auth/local", {
         identifier: formData.email,
         password: formData.password,
       });
-      const { jwt } = res.data;
-      localStorage.setItem("jwt", jwt);
-      const userData = { email: formData.email };
-      login(userData);
-      const redirectTo =
-        window.location.pathname !== "/"
-          ? window.location.pathname
-          : "/admin/dashboard";
-      history.push(redirectTo);
+
+      if (res.data.error) {
+        alert("Invalid email or password");
+      } else {
+        auth.setToken(res.data.jwt);
+        localStorage.setItem("token", res.data.jwt);
+        history.push("/admin/dashboard");
+      }
     } catch (error) {
-      setError("Incorrect email or password");
+      console.error("An error occurred:", error);
+      // Handle the error here, for example:
+      setError("An error occurred. Please try again.");
     }
   };
-
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
@@ -121,19 +124,6 @@ const SignIn = () => {
             >
               Sign In
             </Button>
-
-            <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href="#" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid>
           </Box>
         </Box>
       </Container>

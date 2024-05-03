@@ -17,9 +17,6 @@ import { MdEdit } from "react-icons/md";
 import { useHistory } from "react-router-dom";
 
 export default function HotelCard(props) {
-  const handleEditHotel = () => {
-    history.push(`/admin/hotel/edit/${id}`);
-  };
   const history = useHistory();
 
   const { title, ranking, link, id, image, ...rest } = props;
@@ -68,7 +65,6 @@ export default function HotelCard(props) {
           </Text>
         </Box>
         <Link
-          onClick={handleEditHotel}
           _hover={{
             bg: "gray.200",
             color: "white",
