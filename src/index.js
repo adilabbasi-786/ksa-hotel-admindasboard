@@ -11,25 +11,28 @@ import SignIn from "pages/Login";
 
 import { AuthProvider } from "AuthContext";
 import PrivateRoute from "PrivateRoute";
+import { EmployeeProvider } from "EmployeeContext";
 
 ReactDOM.render(
   <AuthProvider>
-    <ChakraProvider theme={theme}>
-      <React.StrictMode>
-        <ThemeEditorProvider>
-          <Router>
-            <Switch>
-              <Route exact path="/">
-                <SignIn />
-              </Route>
+    <EmployeeProvider>
+      <ChakraProvider theme={theme}>
+        <React.StrictMode>
+          <ThemeEditorProvider>
+            <Router>
+              <Switch>
+                <Route exact path="/">
+                  <SignIn />
+                </Route>
 
-              <PrivateRoute path={`/admin`} component={AdminLayout} />
-              <PrivateRoute path={`/hotel`} component={HotelLayout} />
-            </Switch>
-          </Router>
-        </ThemeEditorProvider>
-      </React.StrictMode>
-    </ChakraProvider>
+                <PrivateRoute path={`/admin`} component={AdminLayout} />
+                <PrivateRoute path={`/hotel`} component={HotelLayout} />
+              </Switch>
+            </Router>
+          </ThemeEditorProvider>
+        </React.StrictMode>
+      </ChakraProvider>
+    </EmployeeProvider>
   </AuthProvider>,
   document.getElementById("root")
 );

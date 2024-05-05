@@ -65,7 +65,7 @@ const EmployeesData = () => {
       >
         {employeeData.map((employee, index) => (
           <Banner
-            key={index} // Use index as the key since there's no unique id
+            key={index}
             gridArea="1 / 1 / 2 / 2"
             name={employee.name}
             passportNumber={employee.passportNumber}

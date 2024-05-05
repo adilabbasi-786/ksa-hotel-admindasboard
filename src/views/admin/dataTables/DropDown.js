@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Select,
@@ -9,22 +9,26 @@ import {
 } from "@chakra-ui/react";
 import { useHistory } from "react-router-dom";
 import Card from "components/card/Card";
-
-const allHotel = [
-  { id: 1, name: "hotel1" },
-  { id: 2, name: "hotel2" },
-  { id: 3, name: "hotel3" },
-  { id: 4, name: "hotel4" },
-  { id: 5, name: "hotel5" },
-  { id: 6, name: "hotel6" },
-  { id: 7, name: "hotel7" },
-  { id: 8, name: "hotel8" },
-  { id: 9, name: "hotel9" },
-  { id: 10, name: "hotel10" },
-];
+import axios from "axios";
 
 const DropDown = ({ onSelectHotel }) => {
   const [selectedHotel, setSelectedHotel] = useState(null);
+  const [hotels, setHotels] = useState([]);
+  const history = useHistory();
+
+  useEffect(() => {
+    fetchHotelNames();
+  }, []);
+
+  const fetchHotelNames = async () => {
+    try {
+      const response = await axios.get("http://localhost:1337/api/hotel-names");
+      setHotels(response.data);
+    } catch (error) {
+      console.error("Error fetching hotel names:", error);
+    }
+  };
+
   const handleSelectChange = (event) => {
     setSelectedHotel(event.target.value);
   };
@@ -32,8 +36,10 @@ const DropDown = ({ onSelectHotel }) => {
   const handleSubmit = () => {
     if (selectedHotel) {
       onSelectHotel(selectedHotel);
+      console.log("selectedHotel");
     }
   };
+
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   return (
     <Card mb={{ base: "0px", "2xl": "20px" }}>
@@ -45,9 +51,9 @@ const DropDown = ({ onSelectHotel }) => {
         value={selectedHotel}
         onChange={handleSelectChange}
       >
-        {allHotel.map((hotel) => (
-          <option key={hotel.id} value={hotel.id}>
-            {hotel.name}
+        {hotels?.data?.map((hotel) => (
+          <option key={hotel?.id} value={hotel?.id}>
+            {hotel?.attributes?.name}
           </option>
         ))}
       </Select>
