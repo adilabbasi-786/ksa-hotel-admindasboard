@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import {
   Box,
@@ -9,8 +9,10 @@ import {
   Input,
   useBreakpointValue,
 } from "@chakra-ui/react";
+import EmployeeContext from "EmployeeContext";
 
-const EmployeeForm = ({ onClose, selectedHotel }) => {
+const EmployeeForm = ({ onClose }) => {
+  const { selectedHotel } = useContext(EmployeeContext);
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   const [formData, setFormData] = useState({

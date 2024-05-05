@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Box,
   Select,
@@ -10,8 +10,11 @@ import {
 import { useHistory } from "react-router-dom";
 import Card from "components/card/Card";
 import axios from "axios";
+import EmployeeContext from "../../../EmployeeContext";
 
-const DropDown = ({ onSelectHotel }) => {
+const DropDown = () => {
+  const { onSelectHotel } = useContext(EmployeeContext);
+
   const [selectedHotel, setSelectedHotel] = useState(null);
   const [hotels, setHotels] = useState([]);
   const history = useHistory();
