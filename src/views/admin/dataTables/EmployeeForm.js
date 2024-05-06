@@ -8,11 +8,11 @@ import {
   FormLabel,
   Input,
   useBreakpointValue,
+  Select,
 } from "@chakra-ui/react";
 import EmployeeContext from "EmployeeContext";
 
-const EmployeeForm = ({ onClose }) => {
-  const { selectedHotel } = useContext(EmployeeContext);
+const EmployeeForm = ({ onClose, selectedHotel }) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   const [formData, setFormData] = useState({
@@ -22,6 +22,7 @@ const EmployeeForm = ({ onClose }) => {
     passportExpiry: "",
     iqamaNumber: "",
     iqamaExpiry: "",
+    status: "",
     iqamaPicture: null,
     passportImage: null,
     hotel_name: selectedHotel,
@@ -132,6 +133,18 @@ const EmployeeForm = ({ onClose }) => {
                 value={formData.iqamaExpiry}
                 onChange={(e) => handleChange(e, "iqamaExpiry")}
               />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Employee Status</FormLabel>
+              <Select
+                name="status"
+                placeholder="Select status"
+                value={formData.status}
+                onChange={(e) => handleChange(e, "status")}
+              >
+                <option value="active">active</option>
+                <option value="inactive">inactive</option>
+              </Select>
             </FormControl>
           </Flex>
           <Flex direction={isMobile ? "column" : "row"}>

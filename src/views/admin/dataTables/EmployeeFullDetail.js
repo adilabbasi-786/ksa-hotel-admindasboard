@@ -1,15 +1,43 @@
-import { SimpleGrid, Text, useColorModeValue } from "@chakra-ui/react";
+import {
+  SimpleGrid,
+  Text,
+  useColorModeValue,
+  Box,
+  Image,
+} from "@chakra-ui/react";
 import Card from "components/card/Card.js";
-import React from "react";
+import React, { useState } from "react";
 import Information from "../expanses/components/Information";
+import FullScreenImageModal from "./FullScreenModal";
 
-const EmployeeFullDetail = () => {
+const EmployeeFullDetail = ({ employeeData }) => {
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
   const cardShadow = useColorModeValue(
     "0px 18px 40px rgba(112, 144, 176, 0.12)",
     "unset"
   );
+
+  const [isPassportImageOpen, setIsPassportImageOpen] = useState(false);
+  const [isIqamaImageOpen, setIsIqamaImageOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const togglePassportImage = () => {
+    setIsPassportImageOpen(!isPassportImageOpen);
+  };
+
+  const toggleIqamaImage = () => {
+    setIsIqamaImageOpen(!isIqamaImageOpen);
+  };
+
+  const openImageModal = (imageUrl) => {
+    setSelectedImage(imageUrl);
+  };
+
+  const closeImageModal = () => {
+    setSelectedImage(null);
+  };
+
   return (
     <Card mb={{ base: "0px", "2xl": "20px" }}>
       <Text
@@ -19,42 +47,78 @@ const EmployeeFullDetail = () => {
         mt="10px"
         mb="4px"
       >
-        Muhammad Adil
+        {employeeData.EmployeeName}
       </Text>
 
       <SimpleGrid columns={{ base: 1, md: 2 }} gap="20px">
-        <Information boxShadow={cardShadow} title=" Name" value="Riyadh" />
         <Information
           boxShadow={cardShadow}
-          title="Pasport Number"
-          value="nos5554"
+          title="Name"
+          value={employeeData.EmployeeName}
         />
         <Information
           boxShadow={cardShadow}
-          title="Pasport expiry date"
-          value="24/april/2025"
+          title="Passport Number"
+          value={employeeData.PassportNumber}
         />
         <Information
           boxShadow={cardShadow}
-          title="iqama Number"
-          value="no1d554"
+          title="Passport Expiry Date"
+          value={employeeData.passportExpiry}
         />
         <Information
           boxShadow={cardShadow}
-          title="iqama Expiry"
-          value="24/dec/2025"
+          title="Iqama Number"
+          value={employeeData.iqamaNumber}
         />
         <Information
           boxShadow={cardShadow}
-          title="Iqama Picture"
-          value="nos5554"
+          title="Iqama Expiry"
+          value={employeeData.iqamaExpiry}
         />
+        <Box boxShadow={cardShadow}>
+          <Text fontWeight="semibold">Iqama Picture</Text>
+          <Box
+            onClick={() =>
+              openImageModal(
+                `http://localhost:1337${employeeData?.iqamaPicture?.data?.attributes?.url}`
+              )
+            }
+            cursor="pointer"
+          >
+            <Image
+              src={`http://localhost:1337${employeeData?.iqamaPicture?.data?.attributes?.formats?.thumbnail?.url}`}
+              alt="Iqama Picture"
+            />
+          </Box>
+        </Box>
+        <Box boxShadow={cardShadow}>
+          <Text fontWeight="semibold">Passport Picture</Text>
+          <Box
+            onClick={() =>
+              openImageModal(
+                `http://localhost:1337${employeeData?.passportImage?.data?.attributes?.url}`
+              )
+            }
+            cursor="pointer"
+          >
+            <Image
+              src={`http://localhost:1337${employeeData?.passportImage?.data?.attributes?.formats?.thumbnail?.url}`}
+              alt="Passport Picture"
+            />
+          </Box>
+        </Box>
         <Information
           boxShadow={cardShadow}
-          title="Location"
-          value="Riyadh KSA"
+          title="Status"
+          value={employeeData.status}
         />
       </SimpleGrid>
+      <FullScreenImageModal
+        isOpen={selectedImage !== null}
+        onClose={closeImageModal}
+        imageUrl={selectedImage}
+      />
     </Card>
   );
 };

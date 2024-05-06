@@ -12,9 +12,7 @@ import Card from "components/card/Card";
 import axios from "axios";
 import EmployeeContext from "../../../EmployeeContext";
 
-const DropDown = () => {
-  const { onSelectHotel } = useContext(EmployeeContext);
-
+const DropDown = ({ onSelectHotel }) => {
   const [selectedHotel, setSelectedHotel] = useState(null);
   const [hotels, setHotels] = useState([]);
   const history = useHistory();
@@ -39,7 +37,7 @@ const DropDown = () => {
   const handleSubmit = () => {
     if (selectedHotel) {
       onSelectHotel(selectedHotel);
-      console.log("selectedHotel");
+      console.log("selectedHotel", selectedHotel);
     }
   };
 

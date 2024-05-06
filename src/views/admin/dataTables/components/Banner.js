@@ -19,7 +19,14 @@ import Card from "components/card/Card.js";
 import avatar1 from "assets/img/avatars/avatar6.png";
 import EmployeeFullDetail from "views/admin/dataTables/EmployeeFullDetail";
 
-const Banner = ({ name, passportNumber, status, avatar, banner }) => {
+const Banner = ({
+  name,
+  passportNumber,
+  status,
+  avatar,
+  banner,
+  employeeData,
+}) => {
   const history = useHistory();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -55,7 +62,7 @@ const Banner = ({ name, passportNumber, status, avatar, banner }) => {
         />
         <Avatar
           mx="auto"
-          src={avatar1}
+          src={avatar}
           h="87px"
           w="87px"
           mt="-43px"
@@ -96,7 +103,7 @@ const Banner = ({ name, passportNumber, status, avatar, banner }) => {
           <ModalHeader>Employee Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <EmployeeFullDetail />
+            <EmployeeFullDetail employeeData={employeeData} />
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" onClick={handleClose}>

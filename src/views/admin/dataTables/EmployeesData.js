@@ -14,19 +14,30 @@ import {
 import Banner from "./components/Banner";
 import banner from "assets/img/auth/banner.png";
 import EmployeeForm from "./EmployeeForm";
-
+import axios from "axios";
 // Importing the JSON data directly for demonstration purposes
 import tableDataDevelopment from "views/admin/dataTables/variables/tableDataDevelopment.json";
 import Drivers from "./Drivers";
 
-const EmployeesData = () => {
+const EmployeesData = ({ selectedHotel }) => {
   const [employeeData, setEmployeeData] = useState([]);
   const [isAddEmployeeModalOpen, setIsAddEmployeeModalOpen] = useState(false);
 
-  // Set all the data initially
   useEffect(() => {
-    setEmployeeData(tableDataDevelopment);
-  }, []);
+    const fetchEmployeeData = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:1337/api/employee-data?populate=*&filters[hotel_name][id][$in]=${selectedHotel}`
+        );
+        setEmployeeData(response.data);
+        console.log("employeedatddddddda", response.data.data);
+      } catch (error) {
+        console.error("Error fetching employee data:", error);
+      }
+    };
+
+    fetchEmployeeData();
+  }, [selectedHotel]);
 
   const handleOpenAddEmployeeModal = () => {
     setIsAddEmployeeModalOpen(true);
@@ -37,7 +48,11 @@ const EmployeesData = () => {
   };
 
   return (
-    <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
+    <Box
+      pt={{ base: "130px", md: "80px", xl: "80px" }}
+      width="100%"
+      overflow="hidden"
+    >
       <Button
         me="100%"
         mb="50px"
@@ -63,17 +78,20 @@ const EmployeesData = () => {
         }}
         gap={{ base: "20px", xl: "20px" }}
       >
-        {employeeData.map((employee, index) => (
+        {employeeData?.data?.map((employee) => (
           <Banner
-            key={index}
+            id={employee.id}
+            key={employee.id}
             gridArea="1 / 1 / 2 / 2"
-            name={employee.name}
-            passportNumber={employee.passportNumber}
-            status={employee.status}
-            avatar={employee.avatar}
+            name={employee.attributes.EmployeeName}
+            passportNumber={employee.attributes.PassportNumber}
+            avatar={`http://localhost:1337${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
             banner={banner}
+            status={employee.attributes.status}
+            employeeData={employee.attributes}
           />
         ))}
+        {console.log("employeeData", employeeData)}
       </Grid>
       <Modal
         size="xl"
@@ -85,7 +103,10 @@ const EmployeesData = () => {
           <ModalHeader>Add New Employee</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <EmployeeForm onClose={handleCloseAddEmployeeModal} />
+            <EmployeeForm
+              selectedHotel={selectedHotel}
+              onClose={handleCloseAddEmployeeModal}
+            />
           </ModalBody>
         </ModalContent>
       </Modal>
