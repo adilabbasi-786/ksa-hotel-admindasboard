@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Avatar,
   Box,
@@ -18,6 +18,7 @@ import {
   FormControl,
   Alert,
   AlertIcon,
+  Select,
 } from "@chakra-ui/react";
 import { useHistory } from "react-router-dom";
 import Card from "components/card/Card.js";
@@ -36,17 +37,29 @@ const Banner = ({
   const history = useHistory();
   const [isOpen, setIsOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [updatedEmployeeData, setUpdatedEmployeeData] = useState(employeeData);
+  const [updatedEmployeeData, setUpdatedEmployeeData] = useState({
+    EmployeeName: "",
+    PassportNumber: "",
+    status: "",
+  });
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
+  useEffect(() => {
+    if (isEditMode) {
+      setUpdatedEmployeeData({
+        EmployeeName: name,
+        PassportNumber: passportNumber,
+        status: status,
+      });
+    }
+  }, [isEditMode, name, passportNumber, status]);
+
+  // ...
   const handleToggleEditMode = () => {
     setIsEditMode(!isEditMode);
-    setShowSuccessMessage(false); // Hide success message when entering edit mode
   };
 
   const handleSaveChanges = () => {
-    // Step 4: Implement save functionality here
-    // Example: Call API to save changes
     fetch(`http://localhost:1337/api/employee-data/${id}`, {
       method: "PUT",
       body: JSON.stringify({ data: updatedEmployeeData }),
@@ -56,24 +69,26 @@ const Banner = ({
     })
       .then((response) => {
         if (response.ok) {
-          // If the response is successful, show success message
-          setShowSuccessMessage(true);
+          setShowSuccessMessage(true); // Show success message on successful save
           setTimeout(() => {
-            setShowSuccessMessage(false); // Hide the success message after a delay
-          }, 3000); // Hide after 3 seconds
+            setShowSuccessMessage(false); // Hide success message after a delay
+            setIsOpen(false); // Close the modal
+          }, 1000);
         } else {
           console.error("Error saving data:", response.statusText);
         }
       })
       .catch((error) => {
         console.error("Error saving data:", error);
-        // Handle error scenario
       });
   };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setUpdatedEmployeeData((prevData) => ({ ...prevData, [name]: value }));
+
+    if (value !== null && value !== undefined) {
+      setUpdatedEmployeeData((prevData) => ({ ...prevData, [name]: value }));
+    }
   };
 
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
@@ -165,13 +180,23 @@ const Banner = ({
                   value={updatedEmployeeData.PassportNumber}
                   onChange={handleInputChange}
                 />
-                <FormLabel>Status:</FormLabel>
+                <FormLabel>Employee Status</FormLabel>
+                <Select
+                  name="status"
+                  placeholder="Select status"
+                  value={updatedEmployeeData.status}
+                  onChange={handleInputChange}
+                >
+                  <option value="active">active</option>
+                  <option value="inactive">inactive</option>
+                </Select>
+                {/* <FormLabel>Status:</FormLabel>
                 <Input
                   type="text"
                   name="status"
                   value={updatedEmployeeData.status}
                   onChange={handleInputChange}
-                />
+                /> */}
               </FormControl>
             ) : (
               <EmployeeFullDetail employeeData={employeeData} />
@@ -194,9 +219,19 @@ const Banner = ({
 
       {/* Success Message */}
       {showSuccessMessage && (
-        <Alert status="success" mt="4" borderRadius="md">
+        <Alert
+          status="success"
+          mt="4"
+          borderRadius="md"
+          fontSize="24px"
+          position="fixed"
+          top="0"
+          left="50%"
+          transform="translateX(-50%)"
+          zIndex="999"
+        >
           <AlertIcon />
-          Data saved successfully!
+          Data updated successfully!
         </Alert>
       )}
     </>
