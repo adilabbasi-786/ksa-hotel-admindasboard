@@ -9,6 +9,7 @@ import {
   Input,
   useBreakpointValue,
   Select,
+  Text,
 } from "@chakra-ui/react";
 import EmployeeContext from "EmployeeContext";
 
@@ -28,17 +29,85 @@ const EmployeeForm = ({ onClose, selectedHotel }) => {
     hotel_name: selectedHotel,
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
-
+  const [formErrors, setFormErrors] = useState({
+    EmployeeName: "",
+    PassportNumber: "",
+    passportExpiry: "",
+    iqamaNumber: "",
+    iqamaExpiry: "",
+    status: "",
+    employeePicture: "",
+    iqamaPicture: "",
+    passportImage: "",
+  });
   const handleChange = (e, fieldName) => {
     const { files } = e.target;
+    const value = files ? files[0] : e.target.value;
+
+    // Update formData
     setFormData((prevData) => ({
       ...prevData,
-      [fieldName]: files ? files[0] : e.target.value,
+      [fieldName]: value,
     }));
+
+    // Validate if field is empty
+    if (value === "") {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        [fieldName]: `Please fill ${fieldName}`,
+      }));
+    } else {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        [fieldName]: "", // Clear error message if field is not empty
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if any required field is empty
+    const requiredFields = [
+      "EmployeeName",
+      "PassportNumber",
+      "passportExpiry",
+      "iqamaNumber",
+      "iqamaExpiry",
+      "status",
+    ];
+    let hasErrors = false;
+    const newFormErrors = {};
+
+    requiredFields.forEach((fieldName) => {
+      if (formData[fieldName] === "") {
+        newFormErrors[fieldName] = `Please fill ${fieldName}`;
+        hasErrors = true;
+      }
+    });
+
+    // Check if employee picture, iqama picture, and passport picture are not empty
+    if (!formData.employeePicture) {
+      newFormErrors.employeePicture = "Please upload Employee picture";
+      hasErrors = true;
+    }
+    if (!formData.iqamaPicture) {
+      newFormErrors.iqamaPicture = "Please upload iqama picture";
+      hasErrors = true;
+    }
+    if (!formData.passportImage) {
+      newFormErrors.passportImage = "Please upload Passport picture";
+      hasErrors = true;
+    }
+
+    // If there are errors, update state and stop form submission
+    if (hasErrors) {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        ...newFormErrors,
+      }));
+    }
+
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("data", JSON.stringify(formData));
@@ -80,6 +149,7 @@ const EmployeeForm = ({ onClose, selectedHotel }) => {
               accept="image/*"
               onChange={(e) => handleChange(e, "employeePicture")}
             />
+            <Text color="red">{formErrors.employeePicture}</Text>
           </FormControl>
           <Flex direction={isMobile ? "column" : "row"}>
             <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
@@ -90,6 +160,7 @@ const EmployeeForm = ({ onClose, selectedHotel }) => {
                 onChange={(e) => handleChange(e, "EmployeeName")}
                 placeholder="Employee name"
               />
+              <Text color="red">{formErrors.EmployeeName}</Text>
             </FormControl>
 
             <FormControl flex="1">
@@ -100,6 +171,7 @@ const EmployeeForm = ({ onClose, selectedHotel }) => {
                 onChange={(e) => handleChange(e, "PassportNumber")}
                 placeholder="Passport Number"
               />
+              <Text color="red">{formErrors.PassportNumber}</Text>
             </FormControl>
           </Flex>
           <Flex direction={isMobile ? "column" : "row"}>
@@ -112,6 +184,7 @@ const EmployeeForm = ({ onClose, selectedHotel }) => {
                 value={formData.passportExpiry}
                 onChange={(e) => handleChange(e, "passportExpiry")}
               />
+              <Text color="red">{formErrors.passportExpiry}</Text>
             </FormControl>
             <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
               <FormLabel>iqama number</FormLabel>
@@ -121,6 +194,7 @@ const EmployeeForm = ({ onClose, selectedHotel }) => {
                 onChange={(e) => handleChange(e, "iqamaNumber")}
                 placeholder="iqama Number"
               />
+              <Text color="red">{formErrors.iqamaNumber}</Text>
             </FormControl>
           </Flex>
           <Flex direction={isMobile ? "column" : "row"}>
@@ -133,6 +207,7 @@ const EmployeeForm = ({ onClose, selectedHotel }) => {
                 value={formData.iqamaExpiry}
                 onChange={(e) => handleChange(e, "iqamaExpiry")}
               />
+              <Text color="red">{formErrors.iqamaExpiry}</Text>
             </FormControl>
             <FormControl>
               <FormLabel>Employee Status</FormLabel>
@@ -145,6 +220,7 @@ const EmployeeForm = ({ onClose, selectedHotel }) => {
                 <option value="active">active</option>
                 <option value="inactive">inactive</option>
               </Select>
+              <Text color="red">{formErrors.status}</Text>
             </FormControl>
           </Flex>
           <Flex direction={isMobile ? "column" : "row"}>
@@ -155,6 +231,7 @@ const EmployeeForm = ({ onClose, selectedHotel }) => {
                 accept="image/*"
                 onChange={(e) => handleChange(e, "iqamaPicture")}
               />
+              <Text color="red">{formErrors.iqamaPicture}</Text>
             </FormControl>
             <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
               <FormLabel>Passport picture</FormLabel>
@@ -163,6 +240,7 @@ const EmployeeForm = ({ onClose, selectedHotel }) => {
                 accept="image/*"
                 onChange={(e) => handleChange(e, "passportImage")}
               />
+              <Text color="red">{formErrors.passportImage}</Text>
             </FormControl>
           </Flex>
 
@@ -178,6 +256,7 @@ const EmployeeForm = ({ onClose, selectedHotel }) => {
           >
             Submit
           </Button>
+          {console.log("submit", handleSubmit)}
         </form>
       )}
     </Box>

@@ -32,6 +32,9 @@ const Banner = ({
   avatar,
   banner,
   employeeData,
+  iqamaNumber,
+  passportExpiry,
+  iqamaExpiry,
   id,
 }) => {
   const history = useHistory();
@@ -41,6 +44,9 @@ const Banner = ({
     EmployeeName: "",
     PassportNumber: "",
     status: "",
+    iqamaNumber: "",
+    passportExpiry: "",
+    iqamaExpiry: "",
   });
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
@@ -50,9 +56,20 @@ const Banner = ({
         EmployeeName: name,
         PassportNumber: passportNumber,
         status: status,
+        iqamaNumber: iqamaNumber,
+        passportExpiry: passportExpiry,
+        iqamaExpiry: iqamaExpiry,
       });
     }
-  }, [isEditMode, name, passportNumber, status]);
+  }, [
+    isEditMode,
+    name,
+    passportNumber,
+    status,
+    iqamaExpiry,
+    passportExpiry,
+    iqamaNumber,
+  ]);
 
   // ...
   const handleToggleEditMode = () => {
@@ -181,6 +198,28 @@ const Banner = ({
                   onChange={handleInputChange}
                 />
                 <FormLabel>Employee Status</FormLabel>
+                <FormLabel>iqama Number:</FormLabel>
+                <Input
+                  type="text"
+                  name="iqamaNumber"
+                  value={updatedEmployeeData.iqamaNumber}
+                  onChange={handleInputChange}
+                />
+                <FormLabel>Passport Expiry:</FormLabel>
+                <Input
+                  type="date"
+                  name="passportExpiry"
+                  value={updatedEmployeeData.passportExpiry}
+                  onChange={handleInputChange}
+                />
+                <FormLabel>iqama Expiry:</FormLabel>
+                <Input
+                  type="date"
+                  name="iqamaExpiry"
+                  value={updatedEmployeeData.iqamaExpiry}
+                  onChange={handleInputChange}
+                />
+                <FormLabel>Employee Status</FormLabel>
                 <Select
                   name="status"
                   placeholder="Select status"
@@ -190,13 +229,6 @@ const Banner = ({
                   <option value="active">active</option>
                   <option value="inactive">inactive</option>
                 </Select>
-                {/* <FormLabel>Status:</FormLabel>
-                <Input
-                  type="text"
-                  name="status"
-                  value={updatedEmployeeData.status}
-                  onChange={handleInputChange}
-                /> */}
               </FormControl>
             ) : (
               <EmployeeFullDetail employeeData={employeeData} />

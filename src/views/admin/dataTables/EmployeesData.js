@@ -86,8 +86,12 @@ const EmployeesData = ({ selectedHotel }) => {
             name={employee.attributes.EmployeeName}
             passportNumber={employee.attributes.PassportNumber}
             avatar={`http://localhost:1337${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
+            passportImage={`http://localhost:1337${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
             banner={banner}
             status={employee.attributes.status}
+            iqamaNumber={employee.attributes.iqamaNumber}
+            passportExpiry={employee.attributes.passportExpiry}
+            iqamaExpiry={employee.attributes.iqamaExpiry}
             employeeData={employee.attributes}
           />
         ))}
