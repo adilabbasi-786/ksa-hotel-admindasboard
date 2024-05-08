@@ -197,7 +197,6 @@ const Banner = ({
                   value={updatedEmployeeData.PassportNumber}
                   onChange={handleInputChange}
                 />
-                <FormLabel>Employee Status</FormLabel>
                 <FormLabel>iqama Number:</FormLabel>
                 <Input
                   type="text"

@@ -1,12 +1,9 @@
-/* eslint-disable */
 import {
   Flex,
-  Progress,
   Table,
   Tbody,
   Td,
   Text,
-  Textarea,
   Th,
   Thead,
   Tr,
@@ -20,12 +17,11 @@ import {
   ModalFooter,
   ModalBody,
 } from "@chakra-ui/react";
+import axios from "axios";
 // Custom components
 import Card from "components/card/Card";
 import { MdEdit } from "react-icons/md";
-import { AndroidLogo, AppleLogo, WindowsLogo } from "components/icons/Icons";
-import Menu from "components/menu/MainMenu";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   useGlobalFilter,
   usePagination,
@@ -36,16 +32,48 @@ import {
 export default function DevelopmentTable(props) {
   const [showTodaySaleModal, setShowTodaySaleModal] = useState(false);
   const [showAdvanceSalaryModal, setShowAdvanceSalaryModal] = useState(false);
+  const [todaySaleData, setTodaySaleData] = useState([]);
+  const [advanceSalaryData, setAdvanceSalaryData] = useState([]);
 
   const handleTodaySaleModalClose = () => setShowTodaySaleModal(false);
   const handleAdvanceSalaryModalClose = () => setShowAdvanceSalaryModal(false);
-  const { columnsData, tableData } = props;
-  const textColorSecondary = "gray.400";
+  const {
+    columnsData,
+    tableData,
+    selectedHotel,
+    selectedDate,
+    updateTableData,
+  } = props;
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => tableData, [tableData]);
 
+  const handleTodaySaleModalOpen = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:1337/api/daily-sales?poulate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date][$eq]=${selectedDate}`
+      );
+
+      setTodaySaleData(response.data);
+
+      setShowTodaySaleModal(true);
+    } catch (error) {
+      console.error("Error fetching today's sale data:", error);
+    }
+  };
+  const handleAdvanceSalaryModalOpen = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:1337/api/advance-salaries?populate[employees_datum][populate][0]=hotel_name&filters[employees_datum][hotel_name][id][$eq]=${selectedHotel}&filters[date][$eq]=${selectedDate}`
+      );
+
+      setAdvanceSalaryData(response.data);
+      setShowAdvanceSalaryModal(true);
+    } catch (error) {
+      console.error("Error fetching advance salary data:", error);
+    }
+  };
   const tableInstance = useTable(
     {
       columns,
@@ -65,10 +93,13 @@ export default function DevelopmentTable(props) {
     initialState,
   } = tableInstance;
   initialState.pageSize = 11;
-
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const iconColor = useColorModeValue("secondaryGray.500", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
+  const totalExpense = tableData
+    .reduce((total, item) => total + parseFloat(item.totalPrice), 0)
+    .toFixed(1);
+
   return (
     <Card
       direction="column"
@@ -82,7 +113,7 @@ export default function DevelopmentTable(props) {
             colorScheme="blue"
             width="fit-content"
             alignSelf="flex-end"
-            onClick={() => setShowTodaySaleModal(true)}
+            onClick={handleTodaySaleModalOpen}
           >
             View Today Sale
           </Button>
@@ -91,7 +122,7 @@ export default function DevelopmentTable(props) {
               colorScheme="blue"
               width="fit-content"
               alignSelf="flex-end"
-              onClick={() => setShowAdvanceSalaryModal(true)}
+              onClick={handleAdvanceSalaryModalOpen}
             >
               View Advance Salary
             </Button>
@@ -141,28 +172,35 @@ export default function DevelopmentTable(props) {
               <Tr {...row.getRowProps()} key={index}>
                 {row.cells.map((cell, index) => {
                   let data = "";
-                  if (cell.column.Header === " Items Name") {
+                  if (cell.column.Header === "Items Name") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === " Category") {
+                  if (cell.column.Header === "Category") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === " Quantity") {
+                  if (cell.column.Header === "Quantity") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === " Price") {
+                  if (cell.column.Header === "Price") {
+                    data = (
+                      <Text color={textColor} fontSize="sm" fontWeight="700">
+                        {cell.value} SAR
+                      </Text>
+                    );
+                  }
+                  if (cell.column.Header === "Total Price") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
@@ -201,8 +239,14 @@ export default function DevelopmentTable(props) {
           }}
         />
       </Flex>
-      <Text fontWeight="bold">Total Expenses: 504500</Text>
-      <Text fontWeight="bold">Total Sale: 500SAR</Text>
+      <Text fontWeight="bold">Total Expense: {totalExpense}</Text>
+      <Text fontWeight="bold">
+        Total Sale:{" "}
+        {todaySaleData?.data?.reduce(
+          (total, item) => total + item.attributes.sale,
+          0
+        )}
+      </Text>
       <Text fontWeight="bold">Total Advance: 100SAR</Text>
       <Text fontWeight="bold">Total Deposit: 1000SAR</Text>
       {/* Today Sale Modal */}
@@ -215,9 +259,15 @@ export default function DevelopmentTable(props) {
         <ModalContent>
           <ModalHeader>Today Sale</ModalHeader>
           <ModalBody>
-            <Text color={textColorPrimary} fontWeight="bold">
-              5000SAR
-            </Text>
+            {todaySaleData?.data?.map((saleItem, index) => {
+              return (
+                <Text key={index} color={textColorPrimary} fontWeight="bold">
+                  date: {saleItem?.attributes?.date}
+                  <br />
+                  Today Total Sale: {saleItem?.attributes?.sale}
+                </Text>
+              );
+            })}
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" onClick={handleTodaySaleModalClose}>
@@ -237,12 +287,19 @@ export default function DevelopmentTable(props) {
         <ModalContent>
           <ModalHeader>Advance Salary</ModalHeader>
           <ModalBody>
-            <Text color={textColorPrimary} fontWeight="bold">
-              Employee Name: Adil
-            </Text>
-            <Text color={textColorPrimary} fontWeight="bold">
-              Advance: 500SAR
-            </Text>
+            {advanceSalaryData?.data?.map((salaryItem, index) => {
+              return (
+                <Text key={index} color={textColorPrimary} fontWeight="bold">
+                  Employee Name:{" "}
+                  {
+                    salaryItem.attributes.employees_datum.data.attributes
+                      .EmployeeName
+                  }
+                  <br />
+                  Advance: {salaryItem?.attributes?.amount} SAR
+                </Text>
+              );
+            })}
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" onClick={handleAdvanceSalaryModalClose}>

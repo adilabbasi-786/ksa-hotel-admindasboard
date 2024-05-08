@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Button, Flex, Text, useColorModeValue } from "@chakra-ui/react";
 import { Card, Input } from "@material-ui/core";
 import DevelopmentTable from "../expanses/components/DevelopmentTable";
-import DatePickerComponent from "./DatePickerComponent";
 import AddNewItem from "./AddNewItem";
-import Banner from "./components/Banner";
+
 const getCurrentDate = () => {
   const currentDate = new Date();
   const year = currentDate.getFullYear();
@@ -12,108 +12,96 @@ const getCurrentDate = () => {
   const day = String(currentDate.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
-const KitchenExpanses = () => {
+
+const KitchenExpanses = ({ selectedHotel }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [defaultDate, setDefaultDate] = useState(getCurrentDate());
-  const textColorSecondary = "gray.400";
+  const [selectedDate, setSelectedDate] = useState(getCurrentDate());
+  const [tableData, setTableData] = useState([]);
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
 
   const handleAddItem = (newItem) => {
     console.log("New item added:", newItem);
-    // Implement logic to add new item to table data
   };
-  // Define columns data
-  const columnsDataDevelopment = [
+
+  useEffect(() => {
+    axios
+      .get(
+        `http://localhost:1337/api/daily-registers?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date]=${selectedDate}`
+      )
+      .then((response) => {
+        const mappedData = response?.data?.data?.map((item) => {
+          console.log("item", item.attributes.category);
+          const totalPrice = (
+            item.attributes.quantity * item.attributes.price
+          ).toFixed(1);
+          return {
+            itemName: item.attributes.itemName,
+            category: item?.attributes?.category,
+            quantity: `${item.attributes.quantity} ${
+              item.attributes.quantity === "kitchen" ? "others" : "kg"
+            }`,
+            price: item.attributes.price,
+            totalPrice: totalPrice,
+          };
+        });
+
+        setTableData(mappedData);
+      })
+      .catch((error) => {
+        console.error("Error fetching table data:", error);
+      });
+  }, [selectedHotel, selectedDate]);
+
+  const columnsData = [
     {
-      Header: " Items Name",
-      accessor: "itemname",
+      Header: "Items Name",
+      accessor: "itemName",
     },
     {
-      Header: " Category",
+      Header: "Category",
       accessor: "category",
     },
     {
-      Header: " Quantity",
+      Header: "Quantity",
       accessor: "quantity",
     },
     {
-      Header: " Price",
+      Header: "Price",
       accessor: "price",
     },
-  ];
-
-  // Define table data
-  const tableDataDevelopment = [
     {
-      itemname: "Milk",
-      category: "kitchen",
-      quantity: "50kg",
-      price: "300",
-    },
-    {
-      itemname: "Beef",
-      category: "kitchen",
-
-      quantity: "5kg",
-      price: "3000",
-    },
-    {
-      itemname: "oil",
-      category: "kitchen",
-
-      quantity: "7kg",
-      price: "300",
-    },
-    {
-      itemname: "petrol",
-      category: "oil",
-
-      quantity: "5litre",
-      price: "300",
-    },
-    {
-      itemname: "taxi",
-      quantity: "50kg",
-      price: "300",
-      category: "rent",
-    },
-    {
-      itemname: "Milk",
-      quantity: "50kg",
-      price: "300",
-      category: "oil",
-    },
-    {
-      itemname: "Milk",
-      quantity: "50kg",
-      price: "300",
-      category: "dairy",
+      Header: "Total Price",
+      accessor: "totalPrice",
     },
   ];
-
+  const handleUpdateTableData = (newItem) => {
+    setTableData((prevData) => {
+      console.log("ssss", [...prevData, newItem]);
+      return [...prevData, newItem];
+    });
+  };
   return (
     <>
-      <Flex
-        alignItems="center"
-        mb="10px"
-        width={{ base: "100%", lg: "30%" }} // Adjust width based on screen size
-      >
-        <Text mr={{ base: "3px", lg: "5px" }}>Select month</Text>
+      <Flex alignItems="center" mb="10px" width={{ base: "100%", lg: "30%" }}>
+        <Text mr={{ base: "3px", lg: "5px" }}>Select date</Text>
         <Input
-          type="date" // Change type to "date" for date picker
-          id="expanseydate"
-          name="expansedate"
-          value={defaultDate}
-          onChange={(e) => setDefaultDate(e.target.value)}
-          fontSize="md" // Adjust the font size for mobile
-          width="100%" // Adjust the width for mobile
+          type="date"
+          id="selectedDate"
+          name="selectedDate"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+          fontSize="md"
+          width="100%"
         />
       </Flex>
       <Card>
         <Flex direction="column" justifyContent="space-between">
           <DevelopmentTable
-            columnsData={columnsDataDevelopment}
-            tableData={tableDataDevelopment}
+            selectedHotel={selectedHotel}
+            selectedDate={selectedDate}
+            columnsData={columnsData}
+            tableData={tableData}
+            updateTableData={handleUpdateTableData}
           />
           <Button
             colorScheme="blue"
@@ -127,9 +115,12 @@ const KitchenExpanses = () => {
         </Flex>
       </Card>
       <AddNewItem
+        selectedHotel={selectedHotel}
+        selectedDate={selectedDate}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onAddItem={handleAddItem}
+        updateTableData={handleUpdateTableData}
       />
     </>
   );

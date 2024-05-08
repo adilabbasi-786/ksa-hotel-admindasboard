@@ -78,24 +78,26 @@ const EmployeesData = ({ selectedHotel }) => {
         }}
         gap={{ base: "20px", xl: "20px" }}
       >
-        {employeeData?.data?.map((employee) => (
-          <Banner
-            id={employee.id}
-            key={employee.id}
-            gridArea="1 / 1 / 2 / 2"
-            name={employee.attributes.EmployeeName}
-            passportNumber={employee.attributes.PassportNumber}
-            avatar={`http://localhost:1337${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
-            passportImage={`http://localhost:1337${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
-            banner={banner}
-            status={employee.attributes.status}
-            iqamaNumber={employee.attributes.iqamaNumber}
-            passportExpiry={employee.attributes.passportExpiry}
-            iqamaExpiry={employee.attributes.iqamaExpiry}
-            employeeData={employee.attributes}
-          />
-        ))}
-        {console.log("employeeData", employeeData)}
+        {employeeData?.data?.map((employee) => {
+          console.log("employee", employee.attributes.status);
+          return (
+            <Banner
+              id={employee.id}
+              key={employee.id}
+              gridArea="1 / 1 / 2 / 2"
+              name={employee.attributes.EmployeeName}
+              passportNumber={employee.attributes.PassportNumber}
+              avatar={`http://localhost:1337${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
+              passportImage={`http://localhost:1337${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
+              banner={banner}
+              status={employee.attributes.status}
+              iqamaNumber={employee.attributes.iqamaNumber}
+              passportExpiry={employee.attributes.passportExpiry}
+              iqamaExpiry={employee.attributes.iqamaExpiry}
+              employeeData={employee.attributes}
+            />
+          );
+        })}
       </Grid>
       <Modal
         size="xl"

@@ -18,7 +18,7 @@ const Expanse = () => {
         <Box mb="20px">
           <DropDown onSelectHotel={handleSelectHotel} />
         </Box>
-        {selectedHotel && <KitchenExpanses electedHotel={selectedHotel} />}
+        {selectedHotel && <KitchenExpanses selectedHotel={selectedHotel} />}
       </Box>
     </Router>
   );

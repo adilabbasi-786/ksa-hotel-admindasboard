@@ -13,18 +13,52 @@ import {
   FormControl,
   FormLabel,
   Select,
+  Text,
 } from "@chakra-ui/react";
-
-const AddNewItem = ({ isOpen, onClose, onAddItem }) => {
+import axios from "axios";
+const AddNewItem = ({
+  isOpen,
+  onClose,
+  onAddItem,
+  selectedHotel,
+  selectedDate,
+  updateTableData,
+}) => {
   const [itemName, setItemName] = useState("");
   const [quantity, setQuantity] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
-
+  const [successMessage, setSuccessMessage] = useState("");
   const handleAddItem = () => {
-    const newItem = { itemName, quantity, price, category };
-    onAddItem(newItem);
-    onClose();
+    const newItem = {
+      itemName,
+      quantity,
+      price,
+      category,
+      hotel_name: selectedHotel,
+      date: selectedDate,
+    };
+    axios
+      .post(
+        "http://localhost:1337/api/daily-registers",
+        {
+          data: newItem,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {
+        setSuccessMessage("Item added successfully!");
+        onAddItem(newItem);
+        // updateTableData(onAddItem);
+        onClose();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -44,12 +78,13 @@ const AddNewItem = ({ isOpen, onClose, onAddItem }) => {
             <FormControl>
               <FormLabel>Category</FormLabel>
               <Select
+                name="category"
                 value={category}
+                placeholder="Select category"
                 onChange={(e) => setCategory(e.target.value)}
               >
                 <option value="kitchen">Kitchen</option>
-                <option value="oil and gas">Oil and Gas</option>
-                <option value="drinks">Drinks</option>
+
                 <option value="others">Others</option>
               </Select>
             </FormControl>
@@ -65,6 +100,11 @@ const AddNewItem = ({ isOpen, onClose, onAddItem }) => {
               <Input value={price} onChange={(e) => setPrice(e.target.value)} />
             </FormControl>
           </VStack>
+          {successMessage && (
+            <Text color="green.500" fontSize="sm">
+              {successMessage}
+            </Text>
+          )}
         </ModalBody>
         <ModalFooter>
           <Button colorScheme="blue" mr={3} onClick={handleAddItem}>
