@@ -99,7 +99,14 @@ export default function DevelopmentTable(props) {
   const totalExpense = tableData
     .reduce((total, item) => total + parseFloat(item.totalPrice), 0)
     .toFixed(1);
-
+  const totalAdvanceSalary = advanceSalaryData?.data?.reduce(
+    (total, item) => total + item.attributes.amount,
+    0
+  );
+  const totalSale = todaySaleData?.data?.reduce(
+    (total, item) => total + item.attributes.sale,
+    0
+  );
   return (
     <Card
       direction="column"
@@ -240,15 +247,11 @@ export default function DevelopmentTable(props) {
         />
       </Flex>
       <Text fontWeight="bold">Total Expense: {totalExpense}</Text>
+      <Text fontWeight="bold">Total Sale: {totalSale}</Text>
+      <Text fontWeight="bold">Total Advance:{totalAdvanceSalary} </Text>
       <Text fontWeight="bold">
-        Total Sale:{" "}
-        {todaySaleData?.data?.reduce(
-          (total, item) => total + item.attributes.sale,
-          0
-        )}
+        Total Deposit: {totalSale - totalExpense - totalAdvanceSalary}
       </Text>
-      <Text fontWeight="bold">Total Advance: 100SAR</Text>
-      <Text fontWeight="bold">Total Deposit: 1000SAR</Text>
       {/* Today Sale Modal */}
       <Modal
         isOpen={showTodaySaleModal}
@@ -300,6 +303,11 @@ export default function DevelopmentTable(props) {
                 </Text>
               );
             })}
+            ____________________
+            <Text color={textColorPrimary} fontWeight="bold">
+              Total Advance: {totalAdvanceSalary}
+              SAR
+            </Text>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" onClick={handleAdvanceSalaryModalClose}>
