@@ -15,7 +15,7 @@ const Index = () => {
       <Box mb="20px">
         <DropDown onSelectHotel={handleSelectHotel} />
       </Box>
-      {selectedHotel && <SalaryTable electedHotel={selectedHotel} />}
+      {selectedHotel && <SalaryTable selectedHotel={selectedHotel} />}
     </Box>
   );
 };

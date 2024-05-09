@@ -63,10 +63,6 @@ export default function DevelopmentTable(props) {
         align="center"
         direction={{ base: "column", lg: "row" }}
       >
-        <Flex alignItems="center" mb={{ base: "10px", lg: "0px" }}>
-          <Text mr={{ base: "3px", lg: "2px" }}>Select month</Text>
-          <Input type="month" id="profitmonth" name="profitmonth" />
-        </Flex>
         <Text
           color={textColor}
           fontSize={{ base: "18px", lg: "22px" }}
@@ -104,35 +100,35 @@ export default function DevelopmentTable(props) {
               <Tr {...row.getRowProps()} key={index}>
                 {row.cells.map((cell, index) => {
                   let data = "";
-                  if (cell.column.Header === " Employee Name") {
+                  if (cell.column.Header === "Employee Name") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === " Total Salary") {
+                  if (cell.column.Header === "Total Salary") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === " Advance") {
+                  if (cell.column.Header === "Advance") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === " Deducation") {
+                  if (cell.column.Header === "Deduction") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === " Total Paid salary") {
+                  if (cell.column.Header === "Total Paid salary") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
