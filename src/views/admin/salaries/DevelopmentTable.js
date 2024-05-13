@@ -135,6 +135,13 @@ export default function DevelopmentTable(props) {
                       </Text>
                     );
                   }
+                  if (cell.column.Header === "STATUS") {
+                    data = (
+                      <Text color={textColor} fontSize="sm" fontWeight="700">
+                        {cell.value}
+                      </Text>
+                    );
+                  }
                   return (
                     <Td
                       {...cell.getCellProps()}

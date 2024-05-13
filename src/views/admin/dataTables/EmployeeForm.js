@@ -24,6 +24,7 @@ const EmployeeForm = ({ onClose, selectedHotel }) => {
     iqamaNumber: "",
     iqamaExpiry: "",
     status: "",
+    salary: "",
     iqamaPicture: null,
     passportImage: null,
     hotel_name: selectedHotel,
@@ -39,6 +40,7 @@ const EmployeeForm = ({ onClose, selectedHotel }) => {
     employeePicture: "",
     iqamaPicture: "",
     passportImage: "",
+    salary: "",
   });
   const handleChange = (e, fieldName) => {
     const { files } = e.target;
@@ -75,6 +77,7 @@ const EmployeeForm = ({ onClose, selectedHotel }) => {
       "iqamaNumber",
       "iqamaExpiry",
       "status",
+      "salary",
     ];
     let hasErrors = false;
     const newFormErrors = {};
@@ -161,6 +164,16 @@ const EmployeeForm = ({ onClose, selectedHotel }) => {
                 placeholder="Employee name"
               />
               <Text color="red">{formErrors.EmployeeName}</Text>
+            </FormControl>
+            <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
+              <FormLabel>Employee Salary</FormLabel>
+              <Input
+                name="EmployeeName"
+                value={formData.salary}
+                onChange={(e) => handleChange(e, "salary")}
+                placeholder="Employee salary"
+              />
+              <Text color="red">{formErrors.salary}</Text>
             </FormControl>
 
             <FormControl flex="1">

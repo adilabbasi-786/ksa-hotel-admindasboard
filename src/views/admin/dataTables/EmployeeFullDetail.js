@@ -113,6 +113,11 @@ const EmployeeFullDetail = ({ employeeData }) => {
           title="Status"
           value={employeeData.status}
         />
+        <Information
+          boxShadow={cardShadow}
+          title="Salary"
+          value={employeeData.salary}
+        />
       </SimpleGrid>
       <FullScreenImageModal
         isOpen={selectedImage !== null}

@@ -36,6 +36,7 @@ const Banner = ({
   passportExpiry,
   iqamaExpiry,
   id,
+  salary,
 }) => {
   const history = useHistory();
   const [isOpen, setIsOpen] = useState(false);
@@ -47,6 +48,7 @@ const Banner = ({
     iqamaNumber: "",
     passportExpiry: "",
     iqamaExpiry: "",
+    salary: "",
   });
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
@@ -59,6 +61,7 @@ const Banner = ({
         iqamaNumber: iqamaNumber,
         passportExpiry: passportExpiry,
         iqamaExpiry: iqamaExpiry,
+        salary: salary,
       });
     }
   }, [
@@ -69,6 +72,7 @@ const Banner = ({
     iqamaExpiry,
     passportExpiry,
     iqamaNumber,
+    salary,
   ]);
 
   // ...
@@ -188,6 +192,13 @@ const Banner = ({
                   type="text"
                   name="EmployeeName"
                   value={updatedEmployeeData.EmployeeName}
+                  onChange={handleInputChange}
+                />
+                <FormLabel>Employee salary:</FormLabel>
+                <Input
+                  type="number"
+                  name="salary"
+                  value={updatedEmployeeData.salary}
                   onChange={handleInputChange}
                 />
                 <FormLabel>Passport Number:</FormLabel>

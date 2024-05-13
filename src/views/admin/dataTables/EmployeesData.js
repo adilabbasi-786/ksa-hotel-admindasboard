@@ -79,7 +79,6 @@ const EmployeesData = ({ selectedHotel }) => {
         gap={{ base: "20px", xl: "20px" }}
       >
         {employeeData?.data?.map((employee) => {
-          console.log("employee", employee.attributes.status);
           return (
             <Banner
               id={employee.id}
@@ -94,6 +93,7 @@ const EmployeesData = ({ selectedHotel }) => {
               iqamaNumber={employee.attributes.iqamaNumber}
               passportExpiry={employee.attributes.passportExpiry}
               iqamaExpiry={employee.attributes.iqamaExpiry}
+              salary={employee.attributes.salary}
               employeeData={employee.attributes}
             />
           );
