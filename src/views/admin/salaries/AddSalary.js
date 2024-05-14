@@ -16,66 +16,81 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 
-const AddSalary = ({ isOpen, onClose, onAddItem, selectedHotel }) => {
-  const [employeeList, setEmployeeList] = useState([]);
-  const [selectedEmployee, setSelectedEmployee] = useState("");
-  const [totalSalary, setTotalSalary] = useState("");
-  const [advance, setAdvance] = useState("");
+const AddSalary = ({
+  isOpen,
+  onClose,
+  onAddItem,
+  selectedHotel,
+  selectedEmployee,
+  tableData,
+  setTableData,
+  fetchSalaryData,
+}) => {
+  const [entryType, setEntryType] = useState("monthly salary");
+  const [amount, setAmount] = useState("");
+  const [month, setMonth] = useState("");
+  const [employeeName, setEmployeeName] = useState(""); // State to store employee name
+
   const [deduction, setDeduction] = useState("");
 
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:1337/api/employee-data?populate=*&filters[hotel_name][id][$in]=${selectedHotel}`
-        );
-        const employees = response.data.data.map((employee) => ({
-          id: employee.id,
-          name: employee.attributes.EmployeeName,
-          // Include other necessary employee details here
-          employeeData: {
-            id: employee.id,
-            EmployeeName: employee.attributes.EmployeeName,
-            // Include other necessary employee details here
-          },
-        }));
-        setEmployeeList(employees);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-      }
-    };
-    fetchEmployees();
-  }, [selectedHotel]);
+    if (selectedEmployee) {
+      fetchEmployeeName(selectedEmployee);
+    }
+  }, [selectedEmployee]);
 
-  const handleAddItem = async () => {
+  const fetchEmployeeName = async (employeeId) => {
     try {
-      const selectedEmployeeData = employeeList.find(
-        (employee) => employee.id === parseInt(selectedEmployee)
+      const response = await axios.get(
+        `http://localhost:1337/api/employee-data/${employeeId}`
       );
-      if (!selectedEmployeeData) {
-        throw new Error("Selected employee not found");
-      }
+      console.log("response data", response.data);
+      const employeeData = response.data.data;
+      setEmployeeName(employeeData.attributes.EmployeeName);
+    } catch (error) {
+      console.error("Error fetching employee name:", error);
+    }
+  };
 
-      const newSalaryEntry = {
-        basic_salary: totalSalary,
-        deduction: deduction,
-        advance: advance,
+  const handleAddItem = async (newItem) => {
+    // Check if the entry type is "monthly salary" and the entered amount is greater than the employee's salary
+    if (
+      entryType === "monthly salary" &&
+      parseFloat(amount) > parseFloat(tableData[0]?.salary)
+    ) {
+      alert("Monthly salary cannot be greater than the employee's salary.");
+      return;
+    }
+
+    const requestData = {
+      data: {
+        employees_datum: { id: selectedEmployee },
         date: new Date().toISOString(),
-        month: new Date().getMonth() + 1,
-        hotel_name: selectedHotel,
-        employees_datum: selectedEmployeeData.employeeData,
-      };
-
+        type: entryType,
+        amount: amount,
+      },
+    };
+    if (entryType === "monthly salary") {
+      requestData.data.month = month;
+    }
+    if (amount > tableData[0]?.salary) {
+      alert("Monthly salary cannot be more than employee's salary!");
+      return;
+    }
+    try {
       const response = await axios.post(
         "http://localhost:1337/api/salaries",
-        newSalaryEntry
+        requestData
       );
 
       if (response.status === 200) {
-        // If successful, call the callback function to notify parent component
         onAddItem(response.data);
-        onClose(); // Close the modal
+        fetchSalaryData();
+        onClose();
         alert("Salary entry added successfully!");
+        setEntryType("monthly salary");
+        setAmount("");
+        setMonth("");
       } else {
         throw new Error("Failed to add salary entry");
       }
@@ -84,7 +99,38 @@ const AddSalary = ({ isOpen, onClose, onAddItem, selectedHotel }) => {
       alert("Failed to add salary entry. Please try again later.");
     }
   };
+  const generateMonthOptions = () => {
+    const currentMonth = new Date().getMonth() + 1;
+    const options = [];
+    for (let i = 1; i <= 12; i++) {
+      if (i <= currentMonth) {
+        options.push(
+          <option key={i} value={i.toString()}>
+            {getMonthName(i)}
+          </option>
+        );
+      }
+    }
+    return options;
+  };
 
+  const getMonthName = (monthIndex) => {
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    return months[monthIndex - 1];
+  };
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -94,37 +140,41 @@ const AddSalary = ({ isOpen, onClose, onAddItem, selectedHotel }) => {
         <ModalBody>
           <VStack spacing={4}>
             <FormControl>
-              <FormLabel>Employee Name</FormLabel>
+              <FormLabel>Employee</FormLabel>
+              <Input value={employeeName} readOnly />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Employee salary</FormLabel>
+              <Input value={tableData[0]?.salary || ""} readOnly />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Entry Type</FormLabel>
               <Select
-                value={selectedEmployee}
-                onChange={(e) => setSelectedEmployee(e.target.value)}
+                value={entryType}
+                onChange={(e) => setEntryType(e.target.value)}
               >
-                {employeeList.map((employee) => (
-                  <option key={employee.id} value={employee.id}>
-                    {employee.name}
-                  </option>
-                ))}
+                <option value="monthly salary"> Monthly salary</option>
+                <option value="advance"> Advance</option>
+                <option value="deduction"> Deduction</option>
               </Select>
             </FormControl>
+            {entryType === "monthly salary" && (
+              <FormControl>
+                <FormLabel>Month</FormLabel>
+
+                <Select
+                  value={month}
+                  onChange={(e) => setMonth(e.target.value)}
+                >
+                  {generateMonthOptions()}
+                </Select>
+              </FormControl>
+            )}
             <FormControl>
-              <FormLabel>Total Salary</FormLabel>
+              <FormLabel>Amount</FormLabel>
               <Input
-                value={totalSalary}
-                onChange={(e) => setTotalSalary(e.target.value)}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Advance</FormLabel>
-              <Input
-                value={advance}
-                onChange={(e) => setAdvance(e.target.value)}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Deduction</FormLabel>
-              <Input
-                value={deduction}
-                onChange={(e) => setDeduction(e.target.value)}
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
               />
             </FormControl>
           </VStack>
