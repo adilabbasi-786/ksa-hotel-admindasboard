@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Button,
   Input,
@@ -14,14 +15,52 @@ import {
   useColorModeValue,
   Flex,
   VStack,
+  FormControl,
+  FormLabel,
 } from "@chakra-ui/react";
 import Card from "components/card/Card.js";
 import Information from "views/admin/expanses/components/Information";
 
-const ProfitTable = (props) => {
+const ProfitTable = ({ selectedHotel }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [partnerName, setPartnerName] = useState("");
   const [partnerRatio, setPartnerRatio] = useState("");
+  const [partnersData, setPartnersData] = useState([]);
+  const [totalProfit, setTotalProfit] = useState(0);
+  const [selectedMonth, setSelectedMonth] = useState("1");
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+  const [partnerToDelete, setPartnerToDelete] = useState(null);
+
+  useEffect(() => {
+    fetchPartnersData();
+    fetchTotalProfit();
+  }, [selectedHotel, selectedMonth]);
+
+  const fetchPartnersData = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:1337/api/partners?populate=*&filters[hotel_names][id][$in]=${selectedHotel}&filters[month]=${selectedMonth}`
+      );
+      const partnersWithProfit = response.data.data.map((partner) => ({
+        ...partner,
+        profitAmount: partner.attributes.profit_amount,
+        ratio: partner.attributes.ratio,
+      }));
+      setPartnersData(partnersWithProfit);
+    } catch (error) {
+      console.error("Error fetching partners data:", error);
+    }
+  };
+
+  const fetchTotalProfit = async () => {
+    try {
+      // Assuming you fetch total profit from the backend based on selected month
+      const totalProfitFromBackend = 500000; // Fetch total profit from the backend
+      setTotalProfit(totalProfitFromBackend);
+    } catch (error) {
+      console.error("Error fetching total profit:", error);
+    }
+  };
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -40,9 +79,75 @@ const ProfitTable = (props) => {
   };
 
   const handleAddPartner = () => {
-    // Perform any necessary validations
-    // Then, add partner using partnerName and partnerRatio
-    handleCloseModal();
+    // Calculate total ratio of existing partners
+    const currentTotalRatio = partnersData.reduce(
+      (total, partner) => total + parseFloat(partner.attributes.ratio),
+      0
+    );
+
+    // Calculate the new partner's ratio
+    const newPartnerRatio = parseFloat(partnerRatio);
+
+    // Check if adding the new partner will exceed 100% total ratio
+    if (currentTotalRatio + newPartnerRatio <= 100) {
+      // Post new partner data to the backend
+      const newPartnerData = {
+        name: partnerName,
+        ratio: partnerRatio,
+        hotel_names: [selectedHotel],
+        month: selectedMonth,
+        // Other data fields as needed
+      };
+
+      axios
+        .post(
+          "http://localhost:1337/api/partners",
+          {
+            data: newPartnerData,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
+        .then((response) => {
+          console.log("New partner added:", response.data);
+          fetchPartnersData();
+        })
+        .catch((error) => {
+          console.error("Error adding new partner:", error);
+        });
+
+      setPartnerName("");
+      setPartnerRatio("");
+      handleCloseModal();
+    } else {
+      alert("Adding the new partner will exceed 100% total ratio.");
+    }
+  };
+
+  const handleMonthChange = (event) => {
+    setSelectedMonth(event.target.value);
+    fetchTotalProfit(); // Update total profit based on the new selected month
+  };
+
+  const handleDeletePartner = () => {
+    // Delete the selected partner
+    if (partnerToDelete) {
+      // Make a DELETE request to the backend API to delete the partner
+      axios
+        .delete(`http://localhost:1337/api/partners/${partnerToDelete.id}`)
+        .then((response) => {
+          console.log("Partner deleted:", response.data);
+          // After successful deletion, close the confirmation modal and refresh the partner data
+          setDeleteConfirmationOpen(false);
+          fetchPartnersData();
+        })
+        .catch((error) => {
+          console.error("Error deleting partner:", error);
+        });
+    }
   };
 
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
@@ -50,6 +155,15 @@ const ProfitTable = (props) => {
     "0px 18px 40px rgba(112, 144, 176, 0.12)",
     "unset"
   );
+
+  const calculateProfitShare = (ratio) => {
+    const ratioAsFloat = parseFloat(ratio);
+    if (!isNaN(ratioAsFloat)) {
+      return (ratioAsFloat / 100) * totalProfit;
+    } else {
+      return 0;
+    }
+  };
 
   return (
     <>
@@ -65,9 +179,18 @@ const ProfitTable = (props) => {
             Partner Profit Ratios
           </Text>
           <SimpleGrid columns={{ base: 1, md: 3 }} gap="20px" w="100%">
-            <Information boxShadow={cardShadow} title="Adil" value="50%" />
-            <Information boxShadow={cardShadow} title="Nouman" value="20%" />
-            <Information boxShadow={cardShadow} title="faheem" value="30%" />
+            {partnersData.map((partner) => (
+              <Information
+                key={partner.id}
+                boxShadow={cardShadow}
+                title={partner.attributes.name}
+                value={partner.attributes.ratio}
+                onDelete={() => {
+                  setPartnerToDelete(partner);
+                  setDeleteConfirmationOpen(true);
+                }}
+              />
+            ))}
           </SimpleGrid>
         </VStack>
         <Flex
@@ -88,8 +211,27 @@ const ProfitTable = (props) => {
       </Card>
       <Card mb={{ base: "0px", lg: "20px" }}>
         <Flex alignItems="center" mb={{ base: "10px", lg: "0px" }}>
-          <Text mr={{ base: "3px", lg: "5px" }}>Select month</Text>
-          <Input type="month" id="profitmonth" name="profitmonth" />
+          <FormControl>
+            <FormLabel>Select month</FormLabel>
+            <select
+              name="months"
+              onChange={handleMonthChange}
+              value={selectedMonth}
+            >
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+          </FormControl>
         </Flex>
         <VStack spacing={4}>
           <Text
@@ -99,28 +241,20 @@ const ProfitTable = (props) => {
             mt="10px"
             mb="4px"
           >
-            Total Profit: 5041542
+            Total Profit: {totalProfit}
           </Text>
           <SimpleGrid columns={{ base: 1, md: 3 }} gap="20px" w="100%">
-            <Information
-              boxShadow={cardShadow}
-              title="Partner 1"
-              value="502000"
-            />
-            <Information
-              boxShadow={cardShadow}
-              title="Partner-2"
-              value="20103"
-            />
-            <Information
-              boxShadow={cardShadow}
-              title="Partner-3"
-              value="305422"
-            />
+            {partnersData.map((partner) => (
+              <Information
+                key={partner.id}
+                boxShadow={cardShadow}
+                title={partner.attributes.name}
+                value={calculateProfitShare(partner.attributes.ratio)}
+              />
+            ))}
           </SimpleGrid>
         </VStack>
       </Card>
-      {/* Modal for adding a new partner */}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         <ModalOverlay />
         <ModalContent>
@@ -144,6 +278,37 @@ const ProfitTable = (props) => {
               Add
             </Button>
             <Button onClick={handleCloseModal}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      {/* Confirmation modal for deleting partner */}
+      <Modal
+        isOpen={deleteConfirmationOpen}
+        onClose={() => setDeleteConfirmationOpen(false)}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Delete Partner</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {partnerToDelete && (
+              <Text>
+                Are you sure you want to delete partner{" "}
+                {partnerToDelete.attributes.name}?
+              </Text>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              width="fit-content"
+              onClick={handleDeletePartner}
+            >
+              Delete Partner
+            </Button>
+            <Button onClick={() => setDeleteConfirmationOpen(false)}>
+              Cancel
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

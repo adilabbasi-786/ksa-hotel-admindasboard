@@ -1,7 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Button,
-  Input,
+  FormControl,
+  FormLabel,
+  Text,
+  useColorModeValue,
+  VStack,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -9,11 +14,7 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  SimpleGrid,
-  Text,
-  useColorModeValue,
-  Flex,
-  VStack,
+  Input,
 } from "@chakra-ui/react";
 import Card from "components/card/Card.js";
 import Information from "views/admin/expanses/components/Information";
@@ -25,8 +26,32 @@ const getCurrentMonth = () => {
   return `${year}-${month}`;
 };
 
-const RentKafalat = (props) => {
+const RentKafalat = ({ selectedHotel }) => {
+  const [rentData, setRentData] = useState(null);
   const [defaultMonth, setDefaultMonth] = useState(getCurrentMonth());
+  const [selectedMonth, setSelectedMonth] = useState("1");
+  const [isPaid, setIsPaid] = useState(false);
+  const [hotelRent, setHotelRent] = useState();
+  const [kafalat, setKafalat] = useState();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [paidRent, setPaidRent] = useState("");
+  const [paidKafalat, setPaidKafalat] = useState("");
+
+  useEffect(() => {
+    fetchRentKafalatData();
+  }, [selectedHotel, selectedMonth]);
+
+  const fetchRentKafalatData = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:1337/api/rents?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[month]=${selectedMonth}`
+      );
+      setRentData(response.data.data);
+      setIsPaid(response.data.data[0]?.attributes?.isPaid || false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const cardShadow = useColorModeValue(
@@ -34,25 +59,75 @@ const RentKafalat = (props) => {
     "unset"
   );
 
+  const handleMonthChange = (event) => {
+    setSelectedMonth(event.target.value);
+  };
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  const handlePayRent = () => {
+    openModal();
+    // Fetch the data again if needed
+    // fetchRentKafalatData();
+  };
+
+  const handleSubmitPaidAmounts = async () => {
+    try {
+      // Make a POST request to submit paid rent and kafalat
+      await axios.post(
+        "http://localhost:1337/api/rents",
+        {
+          data: {
+            hotelRent: paidRent,
+            kafalat: paidKafalat,
+            hotel_name: selectedHotel,
+            month: selectedMonth,
+          },
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setIsPaid(true);
+      closeModal();
+      paidKafalat("");
+      paidRent("");
+      fetchRentKafalatData();
+    } catch (error) {
+      console.error("Error paying rent:", error);
+    }
+  };
+
   return (
     <>
-      <Flex
-        alignItems="center"
-        mb="10px"
-        width={{ base: "100%", lg: "30%" }} // Adjust width based on screen size
-      >
-        <Text mr={{ base: "5px", lg: "10px" }}>Select month</Text>
-        <Input
-          type="month"
-          id="profitmonth"
-          name="profitmonth"
-          value={defaultMonth}
-          onChange={(e) => setDefaultMonth(e.target.value)}
-          fontSize="md" // Adjust the font size for mobile
-          width="100%" // Adjust the width for mobile
-        />
-      </Flex>
-      <Card mb={{ base: "20px", lg: "50px" }} width="80%">
+      <VStack alignItems="center" mb="10px" width="100%">
+        <Text>Select month</Text>
+        <FormControl>
+          <FormLabel>Select month</FormLabel>
+          <select
+            name="months"
+            onChange={handleMonthChange}
+            value={selectedMonth}
+          >
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+        </FormControl>
+      </VStack>
+      <Card mb="20px" width="80%">
         <VStack spacing={4}>
           <Text
             color={textColorPrimary}
@@ -63,40 +138,67 @@ const RentKafalat = (props) => {
           >
             Hotel Rent And Kafalat
           </Text>
-          <SimpleGrid columns={{ base: 1, md: 3 }} gap="20px" w="100%">
-            <Text
-              color={textColorPrimary}
-              fontWeight="bold"
-              fontSize={{ base: "xl", lg: "2xl" }}
-              mt="10px"
-              mb="4px"
-            >
-              Hotel Rent
+          {rentData && (
+            <>
               <Information
                 boxShadow={cardShadow}
                 title={`Hotel Rent for Month of ${defaultMonth}`}
-                value="1000SAR"
+                value={`${rentData[0]?.attributes?.hotelRent} SAR`}
               />
-            </Text>
-          </SimpleGrid>
-          <SimpleGrid columns={{ base: 1, md: 3 }} gap="20px" w="100%">
-            <Text
-              color={textColorPrimary}
-              fontWeight="bold"
-              fontSize={{ base: "xl", lg: "2xl" }}
-              mt="10px"
-              mb="4px"
-            >
-              Kafalat
               <Information
                 boxShadow={cardShadow}
                 title={`Kafalat for Month of ${defaultMonth}`}
-                value="1000SAR"
+                value={`${rentData[0]?.attributes?.kafalat} SAR`}
               />
-            </Text>
-          </SimpleGrid>
+            </>
+          )}
         </VStack>
+        <Button
+          colorScheme="blue"
+          disabled={
+            isPaid ||
+            (rentData &&
+              rentData[0]?.attributes?.hotelRent &&
+              rentData[0]?.attributes?.kafalat)
+          } // Disable the button if rent and kafalat are paid or if they already have values
+          onClick={handlePayRent} // Handle button click to open modal
+        >
+          {isPaid ? "Rent Paid" : "Pay Rent"}
+        </Button>
       </Card>
+      <Modal isOpen={isModalOpen} onClose={closeModal}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Pay Rent and Kafalat</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <FormLabel>Rent Amount</FormLabel>
+              <Input
+                type="number"
+                value={paidRent}
+                onChange={(e) => setPaidRent(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Kafalat Amount</FormLabel>
+              <Input
+                type="number"
+                value={paidKafalat}
+                onChange={(e) => setPaidKafalat(e.target.value)}
+              />
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={closeModal}>
+              Close
+            </Button>
+            <Button colorScheme="green" onClick={handleSubmitPaidAmounts}>
+              Submit
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };
