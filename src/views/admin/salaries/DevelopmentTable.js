@@ -100,42 +100,42 @@ export default function DevelopmentTable(props) {
               <Tr {...row.getRowProps()} key={index}>
                 {row.cells.map((cell, index) => {
                   let data = "";
-                  if (cell.column.Header === "Employee Name") {
+                  if (cell.column.Header === "Date") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === "Total Salary") {
+                  if (cell.column.Header === "Employee_Name") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === "Advance") {
+                  if (cell.column.Header === "Amount") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === "Deduction") {
+                  if (cell.column.Header === "Month") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === "Total Paid salary") {
+                  if (cell.column.Header === "Type") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === "STATUS") {
+                  if (cell.column.Header === "Basic Salary") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}

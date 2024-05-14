@@ -1,7 +1,8 @@
 import { Box } from "@chakra-ui/react";
 import React, { useState } from "react";
 import DropDown from "./DropDown";
-import SalaryTable from "./SalaryTable";
+import SalaryTable from "./EmployeeSalaryTable";
+import EmployeeDropDown from "./EmployeeDropDown";
 
 const Index = () => {
   const [selectedHotel, setSelectedHotel] = useState(null);
@@ -15,7 +16,10 @@ const Index = () => {
       <Box mb="20px">
         <DropDown onSelectHotel={handleSelectHotel} />
       </Box>
-      {selectedHotel && <SalaryTable selectedHotel={selectedHotel} />}
+      <Box mb="20px">
+        {selectedHotel && <EmployeeDropDown selectedHotel={selectedHotel} />}
+      </Box>
+      {/* {selectedHotel && <SalaryTable selectedHotel={selectedHotel} />} */}
     </Box>
   );
 };
