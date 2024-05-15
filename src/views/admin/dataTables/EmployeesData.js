@@ -15,27 +15,25 @@ import Banner from "./components/Banner";
 import banner from "assets/img/auth/banner.png";
 import EmployeeForm from "./EmployeeForm";
 import axios from "axios";
-// Importing the JSON data directly for demonstration purposes
-import tableDataDevelopment from "views/admin/dataTables/variables/tableDataDevelopment.json";
 import Drivers from "./Drivers";
 
 const EmployeesData = ({ selectedHotel }) => {
   const [employeeData, setEmployeeData] = useState([]);
   const [isAddEmployeeModalOpen, setIsAddEmployeeModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchEmployeeData = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:1337/api/employee-data?populate=*&filters[hotel_name][id][$in]=${selectedHotel}`
-        );
-        setEmployeeData(response.data);
-        console.log("employeedatddddddda", response.data.data);
-      } catch (error) {
-        console.error("Error fetching employee data:", error);
-      }
-    };
+  const fetchEmployeeData = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:1337/api/employee-data?populate=*&filters[hotel_name][id][$in]=${selectedHotel}`
+      );
+      setEmployeeData(response.data);
+      console.log("employeedatddddddda", response.data.data);
+    } catch (error) {
+      console.error("Error fetching employee data:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchEmployeeData();
   }, [selectedHotel]);
 
@@ -95,6 +93,7 @@ const EmployeesData = ({ selectedHotel }) => {
               iqamaExpiry={employee.attributes.iqamaExpiry}
               salary={employee.attributes.salary}
               employeeData={employee.attributes}
+              fetchEmployeeData={fetchEmployeeData}
             />
           );
         })}
@@ -110,6 +109,7 @@ const EmployeesData = ({ selectedHotel }) => {
           <ModalCloseButton />
           <ModalBody>
             <EmployeeForm
+              fetchEmployeeData={fetchEmployeeData}
               selectedHotel={selectedHotel}
               onClose={handleCloseAddEmployeeModal}
             />

@@ -24,6 +24,7 @@ import { useHistory } from "react-router-dom";
 import Card from "components/card/Card.js";
 import avatar1 from "assets/img/avatars/avatar6.png";
 import EmployeeFullDetail from "views/admin/dataTables/EmployeeFullDetail";
+import axios from "axios";
 
 const Banner = ({
   name,
@@ -37,6 +38,7 @@ const Banner = ({
   iqamaExpiry,
   id,
   salary,
+  fetchEmployeeData,
 }) => {
   const history = useHistory();
   const [isOpen, setIsOpen] = useState(false);
@@ -95,6 +97,7 @@ const Banner = ({
             setShowSuccessMessage(false); // Hide success message after a delay
             setIsOpen(false); // Close the modal
           }, 1000);
+          fetchEmployeeData();
         } else {
           console.error("Error saving data:", response.statusText);
         }
@@ -103,7 +106,24 @@ const Banner = ({
         console.error("Error saving data:", error);
       });
   };
-
+  const handleDeleteEmployee = () => {
+    if (window.confirm("Are you sure you want to delete this employee?")) {
+      axios
+        .delete(`http://localhost:1337/api/employee-data/${id}`)
+        .then((response) => {
+          if (response.status === 200) {
+            // Optionally, show a success message
+            alert("Employee deleted successfully");
+            fetchEmployeeData();
+          } else {
+            console.error("Error deleting employee:", response.statusText);
+          }
+        })
+        .catch((error) => {
+          console.error("Error deleting employee:", error);
+        });
+    }
+  };
   const handleInputChange = (event) => {
     const { name, value } = event.target;
 
@@ -254,6 +274,13 @@ const Banner = ({
               onClick={isEditMode ? handleSaveChanges : handleToggleEditMode}
             >
               {isEditMode ? "Save" : "Edit"}
+            </Button>
+            <Button
+              colorScheme="blue"
+              style={{ marginLeft: "10px" }}
+              onClick={handleDeleteEmployee}
+            >
+              {isEditMode ? " " : "Delete Employee"}
             </Button>
           </ModalFooter>
         </ModalContent>

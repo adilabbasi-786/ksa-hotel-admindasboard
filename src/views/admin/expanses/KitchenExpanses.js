@@ -19,11 +19,7 @@ const KitchenExpanses = ({ selectedHotel }) => {
   const [tableData, setTableData] = useState([]);
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
 
-  const handleAddItem = (newItem) => {
-    console.log("New item added:", newItem);
-  };
-
-  useEffect(() => {
+  const getData = () => {
     axios
       .get(
         `http://localhost:1337/api/daily-registers?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date]=${selectedDate}`
@@ -50,6 +46,10 @@ const KitchenExpanses = ({ selectedHotel }) => {
       .catch((error) => {
         console.error("Error fetching table data:", error);
       });
+  };
+
+  useEffect(() => {
+    getData();
   }, [selectedHotel, selectedDate]);
 
   const columnsData = [
@@ -79,6 +79,9 @@ const KitchenExpanses = ({ selectedHotel }) => {
       console.log("ssss", [...prevData, newItem]);
       return [...prevData, newItem];
     });
+  };
+  const handleAddItem = (newItem) => {
+    console.log("New item added:", newItem);
   };
   return (
     <>
@@ -121,6 +124,7 @@ const KitchenExpanses = ({ selectedHotel }) => {
         onClose={() => setIsModalOpen(false)}
         onAddItem={handleAddItem}
         updateTableData={handleUpdateTableData}
+        getData={getData}
       />
     </>
   );

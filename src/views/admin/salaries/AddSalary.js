@@ -73,10 +73,15 @@ const AddSalary = ({
     if (entryType === "monthly salary") {
       requestData.data.month = month;
     }
-    if (amount > tableData[0]?.salary) {
-      alert("Monthly salary cannot be more than employee's salary!");
-      return;
+
+    // Validate amount only for "monthly salary" entry type
+    if (entryType === "monthly salary") {
+      if (amount > tableData[0]?.salary) {
+        alert("Monthly salary cannot be more than employee's salary!");
+        return;
+      }
     }
+
     try {
       const response = await axios.post(
         "http://localhost:1337/api/salaries",

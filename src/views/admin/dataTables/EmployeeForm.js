@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import EmployeeContext from "EmployeeContext";
 
-const EmployeeForm = ({ onClose, selectedHotel }) => {
+const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   const [formData, setFormData] = useState({
@@ -128,6 +128,7 @@ const EmployeeForm = ({ onClose, selectedHotel }) => {
       );
       console.log("Form submitted successfully!", response.data);
       setFormSubmitted(true);
+      fetchEmployeeData();
       setTimeout(() => {
         onClose(); // Close the modal after 2 seconds
       }, 2000);

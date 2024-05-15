@@ -132,7 +132,13 @@ const ProfitTable = ({ selectedHotel }) => {
     fetchTotalProfit(); // Update total profit based on the new selected month
   };
 
+  const handleDeleteConfirmation = (partner) => {
+    setPartnerToDelete(partner);
+    setDeleteConfirmationOpen(true);
+  };
+
   const handleDeletePartner = () => {
+    console.log("deleteing");
     // Delete the selected partner
     if (partnerToDelete) {
       // Make a DELETE request to the backend API to delete the partner
@@ -185,10 +191,7 @@ const ProfitTable = ({ selectedHotel }) => {
                 boxShadow={cardShadow}
                 title={partner.attributes.name}
                 value={partner.attributes.ratio}
-                onDelete={() => {
-                  setPartnerToDelete(partner);
-                  setDeleteConfirmationOpen(true);
-                }}
+                onDelete={() => handleDeleteConfirmation(partner)}
               />
             ))}
           </SimpleGrid>
@@ -204,7 +207,12 @@ const ProfitTable = ({ selectedHotel }) => {
           >
             Add Partner
           </Button>
-          <Button colorScheme="blue" width="fit-content">
+          <Button
+            colorScheme="blue"
+            width="fit-content"
+            onClick={handleDeletePartner}
+          >
+            {console.log("Delete")}
             Delete Partner
           </Button>
         </Flex>
@@ -281,7 +289,6 @@ const ProfitTable = ({ selectedHotel }) => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      {/* Confirmation modal for deleting partner */}
       <Modal
         isOpen={deleteConfirmationOpen}
         onClose={() => setDeleteConfirmationOpen(false)}

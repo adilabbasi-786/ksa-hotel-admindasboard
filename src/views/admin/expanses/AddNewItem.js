@@ -23,6 +23,7 @@ const AddNewItem = ({
   selectedHotel,
   selectedDate,
   updateTableData,
+  getData,
 }) => {
   const [itemName, setItemName] = useState("");
   const [quantity, setQuantity] = useState("");
@@ -55,6 +56,8 @@ const AddNewItem = ({
         onAddItem(newItem);
         // updateTableData(onAddItem);
         onClose();
+
+        getData();
       })
       .catch((error) => {
         console.error(error);

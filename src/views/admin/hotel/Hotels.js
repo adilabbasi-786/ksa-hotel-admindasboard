@@ -69,6 +69,11 @@ const Hotels = () => {
               ranking={hotel?.id}
               link={`hotel/${hotel.id}`}
               title={hotel?.attributes?.name}
+              managerName={hotel?.attributes?.managerName}
+              managerEmail={hotel?.attributes?.managerEmail}
+              managerPassword={hotel?.attributes?.managerPassword}
+              hotelRent={hotel?.attributes?.hotelRent}
+              kafalat={hotel?.attributes?.kafalat}
             />
           ))}
       </Card>
