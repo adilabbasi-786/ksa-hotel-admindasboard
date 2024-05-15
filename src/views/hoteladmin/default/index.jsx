@@ -120,7 +120,7 @@ export default function UserReports() {
           name="Your balance"
           value="$1,000"
         />
-        <MiniStatistics
+        {/* <MiniStatistics
           startContent={
             <IconBox
               w="56px"
@@ -131,7 +131,7 @@ export default function UserReports() {
           }
           name="New Tasks"
           value="154"
-        />
+        /> */}
         <MiniStatistics
           startContent={
             <IconBox
@@ -148,7 +148,7 @@ export default function UserReports() {
         />
       </SimpleGrid>
 
-      <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px" mb="20px">
+      {/* <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px" mb="20px">
         <TotalSpent />
         <WeeklyRevenue />
       </SimpleGrid>
@@ -168,7 +168,7 @@ export default function UserReports() {
           <Tasks />
           <MiniCalendar h="100%" minW="100%" selectRange={false} />
         </SimpleGrid>
-      </SimpleGrid>
+      </SimpleGrid> */}
     </Box>
   );
 }
