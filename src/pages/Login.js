@@ -122,7 +122,16 @@ const SignIn = () => {
               sx={{ mt: 3, mb: 2 }}
               id="signInAdmin"
             >
-              Sign In
+              Sign In Admin
+            </Button>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              id="signInAdmin"
+            >
+              Sign In Hotel Manager
             </Button>
           </Box>
         </Box>
