@@ -20,8 +20,8 @@ const HotelForm = () => {
     kafalat: "",
     hotelRent: "",
   });
+  const [roleId, setRoleId] = useState("manager");
 
-  // Function to handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
@@ -30,38 +30,90 @@ const HotelForm = () => {
     }));
   };
 
-  // Function to handle form submission
-  const handleSubmit = async () => {
+  const registerManager = async () => {
     try {
-      const response = await fetch("http://localhost:1337/api/hotel-names", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          data: formData,
-        }),
-      });
+      const tokenResponse = await fetch(
+        "http://localhost:1337/api/auth/local",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            identifier: "adil@adil.com",
+            password: "adil@123",
+          }),
+        }
+      );
+      const token = await tokenResponse.json();
+
+      const response = await fetch(
+        "http://localhost:1337/api/auth/local/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token.jwt}`,
+          },
+          body: JSON.stringify({
+            username: formData.managerName,
+            email: formData.managerEmail,
+            password: formData.managerPassword,
+            role: roleId,
+          }),
+        }
+      );
       if (!response.ok) {
-        throw new Error("Failed to submit form data");
+        throw new Error("Failed to register manager");
       }
-      setFormData({
-        name: "",
-        location: "",
-        managerName: "",
-        managerEmail: "",
-        managerPassword: "",
-        kafalat: "",
-        hotelRent: "",
-      });
-      alert("Form submitted successfully!");
-      history.push("/admin/hotel");
+      const responseData = await response.json();
+      console.log("resss", responseData.user.id);
+      const userId = responseData.user.id;
+      return userId;
     } catch (error) {
-      console.error("Error submitting form data:", error);
-      alert("Failed to submit form data. Please try again later.");
+      console.error("Error registering manager:", error);
+      return false;
     }
   };
 
+  const handleSubmit = async (userId) => {
+    const registrationSuccess = await registerManager();
+    console.log("regiseta", registrationSuccess);
+
+    if (registrationSuccess) {
+      try {
+        const response = await fetch("http://localhost:1337/api/hotel-names", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            data: formData,
+            userId: registrationSuccess,
+          }),
+        });
+        if (!response.ok) {
+          throw new Error("Failed to submit form data");
+        }
+        setFormData({
+          name: "",
+          location: "",
+          managerName: "",
+          managerEmail: "",
+          managerPassword: "",
+          kafalat: "",
+          hotelRent: "",
+        });
+        alert("Form submitted successfully!");
+        history.push("/admin/hotel");
+      } catch (error) {
+        console.error("Error submitting form data:", error);
+        alert("Failed to submit form data. Please try again later.");
+      }
+    } else {
+      alert("Failed to register manager. Please try again later.");
+    }
+  };
   return (
     <Box p={4} bg="white">
       <FormControl>
