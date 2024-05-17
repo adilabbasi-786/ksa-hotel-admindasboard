@@ -25,6 +25,7 @@ import Card from "components/card/Card.js";
 import avatar1 from "assets/img/avatars/avatar6.png";
 import EmployeeFullDetail from "views/admin/dataTables/EmployeeFullDetail";
 import axios from "axios";
+import { URL } from "Utils";
 
 const Banner = ({
   name,
@@ -83,7 +84,7 @@ const Banner = ({
   };
 
   const handleSaveChanges = () => {
-    fetch(`http://localhost:1337/api/employee-data/${id}`, {
+    fetch(`${URL}/api/employee-data/${id}`, {
       method: "PUT",
       body: JSON.stringify({ data: updatedEmployeeData }),
       headers: {
@@ -109,7 +110,7 @@ const Banner = ({
   const handleDeleteEmployee = () => {
     if (window.confirm("Are you sure you want to delete this employee?")) {
       axios
-        .delete(`http://localhost:1337/api/employee-data/${id}`)
+        .delete(`${URL}/api/employee-data/${id}`)
         .then((response) => {
           if (response.status === 200) {
             // Optionally, show a success message

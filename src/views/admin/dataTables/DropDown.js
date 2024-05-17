@@ -11,6 +11,7 @@ import { useHistory } from "react-router-dom";
 import Card from "components/card/Card";
 import axios from "axios";
 import EmployeeContext from "../../../EmployeeContext";
+import { URL } from "Utils";
 
 const DropDown = ({ onSelectHotel }) => {
   const [selectedHotel, setSelectedHotel] = useState(null);
@@ -23,7 +24,7 @@ const DropDown = ({ onSelectHotel }) => {
 
   const fetchHotelNames = async () => {
     try {
-      const response = await axios.get("http://localhost:1337/api/hotel-names");
+      const response = await axios.get(`${URL}/api/hotel-names`);
       setHotels(response.data);
     } catch (error) {
       console.error("Error fetching hotel names:", error);

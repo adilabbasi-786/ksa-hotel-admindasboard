@@ -9,6 +9,7 @@ import Card from "components/card/Card.js";
 import React, { useState } from "react";
 import Information from "../expanses/components/Information";
 import FullScreenImageModal from "./FullScreenModal";
+import { URL } from "Utils";
 
 const EmployeeFullDetail = ({ employeeData }) => {
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
@@ -81,13 +82,13 @@ const EmployeeFullDetail = ({ employeeData }) => {
           <Box
             onClick={() =>
               openImageModal(
-                `http://localhost:1337${employeeData?.iqamaPicture?.data?.attributes?.url}`
+                `${URL}${employeeData?.iqamaPicture?.data?.attributes?.url}`
               )
             }
             cursor="pointer"
           >
             <Image
-              src={`http://localhost:1337${employeeData?.iqamaPicture?.data?.attributes?.formats?.thumbnail?.url}`}
+              src={`${URL}${employeeData?.iqamaPicture?.data?.attributes?.formats?.thumbnail?.url}`}
               alt="Iqama Picture"
             />
           </Box>
@@ -97,13 +98,13 @@ const EmployeeFullDetail = ({ employeeData }) => {
           <Box
             onClick={() =>
               openImageModal(
-                `http://localhost:1337${employeeData?.passportImage?.data?.attributes?.url}`
+                `${URL}${employeeData?.passportImage?.data?.attributes?.url}`
               )
             }
             cursor="pointer"
           >
             <Image
-              src={`http://localhost:1337${employeeData?.passportImage?.data?.attributes?.formats?.thumbnail?.url}`}
+              src={`${URL}${employeeData?.passportImage?.data?.attributes?.formats?.thumbnail?.url}`}
               alt="Passport Picture"
             />
           </Box>

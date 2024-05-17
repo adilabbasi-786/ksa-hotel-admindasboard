@@ -4,6 +4,7 @@ import HotelCard from "./HotelCard";
 import { useHistory } from "react-router-dom";
 import { Button, Flex, Text, useColorModeValue } from "@chakra-ui/react";
 import Card from "components/card/Card.js";
+import { URL } from "Utils";
 
 const Hotels = () => {
   const history = useHistory();
@@ -19,7 +20,7 @@ const Hotels = () => {
 
   useEffect(() => {
     const getData = async () => {
-      let req = await fetch("http://localhost:1337/api/hotel-names?populate=*");
+      let req = await fetch(`${URL}/api/hotel-names?populate=*`);
       let res = await req.json();
       setHotels(res.data);
     };
@@ -65,7 +66,7 @@ const Hotels = () => {
               id={hotel?.id}
               boxShadow={cardShadow}
               mb="20px"
-              image={`http://localhost:1337${hotel?.attributes?.img?.data?.attributes?.url}`}
+              image={`${URL}${hotel?.attributes?.img?.data?.attributes?.url}`}
               ranking={hotel?.id}
               link={`hotel/${hotel.id}`}
               title={hotel?.attributes?.name}

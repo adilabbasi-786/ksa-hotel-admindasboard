@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 import Card from "components/card/Card.js";
 import Information from "views/admin/expanses/components/Information";
+import { URL } from "Utils";
 
 const getCurrentMonth = () => {
   const currentDate = new Date();
@@ -44,7 +45,7 @@ const RentKafalat = ({ selectedHotel }) => {
   const fetchRentKafalatData = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:1337/api/rents?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[month]=${selectedMonth}`
+        `${URL}/api/rents?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[month]=${selectedMonth}`
       );
       setRentData(response.data.data);
       setIsPaid(response.data.data[0]?.attributes?.isPaid || false);
@@ -76,7 +77,7 @@ const RentKafalat = ({ selectedHotel }) => {
     try {
       // Make a POST request to submit paid rent and kafalat
       await axios.post(
-        "http://localhost:1337/api/rents",
+        `${URL}/api/rents`,
         {
           data: {
             hotelRent: paidRent,

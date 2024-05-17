@@ -16,6 +16,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import axios from "axios";
+import { URL } from "Utils";
 const AddNewItem = ({
   isOpen,
   onClose,
@@ -41,7 +42,7 @@ const AddNewItem = ({
     };
     axios
       .post(
-        "http://localhost:1337/api/daily-registers",
+        `${URL}/api/daily-registers`,
         {
           data: newItem,
         },

@@ -10,6 +10,7 @@ import {
 import axios from "axios";
 import Card from "components/card/Card";
 import EmployeeSalaryTable from "./EmployeeSalaryTable"; // Import the EmployeeSalaryTable component
+import { URL } from "Utils";
 
 const EmployeeDropDown = ({ selectedHotel }) => {
   const [employees, setEmployees] = useState([]);
@@ -25,7 +26,7 @@ const EmployeeDropDown = ({ selectedHotel }) => {
   const fetchEmployees = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:1337/api/employee-data?populate=*&filters[hotel_name][id][$in]=${selectedHotel}`
+        `${URL}/api/employee-data?populate=*&filters[hotel_name][id][$in]=${selectedHotel}`
       );
       setEmployees(response.data.data);
     } catch (error) {

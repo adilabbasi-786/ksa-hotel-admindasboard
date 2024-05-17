@@ -4,6 +4,7 @@ import { Button, Flex, Text, useColorModeValue } from "@chakra-ui/react";
 import { Card, Input } from "@material-ui/core";
 import DevelopmentTable from "../expanses/components/DevelopmentTable";
 import AddNewItem from "./AddNewItem";
+import { URL } from "Utils";
 
 const getCurrentDate = () => {
   const currentDate = new Date();
@@ -22,7 +23,7 @@ const KitchenExpanses = ({ selectedHotel }) => {
   const getData = () => {
     axios
       .get(
-        `http://localhost:1337/api/daily-registers?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date]=${selectedDate}`
+        `${URL}/api/daily-registers?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date]=${selectedDate}`
       )
       .then((response) => {
         const mappedData = response?.data?.data?.map((item) => {

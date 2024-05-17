@@ -4,7 +4,7 @@ import { Card, Input } from "@material-ui/core";
 import DevelopmentTable from "./DevelopmentTable";
 import AddSalary from "./AddSalary";
 import axios from "axios";
-
+import { URL } from "Utils";
 const EmployeeSalaryTable = ({ selectedHotel, selectedEmployee }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tableData, setTableData] = useState([]);
@@ -32,7 +32,7 @@ const EmployeeSalaryTable = ({ selectedHotel, selectedEmployee }) => {
   const fetchSalaryData = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:1337/api/salaries?populate=*&sort=date:desc&filters[employees_datum]=${selectedEmployee}`
+        `${URL}/api/salaries?populate=*&sort=date:desc&filters[employees_datum]=${selectedEmployee}`
       );
       const data = response.data.data.map((item) => ({
         date: item.attributes.date,

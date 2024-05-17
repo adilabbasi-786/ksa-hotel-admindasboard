@@ -4,6 +4,7 @@ import { Card, Input } from "@material-ui/core";
 import DevelopmentTable from "./DevelopmentTable";
 import AddSalary from "./AddSalary";
 import axios from "axios";
+import { URL } from "Utils";
 
 const SalaryTable = ({ selectedHotel }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,7 +18,7 @@ const SalaryTable = ({ selectedHotel }) => {
   useEffect(() => {
     axios
       .get(
-        `http://localhost:1337/api/employee-data?populate=*&filters[hotel_name][id][$in]=${selectedHotel}`
+        `${URL}/api/employee-data?populate=*&filters[hotel_name][id][$in]=${selectedHotel}`
       )
       .then((response) => {
         const mappedData = response?.data?.data?.map((item) => {

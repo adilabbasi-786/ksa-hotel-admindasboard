@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Information from "views/admin/expanses/components/Information";
 import { useParams } from "react-router-dom";
 import { useHistory } from "react-router-dom";
+import { URL } from "Utils";
 
 const HotelDetail = () => {
   const { id } = useParams();
@@ -13,7 +14,7 @@ const HotelDetail = () => {
   useEffect(() => {
     const getData = async () => {
       let req = await fetch(
-        `http://localhost:1337/api/hotel-names?populate=*&[filters][id]=${id}`
+        `${URL}/api/hotel-names?populate=*&[filters][id]=${id}`
       );
       let res = await req.json();
       setHotel(res.data);

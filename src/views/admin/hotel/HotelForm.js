@@ -9,6 +9,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { useHistory } from "react-router-dom";
+import { URL } from "Utils";
 const HotelForm = () => {
   const history = useHistory();
   const [formData, setFormData] = useState({
@@ -32,37 +33,31 @@ const HotelForm = () => {
 
   const registerManager = async () => {
     try {
-      const tokenResponse = await fetch(
-        "http://localhost:1337/api/auth/local",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            identifier: "adil@adil.com",
-            password: "adil@123",
-          }),
-        }
-      );
+      const tokenResponse = await fetch(`${URL}/api/auth/local`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          identifier: "adil@adil.com",
+          password: "adil@123",
+        }),
+      });
       const token = await tokenResponse.json();
 
-      const response = await fetch(
-        "http://localhost:1337/api/auth/local/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token.jwt}`,
-          },
-          body: JSON.stringify({
-            username: formData.managerName,
-            email: formData.managerEmail,
-            password: formData.managerPassword,
-            role: roleId,
-          }),
-        }
-      );
+      const response = await fetch(`${URL}/api/auth/local/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token.jwt}`,
+        },
+        body: JSON.stringify({
+          username: formData.managerName,
+          email: formData.managerEmail,
+          password: formData.managerPassword,
+          role: roleId,
+        }),
+      });
       if (!response.ok) {
         throw new Error("Failed to register manager");
       }
@@ -82,7 +77,7 @@ const HotelForm = () => {
 
     if (registrationSuccess) {
       try {
-        const response = await fetch("http://localhost:1337/api/hotel-names", {
+        const response = await fetch(`${URL}/api/hotel-names`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

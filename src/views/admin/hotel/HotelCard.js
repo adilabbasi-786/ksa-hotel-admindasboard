@@ -22,6 +22,7 @@ import { MdEdit, MdDelete } from "react-icons/md";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import Card from "components/card/Card";
+import { URL } from "Utils";
 const HotelCard = ({
   title,
   ranking,
@@ -55,7 +56,7 @@ const HotelCard = ({
   const handleSaveChanges = () => {
     const requestData = { data: updatedHotelData }; // Wrap updatedHotelData in a "data" property
     axios
-      .put(`http://localhost:1337/api/hotel-names/${id}`, requestData)
+      .put(`${URL}/api/hotel-names/${id}`, requestData)
       .then((response) => {
         console.log("Data updated successfully:", response.data);
         setIsEditMode(false); // Exit edit mode
@@ -67,7 +68,7 @@ const HotelCard = ({
   };
   const handleDeleteHotel = () => {
     axios
-      .delete(`http://localhost:1337/api/hotel-names/${id}`)
+      .delete(`${URL}/api/hotel-names/${id}`)
       .then((response) => {
         console.log("Hotel deleted successfully:", response.data);
         // Additional logic if needed after deletion

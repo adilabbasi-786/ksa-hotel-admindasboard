@@ -12,6 +12,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import EmployeeContext from "EmployeeContext";
+import { URL } from "Utils";
 
 const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -118,7 +119,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
       formDataToSend.append("files.iqamaPicture", formData.iqamaPicture);
       formDataToSend.append("files.passportImage", formData.passportImage);
       const response = await axios.post(
-        "http://localhost:1337/api/employee-data",
+        `${URL}/api/employee-data`,
         formDataToSend,
         {
           headers: {

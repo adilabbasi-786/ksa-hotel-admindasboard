@@ -15,6 +15,7 @@ import {
   Select,
 } from "@chakra-ui/react";
 import axios from "axios";
+import { URL } from "Utils";
 
 const AddSalary = ({
   isOpen,
@@ -42,7 +43,7 @@ const AddSalary = ({
   const fetchEmployeeName = async (employeeId) => {
     try {
       const response = await axios.get(
-        `http://localhost:1337/api/employee-data/${employeeId}`
+        `${URL}/api/employee-data/${employeeId}`
       );
       console.log("response data", response.data);
       const employeeData = response.data.data;
@@ -83,10 +84,7 @@ const AddSalary = ({
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:1337/api/salaries",
-        requestData
-      );
+      const response = await axios.post(`${URL}/api/salaries`, requestData);
 
       if (response.status === 200) {
         onAddItem(response.data);

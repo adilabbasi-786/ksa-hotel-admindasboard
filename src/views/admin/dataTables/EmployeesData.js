@@ -16,6 +16,7 @@ import banner from "assets/img/auth/banner.png";
 import EmployeeForm from "./EmployeeForm";
 import axios from "axios";
 import Drivers from "./Drivers";
+import { URL } from "Utils";
 
 const EmployeesData = ({ selectedHotel }) => {
   const [employeeData, setEmployeeData] = useState([]);
@@ -24,7 +25,7 @@ const EmployeesData = ({ selectedHotel }) => {
   const fetchEmployeeData = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:1337/api/employee-data?populate=*&filters[hotel_name][id][$in]=${selectedHotel}`
+        `${URL}/api/employee-data?populate=*&filters[hotel_name][id][$in]=${selectedHotel}`
       );
       setEmployeeData(response.data);
       console.log("employeedatddddddda", response.data.data);
@@ -84,8 +85,8 @@ const EmployeesData = ({ selectedHotel }) => {
               gridArea="1 / 1 / 2 / 2"
               name={employee.attributes.EmployeeName}
               passportNumber={employee.attributes.PassportNumber}
-              avatar={`http://localhost:1337${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
-              passportImage={`http://localhost:1337${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
+              avatar={`${URL}${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
+              passportImage={`${URL}${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
               banner={banner}
               status={employee.attributes.status}
               iqamaNumber={employee.attributes.iqamaNumber}

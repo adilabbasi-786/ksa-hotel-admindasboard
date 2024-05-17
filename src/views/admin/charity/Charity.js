@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 import Card from "components/card/Card.js";
 import Information from "views/admin/expanses/components/Information";
+import { URL } from "Utils";
 
 const getCurrentDate = () => {
   const currentDate = new Date();
@@ -41,7 +42,7 @@ const Charity = ({ selectedHotel }) => {
   const fetchDailyCharity = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:1337/api/charities?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date]=${defaultDate}`
+        `${URL}/api/charities?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date]=${defaultDate}`
       );
       setDailyCharity(response.data);
       setIsCharityPaid(response.data.length > 0); // Check if charity is already paid for the day
@@ -71,7 +72,7 @@ const Charity = ({ selectedHotel }) => {
   const handleAddCharity = async () => {
     try {
       await axios.post(
-        "http://localhost:1337/api/charities",
+        `${URL}/api/charities`,
         {
           data: {
             dailycharity: charityCost,

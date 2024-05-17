@@ -20,6 +20,7 @@ import {
 } from "@chakra-ui/react";
 import Card from "components/card/Card.js";
 import Information from "views/admin/expanses/components/Information";
+import { URL } from "Utils";
 
 const ProfitTable = ({ selectedHotel }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,7 +40,7 @@ const ProfitTable = ({ selectedHotel }) => {
   const fetchPartnersData = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:1337/api/partners?populate=*&filters[hotel_names][id][$in]=${selectedHotel}&filters[month]=${selectedMonth}`
+        `${URL}/api/partners?populate=*&filters[hotel_names][id][$in]=${selectedHotel}&filters[month]=${selectedMonth}`
       );
       const partnersWithProfit = response.data.data.map((partner) => ({
         ...partner,
@@ -101,7 +102,7 @@ const ProfitTable = ({ selectedHotel }) => {
 
       axios
         .post(
-          "http://localhost:1337/api/partners",
+          `${URL}/api/partners`,
           {
             data: newPartnerData,
           },
@@ -143,7 +144,7 @@ const ProfitTable = ({ selectedHotel }) => {
     if (partnerToDelete) {
       // Make a DELETE request to the backend API to delete the partner
       axios
-        .delete(`http://localhost:1337/api/partners/${partnerToDelete.id}`)
+        .delete(`${URL}/${partnerToDelete.id}`)
         .then((response) => {
           console.log("Partner deleted:", response.data);
           // After successful deletion, close the confirmation modal and refresh the partner data

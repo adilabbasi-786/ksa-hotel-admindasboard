@@ -15,6 +15,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { AuthContext } from "AuthContext";
+import { URL } from "Utils";
 const defaultTheme = createTheme();
 
 const SignIn = () => {
@@ -41,13 +42,10 @@ const SignIn = () => {
 
     try {
       // Step 1: Login with user credentials
-      const loginRes = await axios.post(
-        "http://localhost:1337/api/auth/local",
-        {
-          identifier: formData.email,
-          password: formData.password,
-        }
-      );
+      const loginRes = await axios.post(`${URL}/api/auth/local`, {
+        identifier: formData.email,
+        password: formData.password,
+      });
 
       if (loginRes.data.error) {
         alert("Invalid email or password");
@@ -57,14 +55,11 @@ const SignIn = () => {
         localStorage.setItem("token", jwt);
 
         // Step 2: Fetch user's role
-        const roleRes = await axios.get(
-          "http://localhost:1337/api/users/me?populate=role",
-          {
-            headers: {
-              Authorization: `Bearer ${jwt}`, // Include JWT token in the request headers
-            },
-          }
-        );
+        const roleRes = await axios.get(`${URL}/api/users/me?populate=role`, {
+          headers: {
+            Authorization: `Bearer ${jwt}`, // Include JWT token in the request headers
+          },
+        });
 
         const userRole = roleRes.data.role;
 
@@ -87,13 +82,10 @@ const SignIn = () => {
 
     try {
       // Step 1: Login with user credentials
-      const loginRes = await axios.post(
-        "http://localhost:1337/api/auth/local",
-        {
-          identifier: formData.email,
-          password: formData.password,
-        }
-      );
+      const loginRes = await axios.post(`${URL}/api/auth/local`, {
+        identifier: formData.email,
+        password: formData.password,
+      });
 
       if (loginRes.data.error) {
         alert("Invalid email or password");
@@ -103,14 +95,11 @@ const SignIn = () => {
         localStorage.setItem("token", jwt);
 
         // Step 2: Fetch user's role
-        const roleRes = await axios.get(
-          "http://localhost:1337/api/users/me?populate=role",
-          {
-            headers: {
-              Authorization: `Bearer ${jwt}`, // Include JWT token in the request headers
-            },
-          }
-        );
+        const roleRes = await axios.get(`${URL}/api/users/me?populate=role`, {
+          headers: {
+            Authorization: `Bearer ${jwt}`, // Include JWT token in the request headers
+          },
+        });
 
         const userRole = roleRes.data.role;
 
