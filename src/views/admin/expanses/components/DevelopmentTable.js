@@ -28,6 +28,7 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
+import { URL } from "Utils";
 
 export default function DevelopmentTable(props) {
   const [showTodaySaleModal, setShowTodaySaleModal] = useState(false);
@@ -52,7 +53,7 @@ export default function DevelopmentTable(props) {
   const handleTodaySaleModalOpen = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:1337/api/daily-sales?poulate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date][$eq]=${selectedDate}`
+        `${URL}/api/daily-sales?poulate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date][$eq]=${selectedDate}`
       );
 
       setTodaySaleData(response.data);
@@ -65,7 +66,7 @@ export default function DevelopmentTable(props) {
   const handleAdvanceSalaryModalOpen = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:1337/api/advance-salaries?populate[employees_datum][populate][0]=hotel_name&filters[employees_datum][hotel_name][id][$eq]=${selectedHotel}&filters[date][$eq]=${selectedDate}`
+        `${URL}/api/advance-salaries?populate[employees_datum][populate][0]=hotel_name&filters[employees_datum][hotel_name][id][$eq]=${selectedHotel}&filters[date][$eq]=${selectedDate}`
       );
 
       setAdvanceSalaryData(response.data);
