@@ -26,6 +26,7 @@ const SignIn = () => {
     password: "",
   });
   const [error, setError] = useState(null);
+  const [role, setRole] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -34,53 +35,100 @@ const SignIn = () => {
       [name]: value,
     }));
   };
-  // user ? history.push("/admin/dashboard") : history.push("/");
 
-  const handleSubmit = async (e) => {
+  const handleAdminSignIn = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:1337/api/auth/local", {
-        identifier: formData.email,
-        password: formData.password,
-      });
+      // Step 1: Login with user credentials
+      const loginRes = await axios.post(
+        "http://localhost:1337/api/auth/local",
+        {
+          identifier: formData.email,
+          password: formData.password,
+        }
+      );
 
-      if (res.data.error) {
+      if (loginRes.data.error) {
         alert("Invalid email or password");
       } else {
-        auth.setToken(res.data.jwt);
-        localStorage.setItem("token", res.data.jwt);
-        history.push("/admin/dashboard");
+        const jwt = loginRes.data.jwt; // Extract JWT token
+        auth.setToken(jwt);
+        localStorage.setItem("token", jwt);
+
+        // Step 2: Fetch user's role
+        const roleRes = await axios.get(
+          "http://localhost:1337/api/users/me?populate=role",
+          {
+            headers: {
+              Authorization: `Bearer ${jwt}`, // Include JWT token in the request headers
+            },
+          }
+        );
+
+        const userRole = roleRes.data.role;
+
+        // Step 3: Redirect based on user's role
+        if (userRole && userRole.name === "admin") {
+          history.push("/admin/dashboard");
+        } else {
+          alert("You don't have permission to access the admin dashboard.");
+        }
       }
     } catch (error) {
       console.error("An error occurred:", error);
-      alert("please type correct email and password");
+      alert("Please type correct email and password");
       setError("An error occurred. Please try again.");
     }
   };
-  const handleSubmitManager = async (e) => {
+
+  const handleManagerSignIn = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:1337/api/auth/local", {
-        identifier: formData.email,
-        password: formData.password,
-      });
+      // Step 1: Login with user credentials
+      const loginRes = await axios.post(
+        "http://localhost:1337/api/auth/local",
+        {
+          identifier: formData.email,
+          password: formData.password,
+        }
+      );
 
-      if (res.data.error) {
+      if (loginRes.data.error) {
         alert("Invalid email or password");
       } else {
-        auth.setToken(res.data.jwt);
-        localStorage.setItem("token", res.data.jwt);
-        history.push("/hotel/dashboard");
+        const jwt = loginRes.data.jwt; // Extract JWT token
+        auth.setToken(jwt);
+        localStorage.setItem("token", jwt);
+
+        // Step 2: Fetch user's role
+        const roleRes = await axios.get(
+          "http://localhost:1337/api/users/me?populate=role",
+          {
+            headers: {
+              Authorization: `Bearer ${jwt}`, // Include JWT token in the request headers
+            },
+          }
+        );
+
+        const userRole = roleRes.data.role;
+
+        // Step 3: Redirect based on user's role
+        if (userRole && userRole.name === "manager") {
+          history.push("/hotel/dashboard");
+        } else {
+          alert(
+            "You don't have permission to access the hotel manager dashboard."
+          );
+        }
       }
     } catch (error) {
       console.error("An error occurred:", error);
-      alert("please type correct email and password");
+      alert("Please type correct email and password");
       setError("An error occurred. Please try again.");
     }
   };
-
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
@@ -101,7 +149,7 @@ const SignIn = () => {
           </Typography>
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={handleAdminSignIn}
             noValidate
             sx={{ mt: 1 }}
           >
@@ -154,7 +202,7 @@ const SignIn = () => {
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
             id="signInAdmin"
-            onClick={handleSubmitManager}
+            onClick={handleManagerSignIn}
           >
             Sign In Hotel Manager
           </Button>
