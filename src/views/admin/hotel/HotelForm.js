@@ -1,15 +1,7 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  ModalBody,
-  Stack,
-} from "@chakra-ui/react";
+import { Box, Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
 import { useHistory } from "react-router-dom";
-import { URL } from "Utils";
+
 const HotelForm = () => {
   const history = useHistory();
   const [formData, setFormData] = useState({
@@ -21,7 +13,7 @@ const HotelForm = () => {
     kafalat: "",
     hotelRent: "",
   });
-  const [roleId, setRoleId] = useState("manager");
+  const [roleId] = useState("manager");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -33,36 +25,41 @@ const HotelForm = () => {
 
   const registerManager = async () => {
     try {
-      const tokenResponse = await fetch(`${URL}/api/auth/local`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          identifier: "adil@adil.com",
-          password: "adil@123",
-        }),
-      });
+      const tokenResponse = await fetch(
+        "http://localhost:1337/api/auth/local",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            identifier: "adil@adil.com",
+            password: "adil@123",
+          }),
+        }
+      );
       const token = await tokenResponse.json();
 
-      const response = await fetch(`${URL}/api/auth/local/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token.jwt}`,
-        },
-        body: JSON.stringify({
-          username: formData.managerName,
-          email: formData.managerEmail,
-          password: formData.managerPassword,
-          role: roleId,
-        }),
-      });
+      const response = await fetch(
+        "http://localhost:1337/api/auth/local/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token.jwt}`,
+          },
+          body: JSON.stringify({
+            username: formData.managerName,
+            email: formData.managerEmail,
+            password: formData.managerPassword,
+            role: roleId,
+          }),
+        }
+      );
       if (!response.ok) {
         throw new Error("Failed to register manager");
       }
       const responseData = await response.json();
-      console.log("resss", responseData.user.id);
       const userId = responseData.user.id;
       return userId;
     } catch (error) {
@@ -71,20 +68,22 @@ const HotelForm = () => {
     }
   };
 
-  const handleSubmit = async (userId) => {
-    const registrationSuccess = await registerManager();
-    console.log("regiseta", registrationSuccess);
+  const handleSubmit = async () => {
+    const managerId = await registerManager();
 
-    if (registrationSuccess) {
+    if (managerId) {
       try {
-        const response = await fetch(`${URL}/api/hotel-names`, {
+        const response = await fetch("http://localhost:1337/api/hotel-names", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            data: formData,
-            userId: registrationSuccess,
+            data: {
+              ...formData,
+              manager: managerId, // Set the manager ID in the hotel data
+            },
+            userId: managerId, // Pass userId in request body for backend use
           }),
         });
         if (!response.ok) {
@@ -109,6 +108,7 @@ const HotelForm = () => {
       alert("Failed to register manager. Please try again later.");
     }
   };
+
   return (
     <Box p={4} bg="white">
       <FormControl>

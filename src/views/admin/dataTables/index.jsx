@@ -18,6 +18,7 @@ const Employer = () => {
           <Route path="/admin/emp-tables">
             <DropDown onSelectHotel={handleSelectHotel} />
             {selectedHotel && <EmployeesData selectedHotel={selectedHotel} />}
+            {console.log("selectedhotel1111", selectedHotel)}
           </Route>
         </Switch>
       </Box>
