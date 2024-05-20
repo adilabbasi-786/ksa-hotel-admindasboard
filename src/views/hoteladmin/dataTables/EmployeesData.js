@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Box,
   Button,
@@ -14,17 +15,30 @@ import {
 import Banner from "./banner/Banner";
 import banner from "assets/img/auth/banner.png";
 import EmployeeForm from "./EmployeeForm";
-
-// Importing the JSON data directly for demonstration purposes
-import tableDataDevelopment from "views/hoteladmin/dataTables/variables/tableDataDevelopment.json";
+import { URL } from "Utils";
 
 const EmployeesData = () => {
   const [employeeData, setEmployeeData] = useState([]);
   const [isAddEmployeeModalOpen, setIsAddEmployeeModalOpen] = useState(false);
 
-  // Set all the data initially
+  const fetchEmployeeData = async () => {
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await axios.get(`${URL}/api/employee-data?populate=*`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setEmployeeData(response.data);
+      console.log("employeedatddddddda", response.data.data);
+    } catch (error) {
+      console.error("Error fetching employee data:", error);
+    }
+  };
+
   useEffect(() => {
-    setEmployeeData(tableDataDevelopment);
+    fetchEmployeeData();
   }, []);
 
   const handleOpenAddEmployeeModal = () => {
@@ -62,17 +76,22 @@ const EmployeesData = () => {
         }}
         gap={{ base: "20px", xl: "20px" }}
       >
-        {employeeData.map((employee, index) => (
-          <Banner
-            key={index} // Use index as the key since there's no unique id
-            gridArea="1 / 1 / 2 / 2"
-            name={employee.name}
-            passportNumber={employee.passportNumber}
-            status={employee.status}
-            avatar={employee.avatar}
-            banner={banner}
-          />
-        ))}
+        {employeeData.map((employee, index) => {
+          console.log("employee", employee);
+
+          return (
+            <Banner
+              key={employee.id || index}
+              gridArea="1 / 1 / 2 / 2"
+              name={employee.EmployeeName}
+              passportNumber={employee.PassportNumber}
+              status={employee.status}
+              avatar={`${URL}${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
+              // avatar={employee.avatar}
+              banner={banner}
+            />
+          );
+        })}
       </Grid>
       <Modal
         size="xl"

@@ -16,7 +16,7 @@ import { URL } from "Utils";
 
 const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
-
+  const token = localStorage.getItem("token");
   const [formData, setFormData] = useState({
     employeePicture: null,
     EmployeeName: "",
@@ -123,6 +123,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
         formDataToSend,
         {
           headers: {
+            Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
         }

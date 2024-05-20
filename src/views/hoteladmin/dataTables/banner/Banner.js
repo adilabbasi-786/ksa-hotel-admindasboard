@@ -55,7 +55,7 @@ const Banner = ({ name, passportNumber, status, avatar, banner }) => {
         />
         <Avatar
           mx="auto"
-          src={avatar1}
+          src={avatar}
           h="87px"
           w="87px"
           mt="-43px"

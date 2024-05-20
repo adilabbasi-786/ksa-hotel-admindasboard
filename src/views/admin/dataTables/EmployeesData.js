@@ -23,9 +23,16 @@ const EmployeesData = ({ selectedHotel }) => {
   const [isAddEmployeeModalOpen, setIsAddEmployeeModalOpen] = useState(false);
 
   const fetchEmployeeData = async () => {
+    const token = localStorage.getItem("token");
+
     try {
       const response = await axios.get(
-        `${URL}/api/employee-data?populate=*&filters[hotel_name][id][$in]=${selectedHotel}`
+        `${URL}/api/employee-data?populate=*&filters[hotel_name][id][$in]=${selectedHotel}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setEmployeeData(response.data);
       console.log("employeedatddddddda", response.data.data);

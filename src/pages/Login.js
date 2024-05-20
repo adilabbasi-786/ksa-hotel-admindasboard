@@ -51,8 +51,8 @@ const SignIn = () => {
         alert("Invalid email or password");
       } else {
         const jwt = loginRes.data.jwt; // Extract JWT token
-        auth.setToken(jwt);
         localStorage.setItem("token", jwt);
+        auth.setToken(jwt);
 
         // Step 2: Fetch user's role
         const roleRes = await axios.get(`${URL}/api/users/me?populate=role`, {
@@ -91,8 +91,8 @@ const SignIn = () => {
         alert("Invalid email or password");
       } else {
         const jwt = loginRes.data.jwt; // Extract JWT token
-        auth.setToken(jwt);
         localStorage.setItem("token", jwt);
+        auth.setToken(jwt);
 
         // Step 2: Fetch user's role
         const roleRes = await axios.get(`${URL}/api/users/me?populate=role`, {
