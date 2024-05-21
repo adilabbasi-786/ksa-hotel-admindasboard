@@ -52,7 +52,9 @@ const Banner = ({
     iqamaExpiry: "",
     salary: "",
   });
+  const [formErrors, setFormErrors] = useState({});
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     if (isEditMode) {
@@ -81,56 +83,74 @@ const Banner = ({
     setIsEditMode(!isEditMode);
   };
 
-  const handleSaveChanges = () => {
-    fetch(`${URL}/api/employee-data/${id}`, {
-      method: "PUT",
-      body: JSON.stringify({ data: updatedEmployeeData }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (response.ok) {
-          setShowSuccessMessage(true); // Show success message on successful save
-          setTimeout(() => {
-            setShowSuccessMessage(false); // Hide success message after a delay
-            setIsOpen(false); // Close the modal
-          }, 1000);
-          fetchEmployeeData();
-        } else {
-          console.error("Error saving data:", response.statusText);
-        }
-      })
-      .catch((error) => {
-        console.error("Error saving data:", error);
-      });
+  const validateForm = () => {
+    const errors = {};
+    const requiredFields = [
+      "EmployeeName",
+      "PassportNumber",
+      "passportExpiry",
+      "iqamaNumber",
+      "iqamaExpiry",
+      "status",
+      "salary",
+    ];
+
+    requiredFields.forEach((field) => {
+      if (!updatedEmployeeData[field]) {
+        errors[field] = `Please fill ${field}`;
+      }
+    });
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
-  const handleDeleteEmployee = () => {
+  const handleSaveChanges = async () => {
+    if (!validateForm()) return;
+
+    try {
+      await axios.put(
+        `${URL}/api/employee-data/${id}`,
+        {
+          data: updatedEmployeeData,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setShowSuccessMessage(true);
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+        setIsOpen(false);
+        fetchEmployeeData();
+      }, 1000);
+    } catch (error) {
+      console.error("Error saving data:", error);
+    }
+  };
+
+  const handleDeleteEmployee = async () => {
     if (window.confirm("Are you sure you want to delete this employee?")) {
-      axios
-        .delete(`${URL}/api/employee-data/${id}`)
-        .then((response) => {
-          if (response.status === 200) {
-            // Optionally, show a success message
-            alert("Employee deleted successfully");
-            fetchEmployeeData();
-          } else {
-            console.error("Error deleting employee:", response.statusText);
-          }
-        })
-        .catch((error) => {
-          console.error("Error deleting employee:", error);
+      try {
+        await axios.delete(`${URL}/api/employee-data/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
+
+        alert("Employee deleted successfully");
+        fetchEmployeeData();
+      } catch (error) {
+        console.error("Error deleting employee:", error);
+      }
     }
   };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-
-    if (value !== null && value !== undefined) {
-      setUpdatedEmployeeData((prevData) => ({ ...prevData, [name]: value }));
-    }
+    setUpdatedEmployeeData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
@@ -215,6 +235,7 @@ const Banner = ({
                   value={updatedEmployeeData.EmployeeName}
                   onChange={handleInputChange}
                 />
+                <Text color="red">{formErrors.EmployeeName}</Text>
                 <FormLabel>Employee salary:</FormLabel>
                 <Input
                   type="number"
@@ -222,6 +243,7 @@ const Banner = ({
                   value={updatedEmployeeData.salary}
                   onChange={handleInputChange}
                 />
+                <Text color="red">{formErrors.salary}</Text>
                 <FormLabel>Passport Number:</FormLabel>
                 <Input
                   type="text"
@@ -229,6 +251,7 @@ const Banner = ({
                   value={updatedEmployeeData.PassportNumber}
                   onChange={handleInputChange}
                 />
+                <Text color="red">{formErrors.PassportNumber}</Text>
                 <FormLabel>iqama Number:</FormLabel>
                 <Input
                   type="text"
@@ -236,6 +259,7 @@ const Banner = ({
                   value={updatedEmployeeData.iqamaNumber}
                   onChange={handleInputChange}
                 />
+                <Text color="red">{formErrors.iqamaNumber}</Text>
                 <FormLabel>Passport Expiry:</FormLabel>
                 <Input
                   type="date"
@@ -243,6 +267,7 @@ const Banner = ({
                   value={updatedEmployeeData.passportExpiry}
                   onChange={handleInputChange}
                 />
+                <Text color="red">{formErrors.passportExpiry}</Text>
                 <FormLabel>iqama Expiry:</FormLabel>
                 <Input
                   type="date"
@@ -250,6 +275,7 @@ const Banner = ({
                   value={updatedEmployeeData.iqamaExpiry}
                   onChange={handleInputChange}
                 />
+                <Text color="red">{formErrors.iqamaExpiry}</Text>
                 <FormLabel>Employee Status</FormLabel>
                 <Select
                   name="status"
@@ -260,6 +286,7 @@ const Banner = ({
                   <option value="active">active</option>
                   <option value="inactive">inactive</option>
                 </Select>
+                <Text color="red">{formErrors.status}</Text>
               </FormControl>
             ) : (
               <EmployeeFullDetail employeeData={employeeData} />
@@ -276,18 +303,19 @@ const Banner = ({
             >
               {isEditMode ? "Save" : "Edit"}
             </Button>
-            <Button
-              colorScheme="blue"
-              style={{ marginLeft: "10px" }}
-              onClick={handleDeleteEmployee}
-            >
-              {isEditMode ? " " : "Delete Employee"}
-            </Button>
+            {!isEditMode && (
+              <Button
+                colorScheme="red"
+                style={{ marginLeft: "10px" }}
+                onClick={handleDeleteEmployee}
+              >
+                Delete Employee
+              </Button>
+            )}
           </ModalFooter>
         </ModalContent>
       </Modal>
 
-      {/* Success Message */}
       {showSuccessMessage && (
         <Alert
           status="success"

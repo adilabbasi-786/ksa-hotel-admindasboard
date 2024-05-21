@@ -77,9 +77,11 @@ const EmployeesData = () => {
         gap={{ base: "20px", xl: "20px" }}
       >
         {employeeData.map((employee, index) => {
+          console.log("employeedata", employee);
           return (
             <Banner
               key={employee.id || index}
+              id={employee.id}
               gridArea="1 / 1 / 2 / 2"
               name={employee.EmployeeName}
               passportNumber={employee.PassportNumber}
