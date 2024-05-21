@@ -77,18 +77,23 @@ const EmployeesData = () => {
         gap={{ base: "20px", xl: "20px" }}
       >
         {employeeData.map((employee, index) => {
-          console.log("employee", employee);
-
           return (
             <Banner
               key={employee.id || index}
               gridArea="1 / 1 / 2 / 2"
               name={employee.EmployeeName}
               passportNumber={employee.PassportNumber}
+              salary={employee.salary}
+              iqamaExpiry={employee.iqamaExpiry}
+              iqamaNumber={employee.iqamaNumber}
+              passportExpiry={employee.passportNumber}
+              passportImage={`${URL}${employee?.passportImage?.url}`}
+              iqamaPicture={`${URL}${employee?.iqamaPicture?.url}`}
               status={employee.status}
-              avatar={`${URL}${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
-              // avatar={employee.avatar}
+              avatar={`${URL}${employee?.employeePicture?.url}`}
               banner={banner}
+              employeeData={employee}
+              fetchEmployeeData={fetchEmployeeData}
             />
           );
         })}
@@ -103,7 +108,10 @@ const EmployeesData = () => {
           <ModalHeader>Add New Employee</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <EmployeeForm onClose={handleCloseAddEmployeeModal} />
+            <EmployeeForm
+              fetchEmployeeData={fetchEmployeeData}
+              onClose={handleCloseAddEmployeeModal}
+            />
           </ModalBody>
         </ModalContent>
       </Modal>
