@@ -1,121 +1,315 @@
-import React from "react";
+import React, { useContext, useState } from "react";
+import axios from "axios";
 import {
   Box,
   Button,
   Flex,
   FormControl,
   FormLabel,
-  Icon,
   Input,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Text,
-  useColorModeValue,
   useBreakpointValue,
+  Select,
+  Text,
 } from "@chakra-ui/react";
-import { MdUpload } from "react-icons/md";
+import EmployeeContext from "EmployeeContext";
+import { URL } from "Utils";
 
-import Dropzone from "views/admin/expanses/components/Dropzone";
-
-const EmployeeForm = ({ isOpen, onClose }) => {
-  const brandColor = useColorModeValue("brand.500", "white");
+const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
+  const token = localStorage.getItem("token");
+  const [formData, setFormData] = useState({
+    employeePicture: null,
+    EmployeeName: "",
+    PassportNumber: "",
+    passportExpiry: "",
+    iqamaNumber: "",
+    iqamaExpiry: "",
+    status: "",
+    salary: "",
+    iqamaPicture: null,
+    passportImage: null,
+  });
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [formErrors, setFormErrors] = useState({
+    EmployeeName: "",
+    PassportNumber: "",
+    passportExpiry: "",
+    iqamaNumber: "",
+    iqamaExpiry: "",
+    status: "",
+    employeePicture: "",
+    iqamaPicture: "",
+    passportImage: "",
+    salary: "",
+  });
+  const handleImageChange = async (e, key) => {
+    console.log("E, key", e.target.files[0], key);
+    const requestFormdata = new FormData();
+    requestFormdata.append("files", e.target.files[0]);
+
+    const requestOptions = {
+      method: "POST",
+      body: requestFormdata,
+    };
+    try {
+      const response = await fetch(
+        "http://localhost:1337/api/upload",
+        requestOptions
+      );
+      const result = await response.json();
+      const imgId = result[0].id;
+      console.log("result", result);
+      console.log("imgId", imgId);
+
+      setFormData({ ...formData, [key]: imgId });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const handleChange = (e, fieldName) => {
+    const { files } = e.target;
+    const value = files ? files[0] : e.target.value;
+
+    // Update formData
+    setFormData((prevData) => ({
+      ...prevData,
+      [fieldName]: value,
+    }));
+
+    // Validate if field is empty
+    if (value === "") {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        [fieldName]: `Please fill ${fieldName}`,
+      }));
+    } else {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        [fieldName]: "", // Clear error message if field is not empty
+      }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Check if any required field is empty
+    const requiredFields = [
+      "EmployeeName",
+      "PassportNumber",
+      "passportExpiry",
+      "iqamaNumber",
+      "iqamaExpiry",
+      "status",
+      "salary",
+    ];
+    let hasErrors = false;
+    const newFormErrors = {};
+
+    requiredFields.forEach((fieldName) => {
+      if (formData[fieldName] === "") {
+        newFormErrors[fieldName] = `Please fill ${fieldName}`;
+        hasErrors = true;
+      }
+    });
+
+    // Check if employee picture, iqama picture, and passport picture are not empty
+    if (!formData.employeePicture) {
+      newFormErrors.employeePicture = "Please upload Employee picture";
+      hasErrors = true;
+    }
+    if (!formData.iqamaPicture) {
+      newFormErrors.iqamaPicture = "Please upload iqama picture";
+      hasErrors = true;
+    }
+    if (!formData.passportImage) {
+      newFormErrors.passportImage = "Please upload Passport picture";
+      hasErrors = true;
+    }
+
+    // If there are errors, update state and stop form submission
+    if (hasErrors) {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        ...newFormErrors,
+      }));
+      return; // Add return to stop form submission if there are errors
+    }
+
+    try {
+      const employeeData = {
+        data: {
+          EmployeeName: formData.EmployeeName,
+          PassportNumber: formData.PassportNumber,
+          passportExpiry: formData.passportExpiry,
+          iqamaNumber: formData.iqamaNumber,
+          iqamaExpiry: formData.iqamaExpiry,
+          status: formData.status,
+          salary: formData.salary,
+          employeePicture: formData.employeePicture,
+          iqamaPicture: formData.iqamaPicture,
+          passportImage: formData.passportImage,
+        },
+      };
+
+      const response = await axios.post(
+        `${URL}/api/employee-data`,
+        employeeData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Form submitted successfully!", response.data);
+      setFormSubmitted(true);
+      fetchEmployeeData();
+      setTimeout(() => {
+        onClose(); // Close the modal after 2 seconds
+      }, 2000);
+    } catch (error) {
+      console.error("Error submitting form data:", error);
+    }
+  };
 
   return (
     <Box p={10} bg="white">
-      <FormControl width="300px" height="280px" mt={4} mb={-10}>
-        <FormLabel>Employee picture</FormLabel>
-        <Dropzone
-          w={{ base: "70%", "2xl": "268px" }}
-          me="36px"
-          mt="20px"
-          mb="20px"
-          maxH={{ base: "70%", lg: "30%", "2xl": "50%" }}
-          minH={{ base: "70%", lg: "30%", "2xl": "50%" }}
-          content={
-            <Box>
-              <Icon as={MdUpload} w="80px" h="40px" color={brandColor} />
-              <Text
-                // fontSize="xl"
-                fontWeight="700"
-                color={brandColor}
-                textAlign="center"
-                fontSize="15px"
-              >
-                Upload Files
-              </Text>
-              <Text
-                fontSize="10px"
-                fontWeight="100"
-                color="secondaryGray.500"
-                textAlign="center"
-              >
-                PNG, JPG and GIF files are allowed
-              </Text>
-            </Box>
-          }
-        />
-      </FormControl>
-      <Flex direction={isMobile ? "column" : "row"}>
-        <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
-          <FormLabel>Employee name</FormLabel>
-          <Input placeholder="First name" />
-        </FormControl>
-        {!isMobile && (
-          <FormControl flex="1">
-            <FormLabel>passport Number</FormLabel>
-            <Input placeholder="Passport Number" />
+      {formSubmitted ? (
+        <Box>
+          <p>Form submitted successfully!</p>
+        </Box>
+      ) : (
+        <form>
+          <FormControl width="300px" height="280px" mt={4} mb={-40}>
+            <FormLabel>Employee picture</FormLabel>
+            <Input
+              name="employeePicture"
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageChange(e, "employeePicture")}
+            />
+            <Text color="red">{formErrors.employeePicture}</Text>
           </FormControl>
-        )}
-      </Flex>
-      <Flex direction={isMobile ? "column" : "row"}>
-        <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
-          <FormLabel>Passport Expiry</FormLabel>
-          <Input placeholder="First name" />
-        </FormControl>
-        {!isMobile && (
-          <FormControl>
-            <FormLabel>Passport picture</FormLabel>
-            <Input placeholder="First name" />
-          </FormControl>
-        )}
-      </Flex>
-      <Flex direction={isMobile ? "column" : "row"}>
-        <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
-          <FormLabel>iqama number</FormLabel>
-          <Input placeholder="First name" />
-        </FormControl>
-        {!isMobile && (
-          <FormControl>
-            <FormLabel>iqama Expiry</FormLabel>
-            <Input placeholder="First name" />
-          </FormControl>
-        )}
-      </Flex>
-      <Flex direction={isMobile ? "column" : "row"}>
-        <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
-          <FormLabel>iqama picture</FormLabel>
-          <Input placeholder="First name" />
-        </FormControl>
-        {!isMobile && (
-          <FormControl>
-            <FormLabel>iqama Expiry</FormLabel>
-            <Input placeholder="First name" />
-          </FormControl>
-        )}
-      </Flex>
+          <Flex direction={isMobile ? "column" : "row"}>
+            <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
+              <FormLabel>Employee name</FormLabel>
+              <Input
+                name="EmployeeName"
+                value={formData.EmployeeName}
+                onChange={(e) => handleChange(e, "EmployeeName")}
+                placeholder="Employee name"
+              />
+              <Text color="red">{formErrors.EmployeeName}</Text>
+            </FormControl>
+            <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
+              <FormLabel>Employee Salary</FormLabel>
+              <Input
+                name="EmployeeName"
+                type="number"
+                value={formData.salary}
+                onChange={(e) => handleChange(e, "salary")}
+                placeholder="Employee salary"
+              />
+              <Text color="red">{formErrors.salary}</Text>
+            </FormControl>
 
-      <Button colorScheme="blue" onClick={onClose} mt={4}>
-        Close
-      </Button>
-      <Button variant="brand" fontWeight="500" ml={4} mt={4}>
-        Submit
-      </Button>
+            <FormControl flex="1">
+              <FormLabel>passport Number</FormLabel>
+              <Input
+                name="PassportNumber"
+                value={formData.PassportNumber}
+                onChange={(e) => handleChange(e, "PassportNumber")}
+                placeholder="Passport Number"
+              />
+              <Text color="red">{formErrors.PassportNumber}</Text>
+            </FormControl>
+          </Flex>
+          <Flex direction={isMobile ? "column" : "row"}>
+            <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
+              <FormLabel>Passport Expiry</FormLabel>
+              <Input
+                type="date"
+                name="passportExpiry"
+                placeholder="Passport Expiry"
+                value={formData.passportExpiry}
+                onChange={(e) => handleChange(e, "passportExpiry")}
+              />
+              <Text color="red">{formErrors.passportExpiry}</Text>
+            </FormControl>
+            <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
+              <FormLabel>iqama number</FormLabel>
+              <Input
+                name="iqamaNumber"
+                value={formData.iqamaNumber}
+                onChange={(e) => handleChange(e, "iqamaNumber")}
+                placeholder="iqama Number"
+              />
+              <Text color="red">{formErrors.iqamaNumber}</Text>
+            </FormControl>
+          </Flex>
+          <Flex direction={isMobile ? "column" : "row"}>
+            <FormControl>
+              <FormLabel>iqama Expiry</FormLabel>
+              <Input
+                type="date"
+                name="iqamaExpiry"
+                placeholder="Iqama Expiry"
+                value={formData.iqamaExpiry}
+                onChange={(e) => handleChange(e, "iqamaExpiry")}
+              />
+              <Text color="red">{formErrors.iqamaExpiry}</Text>
+            </FormControl>
+            <FormControl>
+              <FormLabel>Employee Status</FormLabel>
+              <Select
+                name="status"
+                placeholder="Select status"
+                value={formData.status}
+                onChange={(e) => handleChange(e, "status")}
+              >
+                <option value="active">active</option>
+                <option value="inactive">inactive</option>
+              </Select>
+              <Text color="red">{formErrors.status}</Text>
+            </FormControl>
+          </Flex>
+          <Flex direction={isMobile ? "column" : "row"}>
+            <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
+              <FormLabel>iqama picture</FormLabel>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageChange(e, "iqamaPicture")}
+              />
+              <Text color="red">{formErrors.iqamaPicture}</Text>
+            </FormControl>
+            <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
+              <FormLabel>Passport picture</FormLabel>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageChange(e, "passportImage")}
+              />
+              <Text color="red">{formErrors.passportImage}</Text>
+            </FormControl>
+          </Flex>
+
+          <Button colorScheme="blue" onClick={onClose} mt={4}>
+            Close
+          </Button>
+          <Button
+            variant="brand"
+            fontWeight="500"
+            ml={4}
+            mt={4}
+            onClick={handleSubmit}
+          >
+            Submit
+          </Button>
+          {console.log("submit", handleSubmit)}
+        </form>
+      )}
     </Box>
   );
 };
