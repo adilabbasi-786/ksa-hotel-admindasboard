@@ -54,6 +54,7 @@ const Banner = ({
     salary: "",
   });
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     if (isEditMode) {
@@ -89,6 +90,7 @@ const Banner = ({
       body: JSON.stringify({ data: updatedEmployeeData }),
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     })
       .then((response) => {
@@ -110,7 +112,11 @@ const Banner = ({
   const handleDeleteEmployee = () => {
     if (window.confirm("Are you sure you want to delete this employee?")) {
       axios
-        .delete(`${URL}/api/employee-data/${id}`)
+        .delete(`${URL}/api/employee-data/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
         .then((response) => {
           if (response.status === 200) {
             // Optionally, show a success message
