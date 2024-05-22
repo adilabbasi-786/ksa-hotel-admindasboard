@@ -34,6 +34,7 @@ const Charity = ({ selectedHotel }) => {
   const [charityCost, setCharityCost] = useState("");
   const [dailyCharity, setDailyCharity] = useState(null);
   const [isCharityPaid, setIsCharityPaid] = useState(false);
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     fetchDailyCharity();
@@ -42,7 +43,12 @@ const Charity = ({ selectedHotel }) => {
   const fetchDailyCharity = async () => {
     try {
       const response = await axios.get(
-        `${URL}/api/charities?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date]=${defaultDate}`
+        `${URL}/api/charities?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date]=${defaultDate}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setDailyCharity(response.data);
       setIsCharityPaid(response.data.length > 0); // Check if charity is already paid for the day
@@ -83,6 +89,7 @@ const Charity = ({ selectedHotel }) => {
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         }
       );

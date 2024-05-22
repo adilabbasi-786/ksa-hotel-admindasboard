@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Button,
   Input,
@@ -17,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 import Card from "components/card/Card.js";
 import Information from "views/admin/expanses/components/Information";
+import { URL } from "Utils";
 
 const getCurrentDate = () => {
   const currentDate = new Date();
@@ -26,16 +28,41 @@ const getCurrentDate = () => {
   return `${year}-${month}-${day}`;
 };
 
-const Charity = (props) => {
+const Charity = () => {
   const [defaultDate, setDefaultDate] = useState(getCurrentDate());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [charityCost, setCharityCost] = useState("");
+  const [dailyCharity, setDailyCharity] = useState(null);
+  const [isCharityPaid, setIsCharityPaid] = useState(false);
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    fetchDailyCharity();
+  }, [defaultDate]);
+
+  const fetchDailyCharity = async () => {
+    try {
+      const response = await axios.get(
+        `${URL}/api/charities?populate=&filters[date]=${defaultDate}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setDailyCharity(response.data);
+      setIsCharityPaid(response.data.length > 0); // Check if charity is already paid for the day
+    } catch (error) {
+      console.error("Error fetching daily charity:", error);
+    }
+  };
 
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const cardShadow = useColorModeValue(
     "0px 18px 40px rgba(112, 144, 176, 0.12)",
     "unset"
   );
+
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
@@ -43,14 +70,36 @@ const Charity = (props) => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
+
   const handleCharityChange = (event) => {
     setCharityCost(event.target.value);
   };
-  const handleAddPartner = () => {
-    // Perform any necessary validations
-    // Then, add partner using partnerName and partnerRatio
-    handleCloseModal();
+
+  const handleAddCharity = async () => {
+    try {
+      await axios.post(
+        `${URL}/api/charities`,
+        {
+          data: {
+            dailycharity: charityCost,
+            date: defaultDate,
+          },
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setIsCharityPaid(true);
+      handleCloseModal();
+      charityCost(" ");
+    } catch (error) {
+      console.error("Error adding daily charity:", error);
+    }
   };
+
   return (
     <>
       <Flex
@@ -89,11 +138,13 @@ const Charity = (props) => {
               mb="4px"
             >
               Daily Charity
-              <Information
-                boxShadow={cardShadow}
-                title={`Charity for Date ${defaultDate}`}
-                value="10SAR"
-              />
+              {dailyCharity && (
+                <Information
+                  boxShadow={cardShadow}
+                  title={`Charity for Date ${defaultDate}`}
+                  value={`${dailyCharity[0]?.dailycharity} SAR`}
+                />
+              )}
             </Text>
           </SimpleGrid>
         </VStack>
@@ -101,25 +152,26 @@ const Charity = (props) => {
           colorScheme="blue"
           width="fit-content"
           onClick={handleOpenModal}
+          disabled={isCharityPaid || (dailyCharity && dailyCharity.length > 0)}
         >
-          Add Charity
+          {isCharityPaid ? "Charity Paid" : "Add Charity"}
         </Button>
       </Card>
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Add Partner</ModalHeader>
+          <ModalHeader>Add Charity</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Input
-              placeholder="charity amount"
+              placeholder="Charity Amount"
               value={charityCost}
               onChange={handleCharityChange}
               mb="4"
             />
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" onClick={handleAddPartner}>
+            <Button colorScheme="blue" onClick={handleAddCharity}>
               Add
             </Button>
             <Button onClick={handleCloseModal}>Cancel</Button>
