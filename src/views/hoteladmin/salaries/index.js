@@ -13,8 +13,8 @@ const Index = () => {
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <Box mb="20px"></Box>
-      <SalaryTable />
-      {/* <DropDown /> */}
+      {/* <SalaryTable /> */}
+      <DropDown />
     </Box>
   );
 };

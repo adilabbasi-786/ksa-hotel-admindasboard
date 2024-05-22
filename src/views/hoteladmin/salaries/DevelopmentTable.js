@@ -118,30 +118,31 @@ export default function DevelopmentTable(props) {
             prepareRow(row);
             return (
               <Tr {...row.getRowProps()} key={index}>
+                {console.log("data", data[0].employeeName)}
                 {row.cells.map((cell, index) => {
                   let data = "";
-                  if (cell.column.Header === " Employee Name") {
+                  if (cell.column.Header === "Date") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === " Total Salary") {
+                  if (cell.column.Header === "Amount") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === " Advance") {
+                  if (cell.column.Header === "Month") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}
                       </Text>
                     );
                   }
-                  if (cell.column.Header === " Deducation") {
+                  if (cell.column.Header === "Type") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value}

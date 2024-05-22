@@ -29,10 +29,17 @@ const EmployeeSalaryTable = ({ selectedHotel, selectedEmployee }) => {
     });
     setRemainingAmount(total);
   };
+  const token = localStorage.getItem("token");
+
   const fetchSalaryData = async () => {
     try {
       const response = await axios.get(
-        `${URL}/api/salaries?populate=*&sort=date:desc&filters[employees_datum]=${selectedEmployee}`
+        `${URL}/api/salaries?populate=*&sort=date:desc&filters[employees_datum]=${selectedEmployee}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       const data = response.data.data.map((item) => ({
         date: item.attributes.date,

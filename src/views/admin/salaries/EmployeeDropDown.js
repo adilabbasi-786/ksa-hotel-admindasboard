@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import Card from "components/card/Card";
-import EmployeeSalaryTable from "./EmployeeSalaryTable"; // Import the EmployeeSalaryTable component
+import EmployeeSalaryTable from "./EmployeeSalaryTable";
 import { URL } from "Utils";
 
 const EmployeeDropDown = ({ selectedHotel }) => {
@@ -22,13 +22,20 @@ const EmployeeDropDown = ({ selectedHotel }) => {
       fetchEmployees();
     }
   }, [selectedHotel]);
+  const token = localStorage.getItem("token");
 
   const fetchEmployees = async () => {
     try {
       const response = await axios.get(
-        `${URL}/api/employee-data?populate=*&filters[hotel_name][id][$in]=${selectedHotel}`
+        `${URL}/api/employee-data?populate=*&filters[hotel_name][id][$in]=${selectedHotel}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setEmployees(response.data.data);
+      console.log("response", response);
     } catch (error) {
       console.error("Error fetching employees:", error);
     }

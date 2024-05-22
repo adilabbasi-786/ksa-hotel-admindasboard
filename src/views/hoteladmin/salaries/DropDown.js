@@ -1,48 +1,75 @@
-import React, { useState } from "react";
-import { Box, Select, Button, SimpleGrid } from "@chakra-ui/react";
-import { useHistory } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Select, Button, Text, useColorModeValue } from "@chakra-ui/react";
+import axios from "axios";
 import Card from "components/card/Card";
+import SalaryTable from "./SalaryTable";
+import { URL } from "Utils";
 
-const allHotel = [
-  { id: 1, name: "hotel1" },
-  { id: 2, name: "hotel2" },
-  { id: 3, name: "hotel3" },
-  { id: 4, name: "hotel4" },
-  { id: 5, name: "hotel5" },
-  { id: 6, name: "hotel6" },
-  { id: 7, name: "hotel7" },
-  { id: 8, name: "hotel8" },
-  { id: 9, name: "hotel9" },
-  { id: 10, name: "hotel10" },
-];
+const EmployeeDropDown = () => {
+  const [employees, setEmployees] = useState([]);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [showSalaryTable, setShowSalaryTable] = useState(false);
 
-const DropDown = ({ onSelectHotel }) => {
-  const [selectedHotel, setSelectedHotel] = useState(null);
-  const handleSelectChange = (event) => {
-    setSelectedHotel(event.target.value);
-  };
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
 
-  const handleSubmit = () => {
-    if (selectedHotel) {
-      onSelectHotel(selectedHotel);
+  const token = localStorage.getItem("token");
+
+  const fetchEmployees = async () => {
+    try {
+      const response = await axios.get(`${URL}/api/employee-data?populate=*`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.data) {
+        setEmployees(response.data);
+        console.log("Employees fetched:", response.data);
+      } else {
+        setEmployees([]);
+        console.error("Unexpected response format:", response);
+      }
+    } catch (error) {
+      setEmployees([]);
+      console.error("Error fetching employees:", error);
     }
   };
 
+  const handleSelectChange = (event) => {
+    setSelectedEmployee(event.target.value);
+  };
+
+  const handleSubmit = () => {
+    if (selectedEmployee) {
+      setShowSalaryTable(true);
+    }
+  };
+
+  const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
+
   return (
     <Card mb={{ base: "0px", "2xl": "20px" }}>
+      <Text color={textColorPrimary} fontWeight="bold" fontSize="xl" mt="10px">
+        Employees
+      </Text>
       <Select
-        placeholder="Select Hotel"
-        value={selectedHotel}
+        placeholder="Select Employee"
+        value={selectedEmployee}
         onChange={handleSelectChange}
       >
-        {allHotel.map((hotel) => (
-          <option key={hotel.id} value={hotel.id}>
-            {hotel.name}
-          </option>
-        ))}
+        {employees.length > 0 ? (
+          employees.map((employee) => (
+            <option key={employee.id} value={employee.id}>
+              {employee.EmployeeName}
+            </option>
+          ))
+        ) : (
+          <option disabled>No employees found</option>
+        )}
       </Select>
       <Button
-        // onClick={handleSubmit}
+        onClick={handleSubmit}
         colorScheme="blue"
         width="fit-content"
         mt="10px"
@@ -50,8 +77,9 @@ const DropDown = ({ onSelectHotel }) => {
       >
         Submit
       </Button>
+      {showSalaryTable && <SalaryTable selectedEmployee={selectedEmployee} />}
     </Card>
   );
 };
 
-export default DropDown;
+export default EmployeeDropDown;

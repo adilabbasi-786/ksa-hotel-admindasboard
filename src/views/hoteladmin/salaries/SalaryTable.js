@@ -1,128 +1,132 @@
-import React, { useState } from "react";
-import { Button, Flex } from "@chakra-ui/react";
-import { Card } from "@material-ui/core";
+import React, { useEffect, useState } from "react";
+import { Button, Flex, Text, useColorModeValue } from "@chakra-ui/react";
+import Card from "components/card/Card";
 import DevelopmentTable from "./DevelopmentTable";
-import AddNewEmployee from "./AddNewEmployee"; // Import AddNewEmployee component
-import AddSalary from "./AddSalary"; // Import AddSalary component
+import AddSalary from "./AddSalary";
+import axios from "axios";
+import { URL } from "Utils";
 
-const SalaryTable = () => {
-  const [isAddEmployeeModalOpen, setIsAddEmployeeModalOpen] = useState(false);
-  const [isAddSalaryModalOpen, setIsAddSalaryModalOpen] = useState(false);
-  const [modalValues, setModalValues] = useState({
-    employeename: "",
-    totalsalary: "",
-    advance: "",
-  });
+const EmployeeSalaryTable = ({ selectedEmployee }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [tableData, setTableData] = useState([]);
+  const [remainingAmount, setRemainingAmount] = useState(0);
 
-  const handleAddEmployeeClick = () => {
-    // Set default values for modal inputs
-    setModalValues({
-      employeename: "Default Employee",
-      totalsalary: "2000",
-      advance: "100",
+  useEffect(() => {
+    if (selectedEmployee) {
+      fetchSalaryData();
+    }
+  }, [selectedEmployee]);
+
+  const calculate = (entries) => {
+    let total = 0;
+    entries.forEach((element) => {
+      if (element.type === "advance") {
+        total += element.amount;
+      }
+      if (element.type === "deduction") {
+        total -= element.amount;
+      }
     });
-    // Open the Add Employee modal
-    setIsAddEmployeeModalOpen(true);
+    setRemainingAmount(total);
   };
 
-  // Define columns data
-  const columnsDataDevelopment = [
+  const token = localStorage.getItem("token");
+
+  const fetchSalaryData = async () => {
+    try {
+      const response = await axios.get(
+        `${URL}/api/salaries?populate=*&sort=date:desc&filters[employees_datum]=${selectedEmployee}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("res", response.data);
+      const data = response.data.map((item) => {
+        console.log("item", item.employees_datum.salary);
+        return {
+          date: item?.date,
+          amount: item?.amount,
+          month: item?.month,
+          type: item?.type,
+          employeeName: item?.employees_datum?.EmployeeName,
+          salary: item.employees_datum.salary,
+        };
+      });
+      console.log("salarResponse", data);
+      setTableData(data);
+      calculate(data);
+    } catch (error) {
+      console.error("Error fetching salary data:", error);
+    }
+  };
+
+  const handleAddItem = (newItem) => {
+    console.log("New item added:", newItem);
+  };
+
+  const columnsData = [
     {
-      Header: " Employee Name",
-      accessor: "employeename",
+      Header: "Date",
+      accessor: "date",
     },
     {
-      Header: " Total Salary",
-      accessor: "totalsalary",
+      Header: "Amount",
+      accessor: "amount",
     },
     {
-      Header: " Advance",
-      accessor: "advance",
+      Header: "Month",
+      accessor: "month",
     },
     {
-      Header: " Deducation",
-      accessor: "deduction",
-    },
-    {
-      Header: " Total Paid salary",
-      accessor: "paidsalary",
-    },
-    {
-      Header: " Status",
-      accessor: "status",
+      Header: "Type",
+      accessor: "type",
     },
   ];
 
-  // Define table data
-  const tableDataDevelopment = [
-    {
-      employeename: "Arman malik",
-      totalsalary: "2000",
-      advance: "100",
-      deduction: "50",
-      paidsalary: "300",
-      status: "paid",
-    },
-    {
-      employeename: "shan malik",
-      totalsalary: "5000",
-      advance: "0",
-      deduction: "150",
-      paidsalary: "3500",
-      status: "unpaid",
-    },
-    {
-      employeename: "Arman malik",
-      totalsalary: "2000",
-      advance: "100",
-      deduction: "50",
-      paidsalary: "300",
-      status: "paid",
-    },
-    {
-      employeename: "Arman malik",
-      totalsalary: "2000",
-      advance: "100",
-      deduction: "50",
-      paidsalary: "300",
-      status: "unpaid",
-    },
-  ];
+  const textColor = useColorModeValue("secondaryGray.900", "white");
 
   return (
     <>
       <Card>
         <Flex direction="column" justifyContent="space-between">
-          <DevelopmentTable
-            setIsAddSalaryModalOpen={setIsAddSalaryModalOpen}
-            setIsAddEmployeeModalOpen={setIsAddEmployeeModalOpen}
-            columnsData={columnsDataDevelopment}
-            tableData={tableDataDevelopment}
-          />
+          <Text
+            color={textColor}
+            fontSize={{ base: "18px", lg: "22px" }}
+            fontWeight="700"
+            lineHeight="100%"
+            mb={{ base: "10px", lg: "0px" }}
+          >
+            {tableData[0] && (
+              <>
+                {tableData[0].employeeName}:{tableData[0].salary}
+              </>
+            )}
+          </Text>
+          <DevelopmentTable columnsData={columnsData} tableData={tableData} />
           <Button
             colorScheme="blue"
             width="fit-content"
             alignSelf="flex-end"
-            onClick={handleAddEmployeeClick}
+            onClick={() => setIsModalOpen(true)}
           >
-            Add new Employee
+            Add
           </Button>
         </Flex>
       </Card>
+      <h1>Remaining: {remainingAmount}</h1>
       <AddSalary
-        isOpen={isAddSalaryModalOpen}
-        onClose={() => setIsAddSalaryModalOpen(false)}
-        onAddItem={() => {}}
-        defaultValues={modalValues}
-      />
-      <AddNewEmployee
-        isOpen={isAddEmployeeModalOpen}
-        onClose={() => setIsAddEmployeeModalOpen(false)}
-        onAddItem={() => {}}
-        defaultValues={modalValues}
+        selectedEmployee={selectedEmployee}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onAddItem={handleAddItem}
+        tableData={tableData}
+        setTableData={setTableData}
+        fetchSalaryData={fetchSalaryData}
       />
     </>
   );
 };
 
-export default SalaryTable;
+export default EmployeeSalaryTable;

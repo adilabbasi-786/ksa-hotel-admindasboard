@@ -21,10 +21,15 @@ const DropDown = ({ onSelectHotel }) => {
   useEffect(() => {
     fetchHotelNames();
   }, []);
+  const token = localStorage.getItem("token");
 
   const fetchHotelNames = async () => {
     try {
-      const response = await axios.get(`${URL}/api/hotel-names`);
+      const response = await axios.get(`${URL}/api/hotel-names`, {
+        headers: {
+          Authorization: `Bearar${token}`,
+        },
+      });
       setHotels(response.data);
     } catch (error) {
       console.error("Error fetching hotel names:", error);

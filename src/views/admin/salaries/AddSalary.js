@@ -39,11 +39,17 @@ const AddSalary = ({
       fetchEmployeeName(selectedEmployee);
     }
   }, [selectedEmployee]);
+  const token = localStorage.getItem("token");
 
   const fetchEmployeeName = async (employeeId) => {
     try {
       const response = await axios.get(
-        `${URL}/api/employee-data/${employeeId}`
+        `${URL}/api/employee-data/${employeeId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       console.log("response data", response.data);
       const employeeData = response.data.data;
@@ -84,7 +90,11 @@ const AddSalary = ({
     }
 
     try {
-      const response = await axios.post(`${URL}/api/salaries`, requestData);
+      const response = await axios.post(`${URL}/api/salaries`, requestData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.status === 200) {
         onAddItem(response.data);
