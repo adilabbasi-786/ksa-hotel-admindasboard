@@ -37,6 +37,7 @@ const RentKafalat = ({ selectedHotel }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [paidRent, setPaidRent] = useState("");
   const [paidKafalat, setPaidKafalat] = useState("");
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     fetchRentKafalatData();
@@ -45,7 +46,12 @@ const RentKafalat = ({ selectedHotel }) => {
   const fetchRentKafalatData = async () => {
     try {
       const response = await axios.get(
-        `${URL}/api/rents?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[month]=${selectedMonth}`
+        `${URL}/api/rents?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[month]=${selectedMonth}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setRentData(response.data.data);
       setIsPaid(response.data.data[0]?.attributes?.isPaid || false);
@@ -89,6 +95,7 @@ const RentKafalat = ({ selectedHotel }) => {
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         }
       );
