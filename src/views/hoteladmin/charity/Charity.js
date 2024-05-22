@@ -93,6 +93,7 @@ const Charity = () => {
         }
       );
       setIsCharityPaid(true);
+      fetchDailyCharity();
       handleCloseModal();
       charityCost(" ");
     } catch (error) {

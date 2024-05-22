@@ -101,9 +101,9 @@ const RentKafalat = () => {
       );
       setIsPaid(true);
       closeModal();
+      fetchRentKafalatData();
       paidKafalat("");
       paidRent("");
-      fetchRentKafalatData();
     } catch (error) {
       console.error("Error paying rent:", error);
     }
