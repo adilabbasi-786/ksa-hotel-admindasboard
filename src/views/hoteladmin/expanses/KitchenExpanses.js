@@ -14,33 +14,37 @@ const getCurrentDate = () => {
   return `${year}-${month}-${day}`;
 };
 
-const KitchenExpanses = ({ selectedHotel }) => {
+const KitchenExpanses = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(getCurrentDate());
   const [tableData, setTableData] = useState([]);
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
+  const token = localStorage.getItem("token");
 
   const getData = () => {
     axios
       .get(
-        `${URL}/api/daily-registers?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date]=${selectedDate}`
+        `${URL}/api/daily-registers?populate=*&filters[date]=${selectedDate}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       )
       .then((response) => {
-        const mappedData = response?.data?.data?.map((item) => {
-          console.log("item", item.attributes.category);
-          const totalPrice = (
-            item.attributes.quantity * item.attributes.price
-          ).toFixed(1);
+        const mappedData = response?.data?.map((item) => {
+          const totalPrice = (item?.quantity * item?.price).toFixed(1);
           return {
-            itemName: item.attributes.itemName,
-            category: item?.attributes?.category,
-            quantity: `${item.attributes.quantity} ${
-              item.attributes.quantity === "kitchen" ? "others" : "kg"
+            itemName: item?.itemName,
+            category: item?.category,
+            quantity: `${item?.quantity} ${
+              item?.quantity === "kitchen" ? "others" : "kg"
             }`,
-            price: item.attributes.price,
+            price: item?.price,
             totalPrice: totalPrice,
           };
         });
+        console.log("response", response.data);
 
         setTableData(mappedData);
       })
@@ -51,7 +55,7 @@ const KitchenExpanses = ({ selectedHotel }) => {
 
   useEffect(() => {
     getData();
-  }, [selectedHotel, selectedDate]);
+  }, [selectedDate]);
 
   const columnsData = [
     {
@@ -75,15 +79,15 @@ const KitchenExpanses = ({ selectedHotel }) => {
       accessor: "totalPrice",
     },
   ];
+
   const handleUpdateTableData = (newItem) => {
-    setTableData((prevData) => {
-      console.log("ssss", [...prevData, newItem]);
-      return [...prevData, newItem];
-    });
+    setTableData((prevData) => [...prevData, newItem]);
   };
+
   const handleAddItem = (newItem) => {
     console.log("New item added:", newItem);
   };
+
   return (
     <>
       <Flex alignItems="center" mb="10px" width={{ base: "100%", lg: "30%" }}>
@@ -101,7 +105,6 @@ const KitchenExpanses = ({ selectedHotel }) => {
       <Card>
         <Flex direction="column" justifyContent="space-between">
           <DevelopmentTable
-            selectedHotel={selectedHotel}
             selectedDate={selectedDate}
             columnsData={columnsData}
             tableData={tableData}
@@ -119,7 +122,6 @@ const KitchenExpanses = ({ selectedHotel }) => {
         </Flex>
       </Card>
       <AddNewItem
-        selectedHotel={selectedHotel}
         selectedDate={selectedDate}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

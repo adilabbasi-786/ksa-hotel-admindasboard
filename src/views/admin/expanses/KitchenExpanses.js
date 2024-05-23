@@ -19,11 +19,17 @@ const KitchenExpanses = ({ selectedHotel }) => {
   const [selectedDate, setSelectedDate] = useState(getCurrentDate());
   const [tableData, setTableData] = useState([]);
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
+  const token = localStorage.getItem("token");
 
   const getData = () => {
     axios
       .get(
-        `${URL}/api/daily-registers?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date]=${selectedDate}`
+        `${URL}/api/daily-registers?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date]=${selectedDate}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       )
       .then((response) => {
         const mappedData = response?.data?.data?.map((item) => {
