@@ -16,6 +16,7 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
+  Input,
 } from "@chakra-ui/react";
 import axios from "axios";
 // Custom components
@@ -35,6 +36,7 @@ export default function DevelopmentTable(props) {
   const [showAdvanceSalaryModal, setShowAdvanceSalaryModal] = useState(false);
   const [todaySaleData, setTodaySaleData] = useState([]);
   const [advanceSalaryData, setAdvanceSalaryData] = useState([]);
+  const [newSaleAmount, setNewSaleAmount] = useState("");
 
   const handleTodaySaleModalClose = () => setShowTodaySaleModal(false);
   const handleAdvanceSalaryModalClose = () => setShowAdvanceSalaryModal(false);
@@ -53,7 +55,7 @@ export default function DevelopmentTable(props) {
   const handleTodaySaleModalOpen = async () => {
     try {
       const response = await axios.get(
-        `${URL}/api/daily-sales?poulate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date][$eq]=${selectedDate}`
+        `${URL}/api/daily-sales?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date][$eq]=${selectedDate}`
       );
 
       setTodaySaleData(response.data);
@@ -63,6 +65,7 @@ export default function DevelopmentTable(props) {
       console.error("Error fetching today's sale data:", error);
     }
   };
+
   const handleAdvanceSalaryModalOpen = async () => {
     try {
       const response = await axios.get(
@@ -75,6 +78,32 @@ export default function DevelopmentTable(props) {
       console.error("Error fetching advance salary data:", error);
     }
   };
+
+  const handleAddSale = async () => {
+    try {
+      await axios.post(
+        `${URL}/api/daily-sales`,
+        {
+          data: {
+            sale: newSaleAmount,
+            date: selectedDate,
+            hotel_name: selectedHotel,
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      // Refresh sale data
+      handleTodaySaleModalOpen();
+      setNewSaleAmount("");
+    } catch (error) {
+      console.error("Error adding sale:", error);
+    }
+  };
+
   const tableInstance = useTable(
     {
       columns,
@@ -108,6 +137,7 @@ export default function DevelopmentTable(props) {
     (total, item) => total + item.attributes.sale,
     0
   );
+
   return (
     <Card
       direction="column"
@@ -266,12 +296,29 @@ export default function DevelopmentTable(props) {
             {todaySaleData?.data?.map((saleItem, index) => {
               return (
                 <Text key={index} color={textColorPrimary} fontWeight="bold">
-                  date: {saleItem?.attributes?.date}
+                  Date: {saleItem?.attributes?.date}
                   <br />
                   Today Total Sale: {saleItem?.attributes?.sale}
                 </Text>
               );
             })}
+            {!todaySaleData?.data?.length && (
+              <Flex direction="column" mt="4">
+                <Input
+                  placeholder="Enter sale amount"
+                  value={newSaleAmount}
+                  onChange={(e) => setNewSaleAmount(e.target.value)}
+                />
+                <Button
+                  colorScheme="blue"
+                  mt="2"
+                  onClick={handleAddSale}
+                  // isDisabled={!newSaleAmount}
+                >
+                  Add Sale
+                </Button>
+              </Flex>
+            )}
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" onClick={handleTodaySaleModalClose}>
@@ -306,8 +353,7 @@ export default function DevelopmentTable(props) {
             })}
             ____________________
             <Text color={textColorPrimary} fontWeight="bold">
-              Total Advance: {totalAdvanceSalary}
-              SAR
+              Total Advance: {totalAdvanceSalary} SAR
             </Text>
           </ModalBody>
           <ModalFooter>

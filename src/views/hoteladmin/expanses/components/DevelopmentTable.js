@@ -1,7 +1,5 @@
-/* eslint-disable */
 import {
   Flex,
-  Progress,
   Table,
   Tbody,
   Td,
@@ -10,24 +8,101 @@ import {
   Thead,
   Tr,
   useColorModeValue,
+  Center,
+  Button,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  Input,
 } from "@chakra-ui/react";
+import axios from "axios";
 // Custom components
 import Card from "components/card/Card";
-import { AndroidLogo, AppleLogo, WindowsLogo } from "components/icons/Icons";
-import Menu from "components/menu/MainMenu";
-import React, { useMemo } from "react";
+import { MdEdit } from "react-icons/md";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   useGlobalFilter,
   usePagination,
   useSortBy,
   useTable,
 } from "react-table";
+import { URL } from "Utils";
 
-export default function ExpanseDevelopmentTable(props) {
-  const { columnsData, tableData } = props;
+export default function DevelopmentTable(props) {
+  const [showTodaySaleModal, setShowTodaySaleModal] = useState(false);
+  const [showAdvanceSalaryModal, setShowAdvanceSalaryModal] = useState(false);
+  const [todaySaleData, setTodaySaleData] = useState([]);
+  const [advanceSalaryData, setAdvanceSalaryData] = useState([]);
+  const [newSaleAmount, setNewSaleAmount] = useState("");
+
+  const handleTodaySaleModalClose = () => setShowTodaySaleModal(false);
+  const handleAdvanceSalaryModalClose = () => setShowAdvanceSalaryModal(false);
+  const {
+    columnsData,
+    tableData,
+    selectedHotel,
+    selectedDate,
+    updateTableData,
+  } = props;
+  const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => tableData, [tableData]);
+
+  const handleTodaySaleModalOpen = async () => {
+    try {
+      const response = await axios.get(
+        `${URL}/api/daily-sales?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date][$eq]=${selectedDate}`
+      );
+
+      setTodaySaleData(response.data);
+
+      setShowTodaySaleModal(true);
+    } catch (error) {
+      console.error("Error fetching today's sale data:", error);
+    }
+  };
+
+  const handleAdvanceSalaryModalOpen = async () => {
+    try {
+      const response = await axios.get(
+        `${URL}/api/advance-salaries?populate[employees_datum][populate][0]=hotel_name&filters[employees_datum][hotel_name][id][$eq]=${selectedHotel}&filters[date][$eq]=${selectedDate}`
+      );
+
+      setAdvanceSalaryData(response.data);
+      setShowAdvanceSalaryModal(true);
+    } catch (error) {
+      console.error("Error fetching advance salary data:", error);
+    }
+  };
+
+  const handleAddSale = async () => {
+    try {
+      await axios.post(
+        `${URL}/api/daily-sales`,
+        {
+          data: {
+            sale: newSaleAmount,
+            date: selectedDate,
+            hotel_name: selectedHotel,
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      // Refresh sale data
+      handleTodaySaleModalOpen();
+      setNewSaleAmount("");
+    } catch (error) {
+      console.error("Error adding sale:", error);
+    }
+  };
 
   const tableInstance = useTable(
     {
@@ -48,10 +123,21 @@ export default function ExpanseDevelopmentTable(props) {
     initialState,
   } = tableInstance;
   initialState.pageSize = 11;
-
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const iconColor = useColorModeValue("secondaryGray.500", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
+  const totalExpense = tableData
+    .reduce((total, item) => total + parseFloat(item.totalPrice), 0)
+    .toFixed(1);
+  const totalAdvanceSalary = advanceSalaryData?.data?.reduce(
+    (total, item) => total + item.attributes.amount,
+    0
+  );
+  const totalSale = todaySaleData?.data?.reduce(
+    (total, item) => total + item.attributes.sale,
+    0
+  );
+
   return (
     <Card
       direction="column"
@@ -59,20 +145,42 @@ export default function ExpanseDevelopmentTable(props) {
       px="0px"
       overflowX={{ sm: "scroll", lg: "hidden" }}
     >
-      <Flex px="25px" justify="space-between" mb="20px" align="center">
-        <Text
-          color={textColor}
-          fontSize="22px"
-          fontWeight="700"
-          lineHeight="100%"
-        >
-          kitchen Expanses
-        </Text>
-        <Menu />
+      <Flex marginLeft="10px">
+        <div style={{ width: "250px", fontSize: "15px" }}>
+          <Button
+            colorScheme="blue"
+            width="fit-content"
+            alignSelf="flex-end"
+            onClick={handleTodaySaleModalOpen}
+          >
+            View Today Sale
+          </Button>
+          <Text color={textColorPrimary} fontWeight="bold" mt="10px" mb="4px">
+            <Button
+              colorScheme="blue"
+              width="fit-content"
+              alignSelf="flex-end"
+              onClick={handleAdvanceSalaryModalOpen}
+            >
+              View Advance Salary
+            </Button>
+          </Text>
+        </div>
       </Flex>
+      <Center>
+        <Flex px="25px" justify="center" mb="20px" align="center">
+          <Text
+            color={textColor}
+            fontSize="22px"
+            fontWeight="700"
+            lineHeight="100%"
+          >
+            Daily Expenses
+          </Text>
+        </Flex>
+      </Center>
       <Table {...getTableProps()} variant="simple" color="gray.500" mb="24px">
         <Thead>
-          {console.log("sss", headerGroups)}
           {headerGroups.map((headerGroup, index) => (
             <Tr {...headerGroup.getHeaderGroupProps()} key={index}>
               {headerGroup.headers.map((column, index) => (
@@ -126,7 +234,7 @@ export default function ExpanseDevelopmentTable(props) {
                   if (cell.column.Header === "Price") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
-                        {cell.value}
+                        {cell.value} SAR
                       </Text>
                     );
                   }
@@ -144,16 +252,117 @@ export default function ExpanseDevelopmentTable(props) {
                       fontSize={{ sm: "14px" }}
                       minW={{ sm: "150px", md: "200px", lg: "auto" }}
                       borderColor="transparent"
+                      pr="0"
                     >
                       {data}
                     </Td>
                   );
                 })}
+                <Td>
+                  <Button>
+                    <MdEdit color={iconColor} />
+                  </Button>
+                </Td>
               </Tr>
             );
           })}
         </Tbody>
       </Table>
+      <Flex width="100%" justify="start">
+        <hr
+          style={{
+            width: "100%",
+            margin: "15px 0",
+            border: "1px solid black",
+          }}
+        />
+      </Flex>
+      <Text fontWeight="bold">Total Expense: {totalExpense}</Text>
+      <Text fontWeight="bold">Total Sale: {totalSale}</Text>
+      <Text fontWeight="bold">Total Advance:{totalAdvanceSalary} </Text>
+      <Text fontWeight="bold">
+        Total Deposit: {totalSale - totalExpense - totalAdvanceSalary}
+      </Text>
+      {/* Today Sale Modal */}
+      <Modal
+        isOpen={showTodaySaleModal}
+        onClose={handleTodaySaleModalClose}
+        size="sm"
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Today Sale</ModalHeader>
+          <ModalBody>
+            {todaySaleData?.data?.map((saleItem, index) => {
+              return (
+                <Text key={index} color={textColorPrimary} fontWeight="bold">
+                  Date: {saleItem?.attributes?.date}
+                  <br />
+                  Today Total Sale: {saleItem?.attributes?.sale}
+                </Text>
+              );
+            })}
+            {!todaySaleData?.data?.length && (
+              <Flex direction="column" mt="4">
+                <Input
+                  placeholder="Enter sale amount"
+                  value={newSaleAmount}
+                  onChange={(e) => setNewSaleAmount(e.target.value)}
+                />
+                <Button
+                  colorScheme="blue"
+                  mt="2"
+                  onClick={handleAddSale}
+                  // isDisabled={!newSaleAmount}
+                >
+                  Add Sale
+                </Button>
+              </Flex>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" onClick={handleTodaySaleModalClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Advance Salary Modal */}
+      <Modal
+        isOpen={showAdvanceSalaryModal}
+        onClose={handleAdvanceSalaryModalClose}
+        size="sm"
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Advance Salary</ModalHeader>
+          <ModalBody>
+            {advanceSalaryData?.data?.map((salaryItem, index) => {
+              return (
+                <Text key={index} color={textColorPrimary} fontWeight="bold">
+                  Employee Name:{" "}
+                  {
+                    salaryItem.attributes.employees_datum.data.attributes
+                      .EmployeeName
+                  }
+                  <br />
+                  Advance: {salaryItem?.attributes?.amount} SAR
+                </Text>
+              );
+            })}
+            ____________________
+            <Text color={textColorPrimary} fontWeight="bold">
+              Total Advance: {totalAdvanceSalary} SAR
+            </Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" onClick={handleAdvanceSalaryModalClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Card>
   );
 }

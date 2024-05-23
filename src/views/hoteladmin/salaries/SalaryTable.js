@@ -42,19 +42,16 @@ const EmployeeSalaryTable = ({ selectedEmployee }) => {
           },
         }
       );
-      console.log("res", response.data);
-      const data = response.data.map((item) => {
-        console.log("item", item.employees_datum.salary);
-        return {
-          date: item?.date,
-          amount: item?.amount,
-          month: item?.month,
-          type: item?.type,
-          employeeName: item?.employees_datum?.EmployeeName,
-          salary: item.employees_datum.salary,
-        };
-      });
-      console.log("salarResponse", data);
+
+      const data = response.data.data.map((item) => ({
+        date: item.attributes.date,
+        amount: item.attributes.amount,
+        month: item.attributes.month,
+        type: item.attributes.type,
+        employeeName:
+          item.attributes.employees_datum.data.attributes.EmployeeName,
+        salary: item.attributes.employees_datum.data.attributes.salary,
+      }));
       setTableData(data);
       calculate(data);
     } catch (error) {

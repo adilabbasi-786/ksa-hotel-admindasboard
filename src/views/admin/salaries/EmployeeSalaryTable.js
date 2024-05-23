@@ -41,6 +41,7 @@ const EmployeeSalaryTable = ({ selectedHotel, selectedEmployee }) => {
           },
         }
       );
+
       const data = response.data.data.map((item) => ({
         date: item.attributes.date,
         amount: item.attributes.amount,
@@ -58,6 +59,7 @@ const EmployeeSalaryTable = ({ selectedHotel, selectedEmployee }) => {
   };
   const handleAddItem = (newItem) => {
     console.log("New item added:", newItem);
+    fetchSalaryData();
   };
 
   // Define columns data

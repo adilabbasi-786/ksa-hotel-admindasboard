@@ -77,8 +77,39 @@ const AddSalary = ({
         amount: amount,
       },
     };
+
+    // If entry type is "monthly salary", add month to the request data
     if (entryType === "monthly salary") {
       requestData.data.month = month;
+    }
+
+    // If entry type is "advance", make a request to store advance amount in another API
+    if (entryType === "advance") {
+      try {
+        const advanceResponse = await axios.post(
+          `${URL}/api/advance-salaries`,
+          {
+            data: {
+              employees_datum: { id: selectedEmployee },
+              date: new Date().toISOString(),
+              amount: amount,
+            },
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (advanceResponse.status !== 200) {
+          throw new Error("Failed to add advance amount");
+        }
+      } catch (error) {
+        console.error("Error adding advance amount:", error);
+        alert("Failed to add advance amount. Please try again later.");
+        return;
+      }
     }
 
     // Validate amount only for "monthly salary" entry type
@@ -90,6 +121,7 @@ const AddSalary = ({
     }
 
     try {
+      // Make a request to store salary entry
       const response = await axios.post(`${URL}/api/salaries`, requestData, {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -79,10 +79,6 @@ export default function DevelopmentTable(props) {
         align="center"
         direction={{ base: "column", lg: "row" }}
       >
-        <Flex alignItems="center" mb={{ base: "10px", lg: "0px" }}>
-          <Text mr={{ base: "3px", lg: "2px" }}>Select month</Text>
-          <Input type="month" id="profitmonth" name="profitmonth" />
-        </Flex>
         <Text
           color={textColor}
           fontSize={{ base: "18px", lg: "22px" }}
