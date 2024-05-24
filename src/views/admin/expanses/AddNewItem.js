@@ -31,6 +31,8 @@ const AddNewItem = ({
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const token = localStorage.getItem("token");
+
   const handleAddItem = () => {
     const newItem = {
       itemName,
@@ -49,6 +51,7 @@ const AddNewItem = ({
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         }
       )

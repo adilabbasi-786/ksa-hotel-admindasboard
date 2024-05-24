@@ -58,6 +58,7 @@ export default function DevelopmentTable(props) {
       );
 
       setTodaySaleData(response.data);
+      console.log("salesresponse", response.data);
 
       setShowTodaySaleModal(true);
     } catch (error) {
@@ -134,11 +135,11 @@ export default function DevelopmentTable(props) {
     .reduce((total, item) => total + parseFloat(item.totalPrice), 0)
     .toFixed(1);
   const totalAdvanceSalary = advanceSalaryData?.data?.reduce(
-    (total, item) => total + item.attributes.amount,
+    (total, item) => total + item?.attributes?.amount,
     0
   );
-  const totalSale = todaySaleData?.data?.reduce(
-    (total, item) => total + item.attributes.sale,
+  const totalSale = todaySaleData?.reduce(
+    (total, item) => total + item.sale,
     0
   );
 
@@ -297,16 +298,17 @@ export default function DevelopmentTable(props) {
         <ModalContent>
           <ModalHeader>Today Sale</ModalHeader>
           <ModalBody>
-            {todaySaleData?.data?.map((saleItem, index) => {
+            {todaySaleData?.map((saleItem, index) => {
+              console.log("saleitem", saleItem);
               return (
                 <Text key={index} color={textColorPrimary} fontWeight="bold">
-                  Date: {saleItem?.attributes?.date}
+                  Date: {saleItem?.date}
                   <br />
-                  Today Total Sale: {saleItem?.attributes?.sale}
+                  Today Total Sale: {saleItem?.sale}
                 </Text>
               );
             })}
-            {!todaySaleData?.data?.length && (
+            {!todaySaleData?.length && (
               <Flex direction="column" mt="4">
                 <Input
                   placeholder="Enter sale amount"

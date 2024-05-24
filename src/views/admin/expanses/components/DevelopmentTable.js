@@ -51,11 +51,17 @@ export default function DevelopmentTable(props) {
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => tableData, [tableData]);
+  const token = localStorage.getItem("token");
 
   const handleTodaySaleModalOpen = async () => {
     try {
       const response = await axios.get(
-        `${URL}/api/daily-sales?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date][$eq]=${selectedDate}`
+        `${URL}/api/daily-sales?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date][$eq]=${selectedDate}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       setTodaySaleData(response.data);
@@ -69,7 +75,12 @@ export default function DevelopmentTable(props) {
   const handleAdvanceSalaryModalOpen = async () => {
     try {
       const response = await axios.get(
-        `${URL}/api/advance-salaries?populate[employees_datum][populate][0]=hotel_name&filters[employees_datum][hotel_name][id][$eq]=${selectedHotel}&filters[date][$eq]=${selectedDate}`
+        `${URL}/api/advance-salaries?populate[employees_datum][populate][0]=hotel_name&filters[employees_datum][hotel_name][id][$eq]=${selectedHotel}&filters[date][$eq]=${selectedDate}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       setAdvanceSalaryData(response.data);
@@ -92,7 +103,7 @@ export default function DevelopmentTable(props) {
         },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
