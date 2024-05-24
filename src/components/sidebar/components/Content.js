@@ -9,7 +9,7 @@ import React from "react";
 // FUNCTIONS
 
 function SidebarContent(props) {
-  const { routes } = props;
+  const { routes, onClose } = props;
   console.log("Rpute", routes);
   // SIDEBAR
   return (
@@ -23,7 +23,7 @@ function SidebarContent(props) {
       <Brand />
       <Stack direction="column" mb="auto" mt="8px">
         <Box ps="20px" pe={{ md: "16px", "2xl": "1px" }}>
-          <Links routes={routes} />
+          <Links routes={routes} onClose={onClose} />
         </Box>
       </Stack>
     </Flex>

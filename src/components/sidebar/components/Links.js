@@ -16,7 +16,7 @@ export function SidebarLinks(props) {
   let textColor = useColorModeValue("secondaryGray.500", "white");
   let brandColor = useColorModeValue("brand.500", "brand.400");
 
-  const { routes } = props;
+  const { routes, onClose } = props;
 
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName) => {
@@ -54,7 +54,7 @@ export function SidebarLinks(props) {
         route.layout === "/rtl"
       ) {
         return (
-          <NavLink key={index} to={route.layout + route.path}>
+          <NavLink key={index} to={route.layout + route.path} onClick={onClose}>
             {route.icon ? (
               <Box>
                 <HStack

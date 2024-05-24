@@ -37,10 +37,11 @@ const Hotels = () => {
       <Flex w="100%">
         <Button
           me="100%"
-          mb="50px"
+          mb="20px"
           w="140px"
           minW="140px"
-          mt={{ base: "20px", "2xl": "auto" }}
+          mt="-80px"
+          // mt={{ base: "10px", "1xl": "auto" }}
           variant="brand"
           fontWeight="500"
           onClick={handleCreateHotel}
