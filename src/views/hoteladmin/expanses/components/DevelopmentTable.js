@@ -69,7 +69,7 @@ export default function DevelopmentTable(props) {
   const handleAdvanceSalaryModalOpen = async () => {
     try {
       const response = await axios.get(
-        `${URL}/api/advance-salaries?populate[employees_datum][populate][0]=hotel_name&&filters[date][$eq]=${selectedDate}`,
+        `${URL}/api/advance-salaries?populate=*&filters[date][$eq]=${selectedDate}`,
 
         {
           headers: {
@@ -79,6 +79,7 @@ export default function DevelopmentTable(props) {
       );
 
       setAdvanceSalaryData(response.data);
+      console.log("Responseadvacne", response);
       setShowAdvanceSalaryModal(true);
     } catch (error) {
       console.error("Error fetching advance salary data:", error);
@@ -134,8 +135,8 @@ export default function DevelopmentTable(props) {
   const totalExpense = tableData
     .reduce((total, item) => total + parseFloat(item.totalPrice), 0)
     .toFixed(1);
-  const totalAdvanceSalary = advanceSalaryData?.data?.reduce(
-    (total, item) => total + item?.attributes?.amount,
+  const totalAdvanceSalary = advanceSalaryData?.reduce(
+    (total, item) => total + item?.amount,
     0
   );
   const totalSale = todaySaleData?.reduce(
@@ -344,16 +345,13 @@ export default function DevelopmentTable(props) {
         <ModalContent>
           <ModalHeader>Advance Salary</ModalHeader>
           <ModalBody>
-            {advanceSalaryData?.data?.map((salaryItem, index) => {
+            {advanceSalaryData?.map((salaryItem, index) => {
+              console.log("salarData", salaryItem);
               return (
                 <Text key={index} color={textColorPrimary} fontWeight="bold">
-                  Employee Name:{" "}
-                  {
-                    salaryItem.attributes.employees_datum.data.attributes
-                      .EmployeeName
-                  }
+                  Employee Name: {salaryItem?.employees_datum?.EmployeeName}
                   <br />
-                  Advance: {salaryItem?.attributes?.amount} SAR
+                  Advance: {salaryItem?.amount} SAR
                 </Text>
               );
             })}
