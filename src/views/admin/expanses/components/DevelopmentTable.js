@@ -315,19 +315,21 @@ export default function DevelopmentTable(props) {
             })}
             {!todaySaleData?.data?.length && (
               <Flex direction="column" mt="4">
-                <Input
+                <Text>No Record Found</Text>
+                <Text>Manager did not enter sale</Text>
+                {/* <Input
                   placeholder="Enter sale amount"
                   value={newSaleAmount}
                   onChange={(e) => setNewSaleAmount(e.target.value)}
-                />
-                <Button
+                /> */}
+                {/* <Button
                   colorScheme="blue"
                   mt="2"
                   onClick={handleAddSale}
                   // isDisabled={!newSaleAmount}
                 >
                   Add Sale
-                </Button>
+                </Button> */}
               </Flex>
             )}
           </ModalBody>
@@ -362,6 +364,9 @@ export default function DevelopmentTable(props) {
                 </Text>
               );
             })}
+            {!advanceSalaryData?.data?.length && (
+              <Text>No One take Today advance</Text>
+            )}
             ____________________
             <Text color={textColorPrimary} fontWeight="bold">
               Total Advance: {totalAdvanceSalary} SAR
