@@ -52,10 +52,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
       body: requestFormdata,
     };
     try {
-      const response = await fetch(
-        "http://localhost:1337/api/upload",
-        requestOptions
-      );
+      const response = await fetch(`${URL}/api/upload`, requestOptions);
       const result = await response.json();
       const imgId = result[0].id;
       console.log("result", result);
