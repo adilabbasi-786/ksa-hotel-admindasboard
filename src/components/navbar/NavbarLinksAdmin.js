@@ -55,7 +55,7 @@ export default function HeaderLinks(props) {
       boxShadow={shadow}
     >
       <SidebarResponsive
-        routes={window.location.href.includes("admin") ? routes : hotelroutes}
+        routes={window.location.href.includes("/admin") ? routes : hotelroutes}
       />
     </Flex>
   );
