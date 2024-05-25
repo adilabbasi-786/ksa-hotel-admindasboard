@@ -10,7 +10,7 @@ import {
 import Footer from "components/footer/FooterAdmin.js";
 // Layout components
 import Navbar from "components/navbar/NavbarAdmin.js";
-import Sidebar from "components/hotelsidebar/Sidebar";
+import Sidebar from "components/sidebar/Sidebar";
 import { SidebarContext } from "contexts/SidebarContext";
 import React, { useState } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
