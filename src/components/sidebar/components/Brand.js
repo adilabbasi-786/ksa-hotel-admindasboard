@@ -13,10 +13,12 @@ export function SidebarBrand() {
   const mainText = useColorModeValue("navy.700", "white");
 
   useEffect(() => {
-    const href = window.location.href;
-    console.log("windowref", href);
-    if (href.includes("admin")) {
+    const path = window.location.pathname;
+    console.log("windowref", window.location.href);
+    if (path.includes("/admin")) {
       setDashboardInfo({ url: "/admin/dashboard", text: "ADMIN" });
+    } else {
+      setDashboardInfo({ url: "/hotel/dashboard", text: "HOTEL" });
     }
   }, []);
 
