@@ -47,7 +47,8 @@ export default function HeaderLinks(props) {
       w={{ sm: "15%", md: "auto" }}
       alignItems="center"
       flexDirection="row"
-      bg={menuBg}
+      backgroundColor="lightgrey"
+      // bg={menuBg}
       flexWrap={secondary ? { base: "wrap", md: "nowrap" } : "unset"}
       p="10px"
       boxShadow={shadow}
