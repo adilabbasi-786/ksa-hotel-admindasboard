@@ -42,6 +42,7 @@ export default function HeaderLinks(props) {
     "14px 17px 40px 4px rgba(112, 144, 176, 0.06)"
   );
   const borderButton = useColorModeValue("secondaryGray.500", "whiteAlpha.200");
+  console.log("ebe", window.location.href, { routes, hotelroutes });
   return (
     <Flex
       w={{ sm: "15%", md: "auto" }}
