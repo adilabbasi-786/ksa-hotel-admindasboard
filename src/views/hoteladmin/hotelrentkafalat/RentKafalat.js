@@ -100,8 +100,8 @@ const RentKafalat = () => {
         }
       );
       setIsPaid(true);
-      closeModal();
       fetchRentKafalatData();
+      closeModal();
       paidKafalat("");
       paidRent("");
     } catch (error) {
@@ -146,19 +146,23 @@ const RentKafalat = () => {
           >
             Hotel Rent And Kafalat
           </Text>
-          {rentData && (
+          {rentData ? (
             <>
               <Information
                 boxShadow={cardShadow}
                 title={`Hotel Rent for Month of ${defaultMonth}`}
-                value={`${rentData[0]?.hotelRent} SAR`}
+                value={`${rentData[0]?.hotelRent || "Not paid yet"} SAR`}
               />
               <Information
                 boxShadow={cardShadow}
                 title={`Kafalat for Month of ${defaultMonth}`}
-                value={`${rentData[0]?.kafalat} SAR`}
+                value={`${rentData[0]?.kafalat || "Not paid yet"} SAR`}
               />
             </>
+          ) : (
+            <Text>
+              No rent and kafalat data available for the selected month
+            </Text>
           )}
           {console.log("rentData", rentData)}
         </VStack>
