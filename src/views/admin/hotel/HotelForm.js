@@ -11,8 +11,9 @@ const HotelForm = () => {
     managerName: "",
     managerEmail: "",
     managerPassword: "",
-    kafalat: "",
-    hotelRent: "",
+    managerPhoneNumber: "",
+    kafeelName: "",
+    KafeelPhoneNumber: "",
   });
   const [roleId] = useState("manager");
 
@@ -92,6 +93,9 @@ const HotelForm = () => {
           managerPassword: "",
           kafalat: "",
           hotelRent: "",
+          kafeelName: "",
+          KafeelPhoneNumber: "",
+          managerPhoneNumber: "",
         });
         alert("Form submitted successfully!");
         history.push("/admin/hotel");
@@ -155,22 +159,29 @@ const HotelForm = () => {
         />
       </FormControl>
       <FormControl mt={4}>
-        <FormLabel>Kafalat</FormLabel>
+        <FormLabel>Manager Phone Number</FormLabel>
         <Input
-          type="number"
-          placeholder="Kafalat"
-          name="kafalat"
-          value={formData.kafalat}
+          placeholder="manager phone number"
+          name="managerPhoneNumber"
+          value={formData.managerPhoneNumber}
           onChange={handleInputChange}
         />
       </FormControl>
       <FormControl mt={4}>
-        <FormLabel>Hotel Rent</FormLabel>
+        <FormLabel>kafeel Name</FormLabel>
         <Input
-          type="number"
-          placeholder="Hotel Rent"
-          name="hotelRent"
-          value={formData.hotelRent}
+          placeholder="Kafeel Name"
+          name="kafeelName"
+          value={formData.kafeelName}
+          onChange={handleInputChange}
+        />
+      </FormControl>
+      <FormControl mt={4}>
+        <FormLabel>kafeel Phone Number</FormLabel>
+        <Input
+          placeholder="Kafeel Phone Number"
+          name="KafeelPhoneNumber"
+          value={formData.KafeelPhoneNumber}
           onChange={handleInputChange}
         />
       </FormControl>

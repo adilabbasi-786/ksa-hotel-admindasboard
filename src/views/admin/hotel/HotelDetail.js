@@ -89,15 +89,20 @@ const HotelDetail = () => {
         />
         <Information
           boxShadow={cardShadow}
-          title="Hotel Rent"
-          value={hotel[0]?.attributes?.hotelRent}
+          title="Manager Phone Number"
+          value={hotel[0]?.attributes?.managerPhoneNumber}
         />
         <Information
           boxShadow={cardShadow}
-          title="Kafalat"
-          value={hotel[0]?.attributes?.kafalat}
+          title="kafeel Name"
+          value={hotel[0]?.attributes?.kafeelName}
         />
-        <Information boxShadow={cardShadow} title="Total" value="15000SAR" />
+        <Information
+          boxShadow={cardShadow}
+          title="kafeel Phone Number"
+          value={hotel[0]?.attributes?.KafeelPhoneNumber}
+        />
+        {/* <Information boxShadow={cardShadow} title="Total" value="15000SAR" /> */}
       </SimpleGrid>
     </Card>
   );

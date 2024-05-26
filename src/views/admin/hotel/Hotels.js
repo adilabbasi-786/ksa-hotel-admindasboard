@@ -74,8 +74,9 @@ const Hotels = () => {
               managerName={hotel?.attributes?.managerName}
               managerEmail={hotel?.attributes?.managerEmail}
               managerPassword={hotel?.attributes?.managerPassword}
-              hotelRent={hotel?.attributes?.hotelRent}
-              kafalat={hotel?.attributes?.kafalat}
+              managerPhoneNumber={hotel?.attributes?.managerPhoneNumber}
+              kafeelName={hotel?.attributes?.kafeelName}
+              KafeelPhoneNumber={hotel?.attributes?.KafeelPhoneNumber}
             />
           ))}
       </Card>

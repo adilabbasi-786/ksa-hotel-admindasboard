@@ -31,6 +31,9 @@ const HotelCard = ({
   managerName,
   managerEmail,
   managerPassword,
+  KafeelPhoneNumber,
+  kafeelName,
+  managerPhoneNumber,
   hotelRent,
   image,
   ...rest
@@ -44,6 +47,9 @@ const HotelCard = ({
     managerEmail: managerEmail,
     managerPassword: managerPassword,
     hotelRent: hotelRent,
+    managerPhoneNumber: managerPhoneNumber,
+    kafeelName: kafeelName,
+    KafeelPhoneNumber: KafeelPhoneNumber,
   });
   const [showModal, setShowModal] = useState(false);
   const history = useHistory();
@@ -199,6 +205,33 @@ const HotelCard = ({
                 type="text"
                 name="managerPassword"
                 value={updatedHotelData.managerPassword}
+                onChange={handleInputChange}
+              />
+              <Text fontWeight="bold" fontSize="xl" mt="10px">
+                Manager Phone Number
+              </Text>
+              <Input
+                type="text"
+                name="managerPhoneNumber"
+                value={updatedHotelData.managerPhoneNumber}
+                onChange={handleInputChange}
+              />
+              <Text fontWeight="bold" fontSize="xl" mt="10px">
+                kafeel Name
+              </Text>
+              <Input
+                type="text"
+                name="kafeelName"
+                value={updatedHotelData.kafeelName}
+                onChange={handleInputChange}
+              />
+              <Text fontWeight="bold" fontSize="xl" mt="10px">
+                kafeel Phone Number
+              </Text>
+              <Input
+                type="text"
+                name="KafeelPhoneNumber"
+                value={updatedHotelData.KafeelPhoneNumber}
                 onChange={handleInputChange}
               />
             </Box>
