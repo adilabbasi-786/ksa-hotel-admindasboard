@@ -30,17 +30,35 @@ const AddSalary = ({
   const [entryType, setEntryType] = useState("monthly salary");
   const [amount, setAmount] = useState("");
   const [month, setMonth] = useState("");
-  const [employeeName, setEmployeeName] = useState(""); // State to store employee name
-
+  const [employeeName, setEmployeeName] = useState("");
+  const [paidMonths, setPaidMonths] = useState([]);
   const [deduction, setDeduction] = useState("");
 
   useEffect(() => {
     if (selectedEmployee) {
       fetchEmployeeName(selectedEmployee);
+      fetchPaidMonths(selectedEmployee);
     }
   }, [selectedEmployee]);
   const token = localStorage.getItem("token");
-
+  const fetchPaidMonths = async (employeeId) => {
+    try {
+      const response = await axios.get(
+        `${URL}/api/salaries?employee_id=${employeeId}&type=monthly salary`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const paidMonthsData = response.data.data;
+      const paidMonths = paidMonthsData.map((item) => item.month);
+      console.log("response of add salary", paidMonths);
+      setPaidMonths(paidMonths);
+    } catch (error) {
+      console.error("Error fetching paid months:", error);
+    }
+  };
   const fetchEmployeeName = async (employeeId) => {
     try {
       const response = await axios.get(
@@ -77,39 +95,8 @@ const AddSalary = ({
         amount: amount,
       },
     };
-
-    // If entry type is "monthly salary", add month to the request data
     if (entryType === "monthly salary") {
       requestData.data.month = month;
-    }
-
-    // If entry type is "advance", make a request to store advance amount in another API
-    if (entryType === "advance") {
-      try {
-        const advanceResponse = await axios.post(
-          `${URL}/api/advance-salaries`,
-          {
-            data: {
-              employees_datum: { id: selectedEmployee },
-              date: new Date().toISOString(),
-              amount: amount,
-            },
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (advanceResponse.status !== 200) {
-          throw new Error("Failed to add advance amount");
-        }
-      } catch (error) {
-        console.error("Error adding advance amount:", error);
-        alert("Failed to add advance amount. Please try again later.");
-        return;
-      }
     }
 
     // Validate amount only for "monthly salary" entry type
@@ -121,7 +108,6 @@ const AddSalary = ({
     }
 
     try {
-      // Make a request to store salary entry
       const response = await axios.post(`${URL}/api/salaries`, requestData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -147,18 +133,21 @@ const AddSalary = ({
   const generateMonthOptions = () => {
     const currentMonth = new Date().getMonth() + 1;
     const options = [];
-    for (let i = 1; i <= 12; i++) {
-      if (i <= currentMonth) {
-        options.push(
-          <option key={i} value={i.toString()}>
-            {getMonthName(i)}
-          </option>
-        );
-      }
+
+    for (let i = 1; i <= currentMonth; i++) {
+      const monthName = getMonthName(i);
+      const isPaid = paidMonths.includes(i.toString());
+
+      options.push(
+        <option key={i} value={i.toString()} disabled={isPaid}>
+          {monthName}
+          {isPaid && " (Paid)"}
+        </option>
+      );
     }
+
     return options;
   };
-
   const getMonthName = (monthIndex) => {
     const months = [
       "January",
@@ -210,6 +199,7 @@ const AddSalary = ({
                 <Select
                   value={month}
                   onChange={(e) => setMonth(e.target.value)}
+                  disabled={paidMonths.includes(month)}
                 >
                   {generateMonthOptions()}
                 </Select>

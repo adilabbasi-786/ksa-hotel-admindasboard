@@ -49,6 +49,23 @@ export default function DevelopmentTable(props) {
 
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
+  const getMonthName = (monthIndex) => {
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    return months[monthIndex - 1];
+  };
   return (
     <Card
       direction="column"
@@ -124,7 +141,7 @@ export default function DevelopmentTable(props) {
                   if (cell.column.Header === "Month") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
-                        {cell.value}
+                        {getMonthName(cell.value)}
                       </Text>
                     );
                   }
