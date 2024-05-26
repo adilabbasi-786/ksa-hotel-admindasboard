@@ -49,6 +49,7 @@ const EmployeeFullDetail = ({ employeeData }) => {
         mb="4px"
       >
         {employeeData.EmployeeName}
+        {console.log("view employee", employeeData)}
       </Text>
 
       <SimpleGrid columns={{ base: 1, md: 2 }} gap="20px">
@@ -76,6 +77,11 @@ const EmployeeFullDetail = ({ employeeData }) => {
           boxShadow={cardShadow}
           title="Iqama Expiry"
           value={employeeData.iqamaExpiry}
+        />
+        <Information
+          boxShadow={cardShadow}
+          title="Employee Phone Number"
+          value={employeeData.EmployeePhoneNumber}
         />
         <Box boxShadow={cardShadow}>
           <Text fontWeight="semibold">Iqama Picture</Text>

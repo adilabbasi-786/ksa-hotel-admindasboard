@@ -100,6 +100,7 @@ const EmployeesData = ({ selectedHotel }) => {
               passportExpiry={employee.attributes.passportExpiry}
               iqamaExpiry={employee.attributes.iqamaExpiry}
               salary={employee.attributes.salary}
+              EmployeePhoneNumber={employee.attributes.EmployeePhoneNumber}
               employeeData={employee.attributes}
               fetchEmployeeData={fetchEmployeeData}
             />

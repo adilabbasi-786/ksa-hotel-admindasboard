@@ -36,6 +36,7 @@ const Banner = ({
   employeeData,
   iqamaNumber,
   passportExpiry,
+  EmployeePhoneNumber,
   iqamaExpiry,
   id,
   salary,
@@ -51,6 +52,7 @@ const Banner = ({
     iqamaNumber: "",
     passportExpiry: "",
     iqamaExpiry: "",
+    EmployeePhoneNumber: "",
     salary: "",
   });
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -66,6 +68,7 @@ const Banner = ({
         passportExpiry: passportExpiry,
         iqamaExpiry: iqamaExpiry,
         salary: salary,
+        EmployeePhoneNumber: EmployeePhoneNumber,
       });
     }
   }, [
@@ -76,6 +79,7 @@ const Banner = ({
     iqamaExpiry,
     passportExpiry,
     iqamaNumber,
+    EmployeePhoneNumber,
     salary,
   ]);
 
@@ -214,7 +218,7 @@ const Banner = ({
           <ModalBody>
             {isEditMode ? (
               <FormControl>
-                <FormLabel>Name:</FormLabel>
+                <FormLabel>Employee Name:</FormLabel>
                 <Input
                   type="text"
                   name="EmployeeName"
@@ -226,6 +230,12 @@ const Banner = ({
                   type="number"
                   name="salary"
                   value={updatedEmployeeData.salary}
+                  onChange={handleInputChange}
+                />
+                <FormLabel>Employee Phone number:</FormLabel>
+                <Input
+                  name="EmployeePhoneNumber"
+                  value={updatedEmployeeData.EmployeePhoneNumber}
                   onChange={handleInputChange}
                 />
                 <FormLabel>Passport Number:</FormLabel>
