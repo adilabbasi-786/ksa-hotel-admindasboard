@@ -27,6 +27,24 @@ const getCurrentMonth = () => {
   return `${year}-${month}`;
 };
 
+const getMonthName = (monthNumber) => {
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  return monthNames[monthNumber - 1];
+};
+
 const RentKafalat = ({ selectedHotel }) => {
   const [rentData, setRentData] = useState(null);
   const [defaultMonth, setDefaultMonth] = useState(getCurrentMonth());
@@ -102,8 +120,8 @@ const RentKafalat = ({ selectedHotel }) => {
       setIsPaid(true);
       fetchRentKafalatData();
       closeModal();
-      paidKafalat("");
-      paidRent("");
+      setPaidKafalat("");
+      setPaidRent("");
     } catch (error) {
       console.error("Error paying rent:", error);
     }
@@ -150,14 +168,14 @@ const RentKafalat = ({ selectedHotel }) => {
             <>
               <Information
                 boxShadow={cardShadow}
-                title={`Hotel Rent for Month of ${defaultMonth}`}
+                title={`Hotel Rent for Month of ${getMonthName(selectedMonth)}`}
                 value={`${
                   rentData[0]?.attributes?.hotelRent || "Not paid yet"
                 } SAR`}
               />
               <Information
                 boxShadow={cardShadow}
-                title={`Kafalat for Month of ${defaultMonth}`}
+                title={`Kafalat for Month of ${getMonthName(selectedMonth)}`}
                 value={`${
                   rentData[0]?.attributes?.kafalat || "Not paid yet"
                 } SAR`}
