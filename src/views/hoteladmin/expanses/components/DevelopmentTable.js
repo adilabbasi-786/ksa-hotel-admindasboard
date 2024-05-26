@@ -37,7 +37,8 @@ export default function DevelopmentTable(props) {
   const [todaySaleData, setTodaySaleData] = useState([]);
   const [advanceSalaryData, setAdvanceSalaryData] = useState([]);
   const [newSaleAmount, setNewSaleAmount] = useState("");
-
+  const [cashSaleAmount, setCashSaleAmount] = useState("");
+  const [creditSaleAmount, setCreditSaleAmount] = useState("");
   const handleTodaySaleModalClose = () => setShowTodaySaleModal(false);
   const handleAdvanceSalaryModalClose = () => setShowAdvanceSalaryModal(false);
   const { columnsData, tableData, selectedDate, updateTableData } = props;
@@ -87,12 +88,17 @@ export default function DevelopmentTable(props) {
   };
 
   const handleAddSale = async () => {
+    const cashSale = parseFloat(cashSaleAmount);
+    const creditSale = parseFloat(creditSaleAmount);
+    const totalSale = cashSale + creditSale;
     try {
       await axios.post(
         `${URL}/api/daily-sales`,
         {
           data: {
-            sale: newSaleAmount,
+            cashSale: cashSale,
+            creditSale: creditSale,
+            sale: totalSale,
             date: selectedDate,
           },
         },
@@ -139,11 +145,17 @@ export default function DevelopmentTable(props) {
     (total, item) => total + item?.amount,
     0
   );
-  const totalSale = todaySaleData?.reduce(
-    (total, item) => total + item.sale,
+  const totalCashSale = todaySaleData?.reduce(
+    (total, item) => total + (item.cashSale || 0),
     0
   );
 
+  const totalCreditSale = todaySaleData?.reduce(
+    (total, item) => total + (item.creditSale || 0),
+    0
+  );
+
+  const totalSale = totalCashSale + totalCreditSale;
   return (
     <Card
       direction="column"
@@ -305,16 +317,30 @@ export default function DevelopmentTable(props) {
                 <Text key={index} color={textColorPrimary} fontWeight="bold">
                   Date: {saleItem?.date}
                   <br />
-                  Today Total Sale: {saleItem?.sale}
+                  cash sale: {saleItem?.cashSale}
+                  <br />
+                  credit sale: {saleItem?.creditSale}
+                  <br />
+                  Today Total Sale: {totalSale}
                 </Text>
               );
             })}
             {!todaySaleData?.length && (
               <Flex direction="column" mt="4">
+                <Text>Enter Cash sale Amount</Text>
                 <Input
-                  placeholder="Enter sale amount"
-                  value={newSaleAmount}
-                  onChange={(e) => setNewSaleAmount(e.target.value)}
+                  type="number"
+                  placeholder="Enter cash sale"
+                  value={cashSaleAmount}
+                  onChange={(e) => setCashSaleAmount(e.target.value)}
+                />
+                <Text>Enter Credit sale Amount</Text>
+
+                <Input
+                  type="number"
+                  placeholder="Enter credit sale"
+                  value={creditSaleAmount}
+                  onChange={(e) => setCreditSaleAmount(e.target.value)}
                 />
                 <Button
                   colorScheme="blue"

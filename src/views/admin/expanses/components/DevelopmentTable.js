@@ -37,6 +37,8 @@ export default function DevelopmentTable(props) {
   const [todaySaleData, setTodaySaleData] = useState([]);
   const [advanceSalaryData, setAdvanceSalaryData] = useState([]);
   const [newSaleAmount, setNewSaleAmount] = useState("");
+  const [cashSaleAmount, setCashSaleAmount] = useState("");
+  const [creditSaleAmount, setCreditSaleAmount] = useState("");
 
   const handleTodaySaleModalClose = () => setShowTodaySaleModal(false);
   const handleAdvanceSalaryModalClose = () => setShowAdvanceSalaryModal(false);
@@ -144,10 +146,17 @@ export default function DevelopmentTable(props) {
     (total, item) => total + item.attributes.amount,
     0
   );
-  const totalSale = todaySaleData?.data?.reduce(
-    (total, item) => total + item.attributes.sale,
+  const totalCashSale = todaySaleData?.data?.reduce(
+    (total, item) => total + (item.attributes.cashSale || 0),
     0
   );
+
+  const totalCreditSale = todaySaleData?.data?.reduce(
+    (total, item) => total + (item.attributes.creditSale || 0),
+    0
+  );
+
+  const totalSale = totalCashSale + totalCreditSale;
 
   return (
     <Card
@@ -309,7 +318,11 @@ export default function DevelopmentTable(props) {
                 <Text key={index} color={textColorPrimary} fontWeight="bold">
                   Date: {saleItem?.attributes?.date}
                   <br />
-                  Today Total Sale: {saleItem?.attributes?.sale}
+                  cash sale: {saleItem?.attributes?.cashSale}
+                  <br />
+                  credit sale: {saleItem?.attributes?.creditSale}
+                  <br />
+                  Today Total Sale: {totalSale}
                 </Text>
               );
             })}
