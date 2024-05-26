@@ -109,9 +109,10 @@ const Charity = () => {
         width={{ base: "100%", lg: "30%" }} // Adjust width based on screen size
       >
         <Text mr={{ base: "5px", lg: "10px" }}>Select date</Text>
-        <Input
+        <input
           type="date" // Change type to "date" for date picker
           id="charitydate"
+          max={getCurrentDate()}
           name="charitydate"
           value={defaultDate}
           onChange={(e) => setDefaultDate(e.target.value)}

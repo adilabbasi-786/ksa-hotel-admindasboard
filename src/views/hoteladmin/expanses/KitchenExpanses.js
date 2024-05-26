@@ -92,7 +92,7 @@ const KitchenExpanses = () => {
     <>
       <Flex alignItems="center" mb="10px" width={{ base: "100%", lg: "30%" }}>
         <Text mr={{ base: "3px", lg: "5px" }}>Select date</Text>
-        <Input
+        <input
           type="date"
           id="selectedDate"
           name="selectedDate"
@@ -100,6 +100,7 @@ const KitchenExpanses = () => {
           onChange={(e) => setSelectedDate(e.target.value)}
           fontSize="md"
           width="100%"
+          max={getCurrentDate()}
         />
       </Flex>
       <Card>
