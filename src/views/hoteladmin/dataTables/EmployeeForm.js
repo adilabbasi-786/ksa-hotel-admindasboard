@@ -22,6 +22,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
     EmployeeName: "",
     PassportNumber: "",
     passportExpiry: "",
+    EmployeePhoneNumber: "",
     iqamaNumber: "",
     iqamaExpiry: "",
     status: "",
@@ -32,6 +33,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formErrors, setFormErrors] = useState({
     EmployeeName: "",
+    EmployeePhoneNumber: "",
     PassportNumber: "",
     passportExpiry: "",
     iqamaNumber: "",
@@ -99,6 +101,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
       "iqamaExpiry",
       "status",
       "salary",
+      "EmployeePhoneNumber",
     ];
     let hasErrors = false;
     const newFormErrors = {};
@@ -146,6 +149,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
           employeePicture: formData.employeePicture,
           iqamaPicture: formData.iqamaPicture,
           passportImage: formData.passportImage,
+          EmployeePhoneNumber: formData.EmployeePhoneNumber,
         },
       };
 
@@ -198,6 +202,16 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
                 placeholder="Employee name"
               />
               <Text color="red">{formErrors.EmployeeName}</Text>
+            </FormControl>
+            <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
+              <FormLabel>Employee Phone Number</FormLabel>
+              <Input
+                name="EmployeePhoneNumber"
+                value={formData.EmployeePhoneNumber}
+                onChange={(e) => handleChange(e, "EmployeePhoneNumber")}
+                placeholder="Employee Phone number"
+              />
+              <Text color="red">{formErrors.EmployeePhoneNumber}</Text>
             </FormControl>
             <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
               <FormLabel>Employee Salary</FormLabel>

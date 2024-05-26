@@ -59,6 +59,11 @@ const EmployeeFullDetail = ({ employeeData }) => {
         />
         <Information
           boxShadow={cardShadow}
+          title="EmployeePhoneNumber"
+          value={employeeData.EmployeePhoneNumber}
+        />
+        <Information
+          boxShadow={cardShadow}
           title="Passport Number"
           value={employeeData.PassportNumber}
         />

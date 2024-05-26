@@ -92,6 +92,7 @@ const EmployeesData = () => {
               passportImage={`${URL}${employee?.passportImage?.url}`}
               iqamaPicture={`${URL}${employee?.iqamaPicture?.url}`}
               status={employee.status}
+              EmployeePhoneNumber={employee.EmployeePhoneNumber}
               avatar={`${URL}${employee?.employeePicture?.url}`}
               banner={banner}
               employeeData={employee}

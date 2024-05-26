@@ -35,6 +35,7 @@ const Banner = ({
   employeeData,
   iqamaNumber,
   passportExpiry,
+  EmployeePhoneNumber,
   iqamaExpiry,
   id,
   salary,
@@ -51,6 +52,7 @@ const Banner = ({
     passportExpiry: "",
     iqamaExpiry: "",
     salary: "",
+    EmployeePhoneNumber: "",
   });
   const [formErrors, setFormErrors] = useState({});
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -66,6 +68,7 @@ const Banner = ({
         passportExpiry: passportExpiry,
         iqamaExpiry: iqamaExpiry,
         salary: salary,
+        EmployeePhoneNumber: EmployeePhoneNumber,
       });
     }
   }, [
@@ -76,6 +79,7 @@ const Banner = ({
     iqamaExpiry,
     passportExpiry,
     iqamaNumber,
+    EmployeePhoneNumber,
     salary,
   ]);
 
@@ -93,6 +97,7 @@ const Banner = ({
       "iqamaExpiry",
       "status",
       "salary",
+      "EmployeePhoneNumber",
     ];
 
     requiredFields.forEach((field) => {
@@ -228,7 +233,7 @@ const Banner = ({
           <ModalBody>
             {isEditMode ? (
               <FormControl>
-                <FormLabel>Name:</FormLabel>
+                <FormLabel>Employee NameName:</FormLabel>
                 <Input
                   type="text"
                   name="EmployeeName"
@@ -236,6 +241,14 @@ const Banner = ({
                   onChange={handleInputChange}
                 />
                 <Text color="red">{formErrors.EmployeeName}</Text>
+                <FormLabel>Employee Phone Number</FormLabel>
+                <Input
+                  type="text"
+                  name="EmployeePhoneNumber"
+                  value={updatedEmployeeData.EmployeePhoneNumber}
+                  onChange={handleInputChange}
+                />
+                <Text color="red">{formErrors.EmployeePhoneNumber}</Text>
                 <FormLabel>Employee salary:</FormLabel>
                 <Input
                   type="number"
