@@ -95,7 +95,7 @@ const Charity = () => {
       setIsCharityPaid(true);
       fetchDailyCharity();
       handleCloseModal();
-      charityCost(" ");
+      setCharityCost(""); // Clear the input after submission
     } catch (error) {
       console.error("Error adding daily charity:", error);
     }
@@ -131,22 +131,32 @@ const Charity = () => {
             Daily Charity Date wise
           </Text>
           <SimpleGrid columns={{ base: 1, md: 3 }} gap="20px" w="100%">
-            <Text
-              color={textColorPrimary}
-              fontWeight="bold"
-              fontSize={{ base: "xl", lg: "2xl" }}
-              mt="10px"
-              mb="4px"
-            >
-              Daily Charity
-              {dailyCharity && (
+            {dailyCharity && dailyCharity.length > 0 ? (
+              <Text
+                color={textColorPrimary}
+                fontWeight="bold"
+                fontSize={{ base: "xl", lg: "2xl" }}
+                mt="10px"
+                mb="4px"
+              >
+                Daily Charity
                 <Information
                   boxShadow={cardShadow}
                   title={`Charity for Date ${defaultDate}`}
                   value={`${dailyCharity[0]?.dailycharity} SAR`}
                 />
-              )}
-            </Text>
+              </Text>
+            ) : (
+              <Text
+                color={textColorPrimary}
+                fontWeight="bold"
+                fontSize={{ base: "xl", lg: "2xl" }}
+                mt="10px"
+                mb="4px"
+              >
+                No charity paid yet for the selected date.
+              </Text>
+            )}
           </SimpleGrid>
         </VStack>
         <Button

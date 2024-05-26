@@ -51,7 +51,7 @@ const Charity = ({ selectedHotel }) => {
         }
       );
       setDailyCharity(response.data);
-      setIsCharityPaid(response.data.length > 0); // Check if charity is already paid for the day
+      setIsCharityPaid(response.data.data.length > 0); // Check if charity is already paid for the day
     } catch (error) {
       console.error("Error fetching daily charity:", error);
     }
@@ -95,7 +95,8 @@ const Charity = ({ selectedHotel }) => {
       );
       setIsCharityPaid(true);
       handleCloseModal();
-      charityCost(" ");
+      fetchDailyCharity(); // Refresh the data after adding charity
+      setCharityCost(""); // Clear the input after submission
     } catch (error) {
       console.error("Error adding daily charity:", error);
     }
@@ -131,22 +132,32 @@ const Charity = ({ selectedHotel }) => {
             Daily Charity Date wise
           </Text>
           <SimpleGrid columns={{ base: 1, md: 3 }} gap="20px" w="100%">
-            <Text
-              color={textColorPrimary}
-              fontWeight="bold"
-              fontSize={{ base: "xl", lg: "2xl" }}
-              mt="10px"
-              mb="4px"
-            >
-              Daily Charity
-              {dailyCharity && (
+            {dailyCharity && dailyCharity.data.length > 0 ? (
+              <Text
+                color={textColorPrimary}
+                fontWeight="bold"
+                fontSize={{ base: "xl", lg: "2xl" }}
+                mt="10px"
+                mb="4px"
+              >
+                Daily Charity
                 <Information
                   boxShadow={cardShadow}
                   title={`Charity for Date ${defaultDate}`}
                   value={`${dailyCharity?.data[0]?.attributes?.dailycharity} SAR`}
                 />
-              )}
-            </Text>
+              </Text>
+            ) : (
+              <Text
+                color={textColorPrimary}
+                fontWeight="bold"
+                fontSize={{ base: "xl", lg: "2xl" }}
+                mt="10px"
+                mb="4px"
+              >
+                No charity paid yet for the selected date and hotel.
+              </Text>
+            )}
           </SimpleGrid>
         </VStack>
         <Button
