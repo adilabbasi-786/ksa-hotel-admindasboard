@@ -121,7 +121,7 @@ const KitchenExpanses = ({ selectedHotel }) => {
             alignSelf="flex-end"
             onClick={() => setIsModalOpen(true)}
           >
-            Add new Item
+            Add Daily Expanse Item
           </Button>
         </Flex>
       </Card>
