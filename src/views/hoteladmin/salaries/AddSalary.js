@@ -29,9 +29,9 @@ const AddSalary = ({
 }) => {
   const [entryType, setEntryType] = useState("monthly salary");
   const [amount, setAmount] = useState("");
-  const [month, setMonth] = useState("");
+  const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [employeeName, setEmployeeName] = useState(""); // State to store employee name
-
+  const [employeeSalary, setEmployeeSalary] = useState("");
   const [deduction, setDeduction] = useState("");
 
   useEffect(() => {
@@ -51,14 +51,22 @@ const AddSalary = ({
           },
         }
       );
-      console.log("response data", response.data);
+      console.log("response datas", response.data);
       const employeeData = response.data.data;
       setEmployeeName(employeeData.attributes.EmployeeName);
+      setEmployeeSalary(employeeData.attributes.salary);
+      setAmount(employeeData.attributes.salary);
     } catch (error) {
       console.error("Error fetching employee name:", error);
     }
   };
-
+  useEffect(() => {
+    if (entryType === "monthly salary") {
+      setAmount(employeeSalary);
+    } else {
+      setAmount("");
+    }
+  }, [entryType, month, employeeSalary]);
   const handleAddItem = async (newItem) => {
     // Check if the entry type is "monthly salary" and the entered amount is greater than the employee's salary
     if (
@@ -103,7 +111,7 @@ const AddSalary = ({
         alert("Salary entry added successfully!");
         setEntryType("monthly salary");
         setAmount("");
-        setMonth("");
+        setMonth(new Date().getMonth() + 1);
       } else {
         throw new Error("Failed to add salary entry");
       }
@@ -114,16 +122,41 @@ const AddSalary = ({
   };
   const generateMonthOptions = () => {
     const currentMonth = new Date().getMonth() + 1;
-    const options = [];
-    for (let i = 1; i <= 12; i++) {
-      if (i <= currentMonth) {
-        options.push(
-          <option key={i} value={i.toString()}>
-            {getMonthName(i)}
-          </option>
-        );
+    const options = [
+      <option key="" value="">
+        Select a month
+      </option>,
+    ];
+
+    let allMonthsPaid = true;
+
+    for (let i = 1; i <= currentMonth; i++) {
+      const monthName = getMonthName(i);
+      const isPaid = tableData.some(
+        (entry) => entry.type === "monthly salary" && entry.month === i
+      );
+
+      if (!isPaid) {
+        allMonthsPaid = false;
       }
+
+      options.push(
+        <option
+          key={i}
+          value={i.toString()}
+          disabled={isPaid}
+          style={isPaid ? { color: "red" } : {}}
+        >
+          {monthName}
+          {isPaid && " (Paid)"}
+        </option>
+      );
     }
+
+    if (allMonthsPaid && month !== "") {
+      setMonth("");
+    }
+
     return options;
   };
 
@@ -158,7 +191,7 @@ const AddSalary = ({
             </FormControl>
             <FormControl>
               <FormLabel>Employee salary</FormLabel>
-              <Input value={tableData[0]?.salary || ""} readOnly />
+              <Input value={employeeSalary} readOnly />
             </FormControl>
             <FormControl>
               <FormLabel>Entry Type</FormLabel>
@@ -166,15 +199,14 @@ const AddSalary = ({
                 value={entryType}
                 onChange={(e) => setEntryType(e.target.value)}
               >
-                <option value="monthly salary"> Monthly salary</option>
-                <option value="advance"> Advance</option>
-                <option value="deduction"> Deduction</option>
+                <option value="monthly salary">Monthly salary</option>
+                <option value="advance">Advance</option>
+                <option value="deduction">Deduction</option>
               </Select>
             </FormControl>
             {entryType === "monthly salary" && (
               <FormControl>
                 <FormLabel>Month</FormLabel>
-
                 <Select
                   value={month}
                   onChange={(e) => setMonth(e.target.value)}

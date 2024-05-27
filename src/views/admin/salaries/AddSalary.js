@@ -29,8 +29,9 @@ const AddSalary = ({
 }) => {
   const [entryType, setEntryType] = useState("monthly salary");
   const [amount, setAmount] = useState("");
-  const [month, setMonth] = useState("");
+  const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [employeeName, setEmployeeName] = useState("");
+  const [employeeSalary, setEmployeeSalary] = useState("");
   const [paidMonths, setPaidMonths] = useState([]);
   const [deduction, setDeduction] = useState("");
 
@@ -69,15 +70,23 @@ const AddSalary = ({
           },
         }
       );
-      console.log("response data", response.data);
       const employeeData = response.data.data;
+      console.log("response datas", employeeData.attributes.salary);
       setEmployeeName(employeeData.attributes.EmployeeName);
+      setEmployeeSalary(employeeData.attributes.salary);
+      setAmount(employeeData.attributes.salary);
     } catch (error) {
       console.error("Error fetching employee name:", error);
     }
   };
-
-  const handleAddItem = async (newItem) => {
+  useEffect(() => {
+    if (entryType === "monthly salary") {
+      setAmount(employeeSalary);
+    } else {
+      setAmount("");
+    }
+  }, [entryType, month, employeeSalary]);
+  const handleAddItem = async () => {
     // Check if the entry type is "monthly salary" and the entered amount is greater than the employee's salary
     if (
       entryType === "monthly salary" &&
@@ -99,14 +108,6 @@ const AddSalary = ({
       requestData.data.month = month;
     }
 
-    // Validate amount only for "monthly salary" entry type
-    if (entryType === "monthly salary") {
-      if (amount > tableData[0]?.salary) {
-        alert("Monthly salary cannot be more than employee's salary!");
-        return;
-      }
-    }
-
     try {
       const response = await axios.post(`${URL}/api/salaries`, requestData, {
         headers: {
@@ -121,7 +122,7 @@ const AddSalary = ({
         alert("Salary entry added successfully!");
         setEntryType("monthly salary");
         setAmount("");
-        setMonth("");
+        setMonth(new Date().getMonth() + 1);
       } else {
         throw new Error("Failed to add salary entry");
       }
@@ -130,24 +131,47 @@ const AddSalary = ({
       alert("Failed to add salary entry. Please try again later.");
     }
   };
+
   const generateMonthOptions = () => {
     const currentMonth = new Date().getMonth() + 1;
-    const options = [];
+    const options = [
+      <option key="" value="">
+        Select a month
+      </option>,
+    ];
+
+    let allMonthsPaid = true;
 
     for (let i = 1; i <= currentMonth; i++) {
       const monthName = getMonthName(i);
-      const isPaid = paidMonths.includes(i.toString());
+      const isPaid = tableData.some(
+        (entry) => entry.type === "monthly salary" && entry.month === i
+      );
+
+      if (!isPaid) {
+        allMonthsPaid = false;
+      }
 
       options.push(
-        <option key={i} value={i.toString()} disabled={isPaid}>
+        <option
+          key={i}
+          value={i.toString()}
+          disabled={isPaid}
+          style={isPaid ? { color: "red" } : {}}
+        >
           {monthName}
           {isPaid && " (Paid)"}
         </option>
       );
     }
 
+    if (allMonthsPaid && month !== "") {
+      setMonth("");
+    }
+
     return options;
   };
+
   const getMonthName = (monthIndex) => {
     const months = [
       "January",
@@ -165,6 +189,7 @@ const AddSalary = ({
     ];
     return months[monthIndex - 1];
   };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -179,7 +204,7 @@ const AddSalary = ({
             </FormControl>
             <FormControl>
               <FormLabel>Employee salary</FormLabel>
-              <Input value={tableData[0]?.salary || ""} readOnly />
+              <Input value={employeeSalary} readOnly />
             </FormControl>
             <FormControl>
               <FormLabel>Entry Type</FormLabel>
@@ -187,19 +212,17 @@ const AddSalary = ({
                 value={entryType}
                 onChange={(e) => setEntryType(e.target.value)}
               >
-                <option value="monthly salary"> Monthly salary</option>
-                <option value="advance"> Advance</option>
-                <option value="deduction"> Deduction</option>
+                <option value="monthly salary">Monthly salary</option>
+                <option value="advance">Advance</option>
+                <option value="deduction">Deduction</option>
               </Select>
             </FormControl>
             {entryType === "monthly salary" && (
               <FormControl>
                 <FormLabel>Month</FormLabel>
-
                 <Select
                   value={month}
                   onChange={(e) => setMonth(e.target.value)}
-                  disabled={paidMonths.includes(month)}
                 >
                   {generateMonthOptions()}
                 </Select>
