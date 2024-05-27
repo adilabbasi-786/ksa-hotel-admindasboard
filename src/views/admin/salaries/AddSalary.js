@@ -87,7 +87,6 @@ const AddSalary = ({
     }
   }, [entryType, month, employeeSalary]);
   const handleAddItem = async () => {
-    // Check if the entry type is "monthly salary" and the entered amount is greater than the employee's salary
     if (
       entryType === "monthly salary" &&
       parseFloat(amount) > parseFloat(tableData[0]?.salary)

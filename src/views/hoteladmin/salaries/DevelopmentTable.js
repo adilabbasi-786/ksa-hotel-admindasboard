@@ -194,11 +194,11 @@ export default function DevelopmentTable(props) {
                     </Td>
                   );
                 })}
-                <Td>
+                {/* <Td>
                   <Button>
                     <MdEdit color={iconColor} />
                   </Button>
-                </Td>
+                </Td> */}
               </Tr>
             );
           })}
