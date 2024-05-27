@@ -119,6 +119,33 @@ const AddSalary = ({
       console.error("Error adding salary entry:", error);
       alert("Failed to add salary entry. Please try again later.");
     }
+    if (entryType === "advance") {
+      try {
+        const advanceResponse = await axios.post(
+          `${URL}/api/advance-salaries`,
+          {
+            data: {
+              employees_datum: { id: selectedEmployee },
+              date: new Date().toISOString(),
+              amount: amount,
+            },
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (advanceResponse.status !== 200) {
+          throw new Error("Failed to add advance amount");
+        }
+      } catch (error) {
+        console.error("Error adding advance amount:", error);
+        alert("Failed to add advance amount. Please try again later.");
+        return;
+      }
+    }
   };
   const generateMonthOptions = () => {
     const currentMonth = new Date().getMonth() + 1;
