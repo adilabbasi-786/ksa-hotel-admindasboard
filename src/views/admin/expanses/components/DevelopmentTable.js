@@ -42,6 +42,7 @@ export default function DevelopmentTable(props) {
   const [selectedDriver, setSelectedDriver] = useState(null);
   const [amountPaid, setAmountPaid] = useState("");
   const [salary, setSalary] = useState("");
+  const [sumSalary, setSumSalary] = useState("");
 
   const handleTodaySaleModalClose = () => setShowTodaySaleModal(false);
   const handleAdvanceSalaryModalClose = () => setShowAdvanceSalaryModal(false);
@@ -104,9 +105,7 @@ export default function DevelopmentTable(props) {
       console.error("Error fetching advance salary data:", error);
     }
   };
-  // useEffect(() => {
-  //   alert("driver data");
-  // }, [driverData]);
+
   const handleDriverSalaryModalOpen = async () => {
     try {
       const response = await axios.get(`${URL}/api/driver-details?populate=*`, {
@@ -134,7 +133,7 @@ export default function DevelopmentTable(props) {
   const payment = async () => {
     try {
       const response = await axios.get(
-        `${URL}/api/driver-salaries?populate=*`,
+        `${URL}/api/driver-salaries?populate=*&filters[date][$eq]=${selectedDate}&filters[hotel_name][id][$in]=${selectedHotel}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -142,12 +141,23 @@ export default function DevelopmentTable(props) {
         }
       );
       const resp = response.data.data;
+      let count = 0;
+      resp.forEach((item) => {
+        const paid = item.attributes.paidAmount;
+        count = count + paid;
+        console.log("count", count);
+      });
+      setSumSalary(count);
       console.log("Resp", resp);
       setShowDriverSalaryModal(true);
     } catch (error) {
       console.error("Error fetching driver data:", error);
     }
   };
+  useEffect(() => {
+    // alert("hotelchange");
+    payment();
+  }, [selectedHotel, selectedDate]);
   const handlePayment = async () => {
     try {
       // Assuming there's an API to update the driver's paid salary
@@ -170,7 +180,6 @@ export default function DevelopmentTable(props) {
       );
 
       // Update local state or refetch data if necessary
-      payment();
       setShowPaymentModal(false);
       setAmountPaid("");
     } catch (error) {
@@ -372,14 +381,12 @@ export default function DevelopmentTable(props) {
       <Text fontWeight="bold">Total Expense: {totalExpense}</Text>
       <Text fontWeight="bold">Total Sale: {totalSale}</Text>
       <Text fontWeight="bold">Total Advance: {totalAdvanceSalary} </Text>
-      <Text fontWeight="bold">
-        Total today driver salary:{totalTodayDriverSalary}{" "}
-      </Text>
+      <Text fontWeight="bold">Total today driver salary:{sumSalary} </Text>
 
-      <Text fontWeight="bold">
+      {/* <Text fontWeight="bold">
         Total Deposit:{" "}
         {totalSale - totalExpense - totalAdvanceSalary - totalTodayDriverSalary}
-      </Text>
+      </Text> */}
       {/* Today Sale Modal */}
       <Modal
         isOpen={showTodaySaleModal}
