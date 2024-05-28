@@ -108,7 +108,7 @@ const EmployeeSalaryTable = ({ selectedHotel, selectedEmployee }) => {
             alignSelf="flex-end"
             onClick={() => setIsModalOpen(true)}
           >
-            Add
+            Pay Employee salary
           </Button>
         </Flex>
       </Card>

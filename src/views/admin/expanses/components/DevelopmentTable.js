@@ -1,3 +1,4 @@
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Flex,
   Table,
@@ -19,29 +20,34 @@ import {
   Input,
 } from "@chakra-ui/react";
 import axios from "axios";
-// Custom components
-import Card from "components/card/Card";
-import { MdEdit } from "react-icons/md";
-import React, { useEffect, useMemo, useState } from "react";
 import {
   useGlobalFilter,
   usePagination,
   useSortBy,
   useTable,
 } from "react-table";
+// Custom components
+import Card from "components/card/Card";
+import { MdEdit } from "react-icons/md";
 import { URL } from "Utils";
 
 export default function DevelopmentTable(props) {
   const [showTodaySaleModal, setShowTodaySaleModal] = useState(false);
   const [showAdvanceSalaryModal, setShowAdvanceSalaryModal] = useState(false);
+  const [showDriverSalaryModal, setShowDriverSalaryModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [todaySaleData, setTodaySaleData] = useState([]);
   const [advanceSalaryData, setAdvanceSalaryData] = useState([]);
-  const [newSaleAmount, setNewSaleAmount] = useState("");
-  const [cashSaleAmount, setCashSaleAmount] = useState("");
-  const [creditSaleAmount, setCreditSaleAmount] = useState("");
+  const [driverData, setDriverData] = useState([]);
+  const [selectedDriver, setSelectedDriver] = useState(null);
+  const [amountPaid, setAmountPaid] = useState("");
+  const [salary, setSalary] = useState("");
 
   const handleTodaySaleModalClose = () => setShowTodaySaleModal(false);
   const handleAdvanceSalaryModalClose = () => setShowAdvanceSalaryModal(false);
+  const handleDriverSalaryModalClose = () => setShowDriverSalaryModal(false);
+  const handlePaymentModalClose = () => setShowPaymentModal(false);
+
   const {
     columnsData,
     tableData,
@@ -55,6 +61,13 @@ export default function DevelopmentTable(props) {
   const data = useMemo(() => tableData, [tableData]);
   const token = localStorage.getItem("token");
 
+  const totalTodayDriverSalary = driverData.reduce((acc, current) => {
+    const paidAmounts = current.attributes.driver_salaries.data
+      .filter((salaryEntry) => salaryEntry.attributes.date === selectedDate)
+      .map((salaryEntry) => salaryEntry.attributes.paidAmount);
+    const totalPaidAmount = paidAmounts.reduce((a, b) => a + b, 0);
+    return acc + totalPaidAmount;
+  }, 0);
   const handleTodaySaleModalOpen = async () => {
     try {
       const response = await axios.get(
@@ -91,15 +104,61 @@ export default function DevelopmentTable(props) {
       console.error("Error fetching advance salary data:", error);
     }
   };
-
-  const handleAddSale = async () => {
+  // useEffect(() => {
+  //   alert("driver data");
+  // }, [driverData]);
+  const handleDriverSalaryModalOpen = async () => {
     try {
+      const response = await axios.get(`${URL}/api/driver-details?populate=*`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setDriverData(response.data.data);
+      console.log("resss", response.data.data);
+      console.log("selectedHotel", selectedHotel);
+      if (response.data.data.length > 0) {
+        setSalary(response.data.data[0].attributes.salary);
+      }
+      setShowDriverSalaryModal(true);
+    } catch (error) {
+      console.error("Error fetching driver data:", error);
+    }
+  };
+
+  const handleOpenPaymentModal = (driver) => {
+    setSelectedDriver(driver);
+    setShowPaymentModal(true);
+  };
+  const payment = async () => {
+    try {
+      const response = await axios.get(
+        `${URL}/api/driver-salaries?populate=*`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const resp = response.data.data;
+      console.log("Resp", resp);
+      setShowDriverSalaryModal(true);
+    } catch (error) {
+      console.error("Error fetching driver data:", error);
+    }
+  };
+  const handlePayment = async () => {
+    try {
+      // Assuming there's an API to update the driver's paid salary
       await axios.post(
-        `${URL}/api/daily-sales`,
+        `${URL}/api/driver-salaries`,
         {
           data: {
-            sale: newSaleAmount,
             date: selectedDate,
+            driver_detail: selectedDriver.id,
+            salary: salary,
+            paidAmount: amountPaid,
             hotel_name: selectedHotel,
           },
         },
@@ -109,11 +168,13 @@ export default function DevelopmentTable(props) {
           },
         }
       );
-      // Refresh sale data
-      handleTodaySaleModalOpen();
-      setNewSaleAmount("");
+
+      // Update local state or refetch data if necessary
+      payment();
+      setShowPaymentModal(false);
+      setAmountPaid("");
     } catch (error) {
-      console.error("Error adding sale:", error);
+      console.error("Error making payment:", error);
     }
   };
 
@@ -185,6 +246,16 @@ export default function DevelopmentTable(props) {
               View Advance Salary
             </Button>
           </Text>
+          <Text color={textColorPrimary} fontWeight="bold" mt="10px" mb="4px">
+            <Button
+              colorScheme="blue"
+              width="fit-content"
+              alignSelf="flex-end"
+              onClick={handleDriverSalaryModalOpen}
+            >
+              View Driver Salary
+            </Button>
+          </Text>
         </div>
       </Flex>
       <Center>
@@ -251,7 +322,7 @@ export default function DevelopmentTable(props) {
                       </Text>
                     );
                   }
-                  if (cell.column.Header === "Price") {
+                  if (cell.column.Header === "Unit Price") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value} SAR
@@ -297,11 +368,17 @@ export default function DevelopmentTable(props) {
           }}
         />
       </Flex>
+
       <Text fontWeight="bold">Total Expense: {totalExpense}</Text>
       <Text fontWeight="bold">Total Sale: {totalSale}</Text>
-      <Text fontWeight="bold">Total Advance:{totalAdvanceSalary} </Text>
+      <Text fontWeight="bold">Total Advance: {totalAdvanceSalary} </Text>
       <Text fontWeight="bold">
-        Total Deposit: {totalSale - totalExpense - totalAdvanceSalary}
+        Total today driver salary:{totalTodayDriverSalary}{" "}
+      </Text>
+
+      <Text fontWeight="bold">
+        Total Deposit:{" "}
+        {totalSale - totalExpense - totalAdvanceSalary - totalTodayDriverSalary}
       </Text>
       {/* Today Sale Modal */}
       <Modal
@@ -318,9 +395,9 @@ export default function DevelopmentTable(props) {
                 <Text key={index} color={textColorPrimary} fontWeight="bold">
                   Date: {saleItem?.attributes?.date}
                   <br />
-                  cash sale: {saleItem?.attributes?.cashSale}
+                  Cash Sale: {saleItem?.attributes?.cashSale}
                   <br />
-                  credit sale: {saleItem?.attributes?.creditSale}
+                  Credit Sale: {saleItem?.attributes?.creditSale}
                   <br />
                   Today Total Sale: {totalSale}
                 </Text>
@@ -330,19 +407,6 @@ export default function DevelopmentTable(props) {
               <Flex direction="column" mt="4">
                 <Text>No Record Found</Text>
                 <Text>Manager did not enter sale</Text>
-                {/* <Input
-                  placeholder="Enter sale amount"
-                  value={newSaleAmount}
-                  onChange={(e) => setNewSaleAmount(e.target.value)}
-                /> */}
-                {/* <Button
-                  colorScheme="blue"
-                  mt="2"
-                  onClick={handleAddSale}
-                  // isDisabled={!newSaleAmount}
-                >
-                  Add Sale
-                </Button> */}
               </Flex>
             )}
           </ModalBody>
@@ -387,6 +451,109 @@ export default function DevelopmentTable(props) {
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" onClick={handleAdvanceSalaryModalClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Driver Salary Modal */}
+      <Modal
+        isOpen={showDriverSalaryModal}
+        onClose={handleDriverSalaryModalClose}
+        size="sm"
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Driver Salary</ModalHeader>
+          <ModalBody>
+            {driverData?.map((driver, index) => {
+              const { driverName, salary, driver_salaries, remainingSalary } =
+                driver.attributes;
+              const paidAmounts = driver_salaries.data.map(
+                (salaryEntry) => salaryEntry.attributes.paidAmount
+              );
+              const totalPaidAmount = paidAmounts.reduce((a, b) => a + b, 0);
+
+              let paidSalaryText;
+              let isFullyPaid = totalPaidAmount >= salary;
+              if (isFullyPaid) {
+                paidSalaryText = `Salary is fully paid`;
+              } else {
+                paidSalaryText = `${totalPaidAmount} SAR`;
+              }
+
+              return (
+                <div key={index}>
+                  <Text color={textColorPrimary} fontWeight="bold">
+                    Driver Name: {driverName}
+                    <br />
+                    Total Salary: {salary} SAR
+                    <br />
+                    Paid Salary: {paidSalaryText}
+                    <br />
+                    Remaining Salary: {salary - totalPaidAmount} SAR
+                  </Text>
+                  <Button
+                    colorScheme="blue"
+                    onClick={() => handleOpenPaymentModal(driver)}
+                    disabled={isFullyPaid}
+                  >
+                    Pay the salary
+                  </Button>
+                </div>
+              );
+            })}
+            {!driverData?.length && <Text>No driver data available</Text>}
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" onClick={handleDriverSalaryModalClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Payment Modal */}
+      <Modal
+        isOpen={showPaymentModal}
+        onClose={handlePaymentModalClose}
+        size="sm"
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Pay Driver Salary</ModalHeader>
+          <ModalBody>
+            {selectedDriver && (
+              <Text color={textColorPrimary} fontWeight="bold">
+                Driver Name: {selectedDriver.attributes.driverName}
+                <br />
+                Total Salary: {selectedDriver.attributes.salary} SAR
+                <br />
+                Paid Salary: {selectedDriver.attributes.paidSalary} SAR
+                <br />
+                Remaining Salary: {
+                  selectedDriver.attributes.remainingSalary
+                }{" "}
+                SAR
+                <br />
+                <Input
+                  placeholder="Enter paid amount"
+                  value={amountPaid}
+                  onChange={(e) => setAmountPaid(e.target.value)}
+                />
+              </Text>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              onClick={handlePayment}
+              isDisabled={!amountPaid}
+            >
+              Pay
+            </Button>
+            <Button colorScheme="blue" ml={3} onClick={handlePaymentModalClose}>
               Close
             </Button>
           </ModalFooter>
