@@ -1,6 +1,5 @@
 import React from "react";
-
-import { Icon } from "@chakra-ui/react";
+import { Icon, Box, Badge } from "@chakra-ui/react";
 import {
   MdBarChart,
   MdPerson,
@@ -23,9 +22,13 @@ import Salaries from "views/admin/salaries";
 import Profits from "views/admin/profits";
 import Kafalat from "views/admin/hotelrentkafalat";
 import Charity from "views/admin/charity";
+import Notifications from "views/admin/notifications";
 
 // Auth Imports
 import SignInCentered from "views/auth/signout";
+
+// Assuming unreadCount is fetched from some context or state
+const unreadCount = 5; // This should be dynamically set
 
 const routes = [
   {
@@ -38,14 +41,12 @@ const routes = [
   {
     name: "Hotels",
     layout: "/admin",
-
     path: "/hotel",
     icon: (
       <Icon as={MdOutlineHotel} width="20px" height="20px" color="inherit" />
     ),
     component: Hotel,
   },
-
   {
     name: "Employees Data",
     layout: "/admin",
@@ -62,7 +63,6 @@ const routes = [
     ),
     component: Expanses,
   },
-
   {
     name: "Salaries",
     layout: "/admin",
@@ -100,9 +100,33 @@ const routes = [
     component: Charity,
   },
   {
+    name: "Notifications",
+    layout: "/admin",
+    path: "/notifications",
+    icon: (
+      <Box position="relative">
+        <Icon as={MdAttachMoney} width="20px" height="20px" color="inherit" />
+        {unreadCount > 0 && (
+          <Badge
+            position="absolute"
+            top="-1px"
+            right="-1px"
+            borderRadius="full"
+            bg="red.500"
+            color="white"
+            fontSize="xs"
+          >
+            {unreadCount}
+          </Badge>
+        )}
+      </Box>
+    ),
+    component: Notifications,
+  },
+  {
     name: "signout",
     layout: "/admin",
-    path: "/singout",
+    path: "/signout",
     icon: <Icon as={MdLogout} width="20px" height="20px" color="inherit" />,
     component: SignInCentered,
   },
