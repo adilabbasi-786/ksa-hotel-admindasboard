@@ -13,7 +13,10 @@ const Index = () => {
     setLocalNotifications(notifications);
   }, [notifications]);
 
-  const handleNotificationClick = async (id) => {
+  const handleNotificationClick = async (id, read) => {
+    if (read) {
+      return;
+    }
     try {
       await markAsRead(id);
       setLocalNotifications((prevNotifications) =>
@@ -50,9 +53,15 @@ const Index = () => {
             bg={notification.attributes.read ? "white" : "gray.200"}
             borderRadius="md"
             cursor="pointer"
-            onClick={() => handleNotificationClick(notification.id)}
+            onClick={() =>
+              handleNotificationClick(
+                notification.id,
+                notification.attributes.read
+              )
+            }
           >
             <Text>{notification.attributes.message}</Text>
+            {console.log("notification.attributes.message", notification)}
           </Box>
         ))}
       </VStack>
