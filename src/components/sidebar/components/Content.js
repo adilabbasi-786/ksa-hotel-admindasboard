@@ -1,33 +1,24 @@
-// chakra imports
-import { Box, Flex, Stack } from "@chakra-ui/react";
-//   Custom components
-import Brand from "components/sidebar/components/Brand";
-import Links from "components/sidebar/components/Links";
-import SidebarCard from "components/sidebar/components/SidebarCard";
 import React from "react";
+import { NavLink } from "react-router-dom";
+import { Box, Text, Flex } from "@chakra-ui/react";
 
-// FUNCTIONS
-
-function SidebarContent(props) {
-  const { routes, onClose } = props;
-  console.log("Rpute", routes);
-  // SIDEBAR
+const Content = ({ routes, onClose }) => {
   return (
-    <Flex
-      direction="column"
-      height="100%"
-      pt="25px"
-      px="16px"
-      borderRadius="30px"
-    >
-      <Brand />
-      <Stack direction="column" mb="auto" mt="8px">
-        <Box ps="20px" pe={{ md: "16px", "2xl": "1px" }}>
-          <Links routes={routes} onClose={onClose} />
-        </Box>
-      </Stack>
-    </Flex>
+    <Box>
+      {routes.map((route, index) => (
+        <NavLink
+          key={index}
+          to={`${route.layout}${route.path}`}
+          onClick={onClose}
+        >
+          <Flex align="center" p="4">
+            {route.icon}
+            <Text ml="4">{route.name}</Text>
+          </Flex>
+        </NavLink>
+      ))}
+    </Box>
   );
-}
+};
 
-export default SidebarContent;
+export default Content;

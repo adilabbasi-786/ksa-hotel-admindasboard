@@ -12,11 +12,14 @@ const Index = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await axios.get(`${URL}/api/notifications`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `${URL}/api/notifications?sort=createdAt:desc`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setNotifications(response.data.data);
         const unreadNotifications = response.data.data.filter(
           (notification) => !notification.attributes.read
