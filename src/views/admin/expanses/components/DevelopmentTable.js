@@ -383,10 +383,10 @@ export default function DevelopmentTable(props) {
       <Text fontWeight="bold">Total Advance: {totalAdvanceSalary} </Text>
       <Text fontWeight="bold">Total today driver salary:{sumSalary} </Text>
 
-      {/* <Text fontWeight="bold">
+      <Text fontWeight="bold">
         Total Deposit:{" "}
-        {totalSale - totalExpense - totalAdvanceSalary - totalTodayDriverSalary}
-      </Text> */}
+        {totalSale - totalExpense - totalAdvanceSalary - sumSalary}
+      </Text>
       {/* Today Sale Modal */}
       <Modal
         isOpen={showTodaySaleModal}

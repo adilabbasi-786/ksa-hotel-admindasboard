@@ -23,6 +23,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
     PassportNumber: "",
     passportExpiry: "",
     EmployeePhoneNumber: "",
+    lastActiveDate: "",
     iqamaNumber: "",
     iqamaExpiry: "",
     status: "",
@@ -68,6 +69,16 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
   const handleChange = (e, fieldName) => {
     const { files } = e.target;
     const value = files ? files[0] : e.target.value;
+
+    // Update lastActiveDate based on status
+    if (fieldName === "status") {
+      const newLastActiveDate =
+        value === "active" ? new Date().toISOString().split("T")[0] : "";
+      setFormData((prevData) => ({
+        ...prevData,
+        lastActiveDate: newLastActiveDate,
+      }));
+    }
 
     // Update formData
     setFormData((prevData) => ({
@@ -283,6 +294,18 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
                 <option value="inactive">inactive</option>
               </Select>
               <Text color="red">{formErrors.status}</Text>
+            </FormControl>
+            <FormControl>
+              <FormLabel>lastActiveDate</FormLabel>
+              <Input
+                type="date"
+                name="lastActiveDate"
+                placeholder="Active Date"
+                value={formData.lastActiveDate}
+                onChange={(e) => handleChange(e, "lastActiveDate")}
+                readOnly // make this field read-only
+              />
+              <Text color="red">{formErrors.lastActiveDate}</Text>
             </FormControl>
           </Flex>
           <Flex direction={isMobile ? "column" : "row"}>

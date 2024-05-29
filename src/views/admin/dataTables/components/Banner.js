@@ -22,7 +22,6 @@ import {
 } from "@chakra-ui/react";
 import { useHistory } from "react-router-dom";
 import Card from "components/card/Card.js";
-import avatar1 from "assets/img/avatars/avatar6.png";
 import EmployeeFullDetail from "views/admin/dataTables/EmployeeFullDetail";
 import axios from "axios";
 import { URL } from "Utils";
@@ -41,6 +40,7 @@ const Banner = ({
   id,
   salary,
   fetchEmployeeData,
+  lastActiveDate,
 }) => {
   const history = useHistory();
   const [isOpen, setIsOpen] = useState(false);
@@ -83,26 +83,32 @@ const Banner = ({
     salary,
   ]);
 
-  // ...
   const handleToggleEditMode = () => {
     setIsEditMode(!isEditMode);
   };
 
   const handleSaveChanges = () => {
-    fetch(`${URL}/api/employee-data/${id}`, {
-      method: "PUT",
-      body: JSON.stringify({ data: updatedEmployeeData }),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    if (updatedEmployeeData.status === "active") {
+      updatedEmployeeData.lastActiveDate = new Date().toISOString();
+    }
+
+    axios
+      .put(
+        `${URL}/api/employee-data/${id}`,
+        { data: updatedEmployeeData },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then((response) => {
-        if (response.ok) {
-          setShowSuccessMessage(true); // Show success message on successful save
+        if (response.status === 200) {
+          setShowSuccessMessage(true);
           setTimeout(() => {
-            setShowSuccessMessage(false); // Hide success message after a delay
-            setIsOpen(false); // Close the modal
+            setShowSuccessMessage(false);
+            setIsOpen(false);
           }, 1000);
           fetchEmployeeData();
         } else {
@@ -113,6 +119,7 @@ const Banner = ({
         console.error("Error saving data:", error);
       });
   };
+
   const handleDeleteEmployee = () => {
     if (window.confirm("Are you sure you want to delete this employee?")) {
       axios
@@ -123,7 +130,6 @@ const Banner = ({
         })
         .then((response) => {
           if (response.status === 200) {
-            // Optionally, show a success message
             alert("Employee deleted successfully");
             fetchEmployeeData();
           } else {
@@ -135,12 +141,10 @@ const Banner = ({
         });
     }
   };
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-
-    if (value !== null && value !== undefined) {
-      setUpdatedEmployeeData((prevData) => ({ ...prevData, [name]: value }));
-    }
+    setUpdatedEmployeeData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
@@ -292,13 +296,15 @@ const Banner = ({
             >
               {isEditMode ? "Save" : "Edit"}
             </Button>
-            <Button
-              colorScheme="blue"
-              style={{ marginLeft: "10px" }}
-              onClick={handleDeleteEmployee}
-            >
-              {isEditMode ? " " : "Delete Employee"}
-            </Button>
+            {!isEditMode && (
+              <Button
+                colorScheme="red"
+                style={{ marginLeft: "10px" }}
+                onClick={handleDeleteEmployee}
+              >
+                Delete Employee
+              </Button>
+            )}
           </ModalFooter>
         </ModalContent>
       </Modal>

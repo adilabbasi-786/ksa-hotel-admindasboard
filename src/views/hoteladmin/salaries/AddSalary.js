@@ -32,6 +32,7 @@ const AddSalary = ({
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [employeeName, setEmployeeName] = useState(""); // State to store employee name
   const [employeeSalary, setEmployeeSalary] = useState("");
+  const [lastActiveDate, setLastActiveDate] = useState("");
   const [deduction, setDeduction] = useState("");
 
   useEffect(() => {
@@ -55,14 +56,36 @@ const AddSalary = ({
       const employeeData = response.data.data;
       setEmployeeName(employeeData.attributes.EmployeeName);
       setEmployeeSalary(employeeData.attributes.salary);
+      setLastActiveDate(employeeData.attributes.lastActiveDate);
       setAmount(employeeData.attributes.salary);
     } catch (error) {
       console.error("Error fetching employee name:", error);
     }
   };
+  const calculateProratedSalary = () => {
+    if (!lastActiveDate) return parseInt(employeeSalary);
+
+    const currentDate = new Date();
+    const lastActive = new Date(lastActiveDate);
+
+    // Get the day of the month of the last active date
+    const dayOfMonth = lastActive.getDate();
+
+    // Calculate the number of days remaining in the month starting from the active date
+    const daysRemainingInMonth = Math.min(30, 30 - dayOfMonth + 1);
+
+    // Calculate the daily salary
+    const dailySalary = parseFloat(employeeSalary) / 30; // Assuming 30 days in a month
+
+    // Calculate the prorated salary
+    const proratedSalary = dailySalary * daysRemainingInMonth;
+
+    return isNaN(proratedSalary) ? 0 : Math.floor(proratedSalary); // Round down to the nearest integer
+  };
   useEffect(() => {
     if (entryType === "monthly salary") {
-      setAmount(employeeSalary);
+      const proratedSalary = calculateProratedSalary();
+      setAmount(proratedSalary.toFixed(2));
     } else {
       setAmount("");
     }
@@ -247,6 +270,7 @@ const AddSalary = ({
               <Input
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
+                readOnly
               />
             </FormControl>
           </VStack>

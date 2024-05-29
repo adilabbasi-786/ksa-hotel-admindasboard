@@ -26,9 +26,11 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
     iqamaExpiry: "",
     status: "",
     salary: "",
+    lastActiveDate: "",
     iqamaPicture: null,
     passportImage: null,
     hotel_name: selectedHotel,
+    EmployeePhoneNumber: "",
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formErrors, setFormErrors] = useState({
@@ -44,18 +46,29 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
     salary: "",
     EmployeePhoneNumber: "",
   });
+
   const handleChange = (e, fieldName) => {
-    const { files } = e.target;
-    const value = files ? files[0] : e.target.value;
+    const { files, value } = e.target;
+    const newValue = files ? files[0] : value;
 
     // Update formData
-    setFormData((prevData) => ({
-      ...prevData,
-      [fieldName]: value,
-    }));
+    setFormData((prevData) => {
+      let updatedData = { ...prevData, [fieldName]: newValue };
+
+      // If status is set to "active", update lastActiveDate to the current date
+      if (fieldName === "status") {
+        if (newValue === "active") {
+          updatedData.lastActiveDate = new Date().toISOString().split("T")[0];
+        } else if (newValue === "inactive") {
+          updatedData.lastActiveDate = "";
+        }
+      }
+
+      return updatedData;
+    });
 
     // Validate if field is empty
-    if (value === "") {
+    if (newValue === "") {
       setFormErrors((prevErrors) => ({
         ...prevErrors,
         [fieldName]: `Please fill ${fieldName}`,
@@ -112,6 +125,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
         ...prevErrors,
         ...newFormErrors,
       }));
+      return; // Stop further execution
     }
 
     try {
@@ -249,6 +263,18 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
                 <option value="inactive">inactive</option>
               </Select>
               <Text color="red">{formErrors.status}</Text>
+            </FormControl>
+            <FormControl>
+              <FormLabel>lastActiveDate</FormLabel>
+              <Input
+                type="date"
+                name="lastActiveDate"
+                placeholder="Active Date"
+                value={formData.lastActiveDate}
+                onChange={(e) => handleChange(e, "lastActiveDate")}
+                readOnly // make this field read-only
+              />
+              <Text color="red">{formErrors.lastActiveDate}</Text>
             </FormControl>
           </Flex>
           <Flex direction={isMobile ? "column" : "row"}>

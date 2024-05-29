@@ -31,17 +31,19 @@ const AddSalary = ({
   const [amount, setAmount] = useState("");
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [employeeName, setEmployeeName] = useState("");
-  const [employeeSalary, setEmployeeSalary] = useState("");
+  const [employeeSalary, setEmployeeSalary] = useState(0);
+  const [lastActiveDate, setLastActiveDate] = useState("");
   const [paidMonths, setPaidMonths] = useState([]);
-  const [deduction, setDeduction] = useState("");
 
   useEffect(() => {
     if (selectedEmployee) {
-      fetchEmployeeName(selectedEmployee);
+      fetchEmployeeDetails(selectedEmployee);
       fetchPaidMonths(selectedEmployee);
     }
   }, [selectedEmployee]);
+
   const token = localStorage.getItem("token");
+
   const fetchPaidMonths = async (employeeId) => {
     try {
       const response = await axios.get(
@@ -54,13 +56,13 @@ const AddSalary = ({
       );
       const paidMonthsData = response.data.data;
       const paidMonths = paidMonthsData.map((item) => item.month);
-      console.log("response of add salary", paidMonths);
       setPaidMonths(paidMonths);
     } catch (error) {
       console.error("Error fetching paid months:", error);
     }
   };
-  const fetchEmployeeName = async (employeeId) => {
+
+  const fetchEmployeeDetails = async (employeeId) => {
     try {
       const response = await axios.get(
         `${URL}/api/employee-data/${employeeId}`,
@@ -71,25 +73,48 @@ const AddSalary = ({
         }
       );
       const employeeData = response.data.data;
-      console.log("response datas", employeeData.attributes.salary);
       setEmployeeName(employeeData.attributes.EmployeeName);
       setEmployeeSalary(employeeData.attributes.salary);
+      setLastActiveDate(employeeData.attributes.lastActiveDate);
       setAmount(employeeData.attributes.salary);
     } catch (error) {
-      console.error("Error fetching employee name:", error);
+      console.error("Error fetching employee details:", error);
     }
+  };
+
+  const calculateProratedSalary = () => {
+    if (!lastActiveDate) return parseInt(employeeSalary);
+
+    const currentDate = new Date();
+    const lastActive = new Date(lastActiveDate);
+
+    // Get the day of the month of the last active date
+    const dayOfMonth = lastActive.getDate();
+
+    // Calculate the number of days remaining in the month starting from the active date
+    const daysRemainingInMonth = Math.min(30, 30 - dayOfMonth + 1);
+
+    // Calculate the daily salary
+    const dailySalary = parseFloat(employeeSalary) / 30; // Assuming 30 days in a month
+
+    // Calculate the prorated salary
+    const proratedSalary = dailySalary * daysRemainingInMonth;
+
+    return isNaN(proratedSalary) ? 0 : Math.floor(proratedSalary); // Round down to the nearest integer
   };
   useEffect(() => {
     if (entryType === "monthly salary") {
-      setAmount(employeeSalary);
+      const proratedSalary = calculateProratedSalary();
+      setAmount(proratedSalary.toFixed(2));
     } else {
       setAmount("");
     }
   }, [entryType, month, employeeSalary]);
+
   const handleAddItem = async () => {
     if (
       entryType === "monthly salary" &&
-      parseFloat(amount) > parseFloat(tableData[0]?.salary)
+      parseFloat(amount) > parseFloat(employeeSalary)
     ) {
       alert("Monthly salary cannot be greater than the employee's salary.");
       return;
@@ -259,6 +284,7 @@ const AddSalary = ({
               <Input
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
+                readOnly
               />
             </FormControl>
           </VStack>

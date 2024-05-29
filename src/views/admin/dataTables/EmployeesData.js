@@ -101,6 +101,7 @@ const EmployeesData = ({ selectedHotel }) => {
               iqamaExpiry={employee.attributes.iqamaExpiry}
               salary={employee.attributes.salary}
               EmployeePhoneNumber={employee.attributes.EmployeePhoneNumber}
+              lastActiveDate={employee.attributes.lastActiveDate}
               employeeData={employee.attributes}
               fetchEmployeeData={fetchEmployeeData}
             />
