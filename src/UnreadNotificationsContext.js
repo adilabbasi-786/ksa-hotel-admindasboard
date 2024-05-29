@@ -8,6 +8,7 @@ const UnreadNotificationsContext = createContext();
 // Provider Component
 export const UnreadNotificationsProvider = ({ children }) => {
   const [unreadCount, setUnreadCount] = useState(0);
+  const [notifications, setNotifications] = useState([]);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -18,6 +19,7 @@ export const UnreadNotificationsProvider = ({ children }) => {
             Authorization: `Bearer ${token}`,
           },
         });
+        setNotifications(response.data.data);
         const unreadNotifications = response.data.data.filter(
           (notification) => !notification.attributes.read
         );
@@ -30,9 +32,36 @@ export const UnreadNotificationsProvider = ({ children }) => {
     fetchUnreadCount();
   }, [token]);
 
+  const markAsRead = async (id) => {
+    try {
+      await axios.put(
+        `${URL}/api/notifications/${id}`,
+        { data: { read: true } },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setNotifications((prevNotifications) =>
+        prevNotifications.map((notification) =>
+          notification.id === id
+            ? {
+                ...notification,
+                attributes: { ...notification.attributes, read: true },
+              }
+            : notification
+        )
+      );
+      setUnreadCount((prevCount) => prevCount - 1);
+    } catch (error) {
+      console.error("Error updating notification:", error);
+    }
+  };
+
   return (
     <UnreadNotificationsContext.Provider
-      value={{ unreadCount, setUnreadCount }}
+      value={{ unreadCount, setUnreadCount, notifications, markAsRead }}
     >
       {children}
     </UnreadNotificationsContext.Provider>
