@@ -1,5 +1,6 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+
+// chakra imports
 import {
   Box,
   Flex,
@@ -12,19 +13,21 @@ import {
   DrawerContent,
   DrawerCloseButton,
 } from "@chakra-ui/react";
-import { Scrollbars } from "react-custom-scrollbars-2";
-import { IoMenuOutline } from "react-icons/io5";
-import PropTypes from "prop-types";
 import Content from "components/sidebar/components/Content";
 import {
   renderThumb,
   renderTrack,
   renderView,
 } from "components/scrollbar/Scrollbar";
-import Routes from "routes";
+import { Scrollbars } from "react-custom-scrollbars-2";
+import PropTypes from "prop-types";
+
+// Assets
+import { IoMenuOutline } from "react-icons/io5";
 
 function Sidebar(props) {
-  const routes = Routes();
+  const { routes } = props;
+
   let variantChange = "0.2s linear";
   let shadow = useColorModeValue(
     "14px 17px 40px 4px rgba(112, 144, 176, 0.08)",
@@ -69,11 +72,13 @@ function Sidebar(props) {
 export function SidebarResponsive(props) {
   let sidebarBackgroundColor = useColorModeValue("white", "navy.800");
   let menuColor = useColorModeValue("gray.400", "white");
-  // SIDEBAR
+  // // SIDEBAR
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = React.useRef();
 
-  const routes = Routes();
+  const { routes } = props;
+  // let isWindows = navigator.platform.startsWith("Win");
+  //  BRAND
 
   return (
     <Flex display={{ sm: "flex", xl: "none" }} alignItems="center">
@@ -117,8 +122,8 @@ export function SidebarResponsive(props) {
     </Flex>
   );
 }
-
 // PROPS
+
 Sidebar.propTypes = {
   logoText: PropTypes.string,
   routes: PropTypes.arrayOf(PropTypes.object),

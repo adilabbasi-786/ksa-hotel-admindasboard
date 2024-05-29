@@ -149,7 +149,7 @@ export default function DevelopmentTable(props) {
       });
       setSumSalary(count);
       console.log("Resp", resp);
-      setShowDriverSalaryModal(true);
+      // setShowDriverSalaryModal(true);
     } catch (error) {
       console.error("Error fetching driver data:", error);
     }

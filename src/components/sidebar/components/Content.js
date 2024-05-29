@@ -1,10 +1,11 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { Box, Text, Flex } from "@chakra-ui/react";
-
+import Brand from "components/sidebar/components/Brand";
+import { Box, Flex, Text } from "@chakra-ui/react";
 const Content = ({ routes, onClose }) => {
   return (
     <Box>
+      <Brand />
       {routes.map((route, index) => (
         <NavLink
           key={index}
