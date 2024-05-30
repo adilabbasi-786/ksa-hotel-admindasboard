@@ -19,10 +19,29 @@ export const UnreadNotificationsProvider = ({ children }) => {
             Authorization: `Bearer ${token}`,
           },
         });
-        setNotifications(response.data.data);
-        const unreadNotifications = response.data.data.filter(
+
+        // Sort notifications based on timestamp in descending order
+        const sortedNotifications = response.data.data.sort((a, b) => {
+          return (
+            new Date(b.attributes.timestamp) - new Date(a.attributes.timestamp)
+          );
+        });
+
+        // Separate unread and read notifications
+        const unreadNotifications = sortedNotifications.filter(
           (notification) => !notification.attributes.read
         );
+        const readNotifications = sortedNotifications.filter(
+          (notification) => notification.attributes.read
+        );
+
+        // Combine unread and read notifications, with unread ones first
+        const combinedNotifications = [
+          ...unreadNotifications,
+          ...readNotifications,
+        ];
+
+        setNotifications(combinedNotifications);
         setUnreadCount(unreadNotifications.length);
       } catch (error) {
         console.error("Error fetching unread count:", error);

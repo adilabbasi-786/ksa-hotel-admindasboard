@@ -309,14 +309,14 @@ const Banner = ({
             <Button colorScheme="blue" onClick={handleClose}>
               Close
             </Button>
-            <Button
+            {/* <Button
               style={{ marginLeft: "10px" }}
               colorScheme="blue"
               onClick={isEditMode ? handleSaveChanges : handleToggleEditMode}
             >
               {isEditMode ? "Save" : "Edit"}
-            </Button>
-            {!isEditMode && (
+            </Button> */}
+            {/* {!isEditMode && (
               <Button
                 colorScheme="red"
                 style={{ marginLeft: "10px" }}
@@ -324,7 +324,7 @@ const Banner = ({
               >
                 Delete Employee
               </Button>
-            )}
+            )} */}
           </ModalFooter>
         </ModalContent>
       </Modal>

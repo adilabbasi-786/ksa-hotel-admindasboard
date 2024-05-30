@@ -10,7 +10,28 @@ const Index = () => {
   const [localNotifications, setLocalNotifications] = useState([]);
 
   useEffect(() => {
-    setLocalNotifications(notifications);
+    // Sort notifications based on timestamp in descending order
+    const sortedNotifications = notifications.sort((a, b) => {
+      return (
+        new Date(b.attributes.timestamp) - new Date(a.attributes.timestamp)
+      );
+    });
+
+    // Separate unread and read notifications
+    const unreadNotifications = sortedNotifications.filter(
+      (notification) => !notification.attributes.read
+    );
+    const readNotifications = sortedNotifications.filter(
+      (notification) => notification.attributes.read
+    );
+
+    // Combine unread and read notifications, with unread ones first
+    const combinedNotifications = [
+      ...unreadNotifications,
+      ...readNotifications,
+    ];
+
+    setLocalNotifications(combinedNotifications);
   }, [notifications]);
 
   const handleNotificationClick = async (id, read) => {
@@ -44,27 +65,32 @@ const Index = () => {
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <h2>All Notifications</h2>
-      <VStack spacing={4} align="start">
-        {localNotifications.map((notification) => (
-          <Box
-            key={notification.id}
-            w="100%"
-            p={4}
-            bg={notification.attributes.read ? "white" : "gray.200"}
-            borderRadius="md"
-            cursor="pointer"
-            onClick={() =>
-              handleNotificationClick(
-                notification.id,
-                notification.attributes.read
-              )
-            }
-          >
-            <Text>{notification.attributes.message}</Text>
-            {console.log("notification.attributes.message", notification)}
-          </Box>
-        ))}
-      </VStack>
+      {localNotifications.length === 0 ? (
+        <Text fontWeight="bold" fontSize="xl" mt="100px" ml="300px">
+          No notification
+        </Text>
+      ) : (
+        <VStack spacing={4} align="start">
+          {localNotifications.map((notification) => (
+            <Box
+              key={notification.id}
+              w="100%"
+              p={4}
+              bg={notification.attributes.read ? "white" : "gray.200"}
+              borderRadius="md"
+              cursor="pointer"
+              onClick={() =>
+                handleNotificationClick(
+                  notification.id,
+                  notification.attributes.read
+                )
+              }
+            >
+              <Text>{notification.attributes.message}</Text>
+            </Box>
+          ))}
+        </VStack>
+      )}
     </Box>
   );
 };

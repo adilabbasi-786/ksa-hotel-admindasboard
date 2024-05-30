@@ -182,7 +182,7 @@ const Drivers = () => {
                 </Text>
                 <Text>Salary: {driver?.attributes?.salary}</Text>
                 <Flex mt="10px">
-                  <Button
+                  {/* <Button
                     colorScheme="blue"
                     width="fit-content"
                     mr="2"
@@ -196,7 +196,7 @@ const Drivers = () => {
                     onClick={() => handleDeleteDriver(driver.id)}
                   >
                     Delete Driver
-                  </Button>
+                  </Button> */}
                 </Flex>
               </Card>
             ))}
@@ -232,6 +232,7 @@ const Drivers = () => {
               mb="4"
             />
             <Input
+              type="number"
               placeholder="Salary"
               value={newSalary}
               onChange={(e) => setNewSalary(e.target.value)}
