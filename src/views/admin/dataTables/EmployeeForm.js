@@ -29,6 +29,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
     lastActiveDate: "",
     iqamaPicture: null,
     passportImage: null,
+    Employee_healtCard: null,
     hotel_name: selectedHotel,
     EmployeePhoneNumber: "",
   });
@@ -45,6 +46,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
     passportImage: "",
     salary: "",
     EmployeePhoneNumber: "",
+    Employee_healtCard: "",
   });
 
   const handleChange = (e, fieldName) => {
@@ -118,6 +120,11 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
       newFormErrors.passportImage = "Please upload Passport picture";
       hasErrors = true;
     }
+    if (!formData.Employee_healtCard) {
+      newFormErrors.Employee_healtCard =
+        "Please upload Employee_healtCard picture";
+      hasErrors = true;
+    }
 
     // If there are errors, update state and stop form submission
     if (hasErrors) {
@@ -134,6 +141,10 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
       formDataToSend.append("files.employeePicture", formData.employeePicture);
       formDataToSend.append("files.iqamaPicture", formData.iqamaPicture);
       formDataToSend.append("files.passportImage", formData.passportImage);
+      formDataToSend.append(
+        "files.Employee_healtCard",
+        formData.Employee_healtCard
+      );
       const response = await axios.post(
         `${URL}/api/employee-data`,
         formDataToSend,
@@ -286,6 +297,15 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
                 onChange={(e) => handleChange(e, "iqamaPicture")}
               />
               <Text color="red">{formErrors.iqamaPicture}</Text>
+            </FormControl>
+            <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
+              <FormLabel>HealtCard picture</FormLabel>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleChange(e, "Employee_healtCard")}
+              />
+              <Text color="red">{formErrors.Employee_healtCard}</Text>
             </FormControl>
             <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
               <FormLabel>Passport picture</FormLabel>

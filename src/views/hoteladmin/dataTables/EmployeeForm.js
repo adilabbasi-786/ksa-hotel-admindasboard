@@ -30,6 +30,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
     salary: "",
     iqamaPicture: null,
     passportImage: null,
+    Employee_healtCard: null,
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formErrors, setFormErrors] = useState({
@@ -44,6 +45,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
     iqamaPicture: "",
     passportImage: "",
     salary: "",
+    Employee_healtCard: "",
   });
   const handleImageChange = async (e, key) => {
     console.log("E, key", e.target.files[0], key);
@@ -137,6 +139,11 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
       newFormErrors.passportImage = "Please upload Passport picture";
       hasErrors = true;
     }
+    if (!formData.Employee_healtCard) {
+      newFormErrors.Employee_healtCard =
+        "Please upload Employee_healtCard picture";
+      hasErrors = true;
+    }
 
     // If there are errors, update state and stop form submission
     if (hasErrors) {
@@ -161,6 +168,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
           iqamaPicture: formData.iqamaPicture,
           passportImage: formData.passportImage,
           EmployeePhoneNumber: formData.EmployeePhoneNumber,
+          Employee_healtCard: formData.Employee_healtCard,
         },
       };
 
@@ -326,6 +334,15 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
                 onChange={(e) => handleImageChange(e, "passportImage")}
               />
               <Text color="red">{formErrors.passportImage}</Text>
+            </FormControl>
+            <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
+              <FormLabel>Health Card</FormLabel>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageChange(e, "Employee_healtCard")}
+              />
+              <Text color="red">{formErrors.Employee_healtCard}</Text>
             </FormControl>
           </Flex>
 

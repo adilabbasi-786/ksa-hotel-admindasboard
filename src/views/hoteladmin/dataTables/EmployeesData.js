@@ -97,6 +97,7 @@ const EmployeesData = () => {
               status={employee.status}
               EmployeePhoneNumber={employee.EmployeePhoneNumber}
               avatar={`${URL}${employee?.employeePicture?.url}`}
+              healthCard={`${URL}${employee?.Employee_healtCard?.url}`}
               banner={banner}
               employeeData={employee}
               fetchEmployeeData={fetchEmployeeData}

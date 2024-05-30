@@ -115,6 +115,22 @@ const EmployeeFullDetail = ({ employeeData }) => {
             />
           </Box>
         </Box>
+        <Box boxShadow={cardShadow}>
+          <Text fontWeight="semibold">Employee Health Card Picture</Text>
+          <Box
+            onClick={() =>
+              openImageModal(
+                `${URL}${employeeData?.Employee_healtCard?.data?.attributes?.url}`
+              )
+            }
+            cursor="pointer"
+          >
+            <Image
+              src={`${URL}${employeeData?.Employee_healtCard?.data?.attributes?.formats?.thumbnail?.url}`}
+              alt="Passport Picture"
+            />
+          </Box>
+        </Box>
         <Information
           boxShadow={cardShadow}
           title="Status"
