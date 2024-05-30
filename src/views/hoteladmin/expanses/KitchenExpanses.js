@@ -42,6 +42,7 @@ const KitchenExpanses = () => {
             }`,
             price: item?.price,
             totalPrice: totalPrice,
+            tax: item.tax,
           };
         });
         console.log("response", response.data);
@@ -77,6 +78,10 @@ const KitchenExpanses = () => {
     {
       Header: "Total Price",
       accessor: "totalPrice",
+    },
+    {
+      Header: "TAX",
+      accessor: "tax",
     },
   ];
 

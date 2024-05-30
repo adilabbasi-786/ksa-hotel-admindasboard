@@ -45,6 +45,7 @@ const KitchenExpanses = ({ selectedHotel }) => {
             }`,
             price: item.attributes.price,
             totalPrice: totalPrice,
+            tax: item.attributes.tax,
           };
         });
 
@@ -79,6 +80,10 @@ const KitchenExpanses = ({ selectedHotel }) => {
     {
       Header: "Total Price",
       accessor: "totalPrice",
+    },
+    {
+      Header: "TAX",
+      accessor: "tax",
     },
   ];
   const handleUpdateTableData = (newItem) => {

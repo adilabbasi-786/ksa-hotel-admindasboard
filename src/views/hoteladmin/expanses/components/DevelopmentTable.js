@@ -43,9 +43,10 @@ export default function DevelopmentTable(props) {
   const [driverData, setDriverData] = useState([]);
   const [selectedDriver, setSelectedDriver] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-
   const [amountPaid, setAmountPaid] = useState("");
   const [salary, setSalary] = useState("");
+  const [sumofAllTax, setSumofAllTax] = useState(0);
+  const [driverSalaryReport, setDriverSalaryReport] = useState("");
   const [sumSalary, setSumSalary] = useState("");
 
   const handleDriverSalaryModalClose = () => setShowDriverSalaryModal(false);
@@ -55,8 +56,6 @@ export default function DevelopmentTable(props) {
   const { columnsData, tableData, selectedDate, updateTableData } = props;
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
 
-  const columns = useMemo(() => columnsData, [columnsData]);
-  const data = useMemo(() => tableData, [tableData]);
   const token = localStorage.getItem("token");
   const handleTodaySaleModalOpen = async () => {
     try {
@@ -81,7 +80,7 @@ export default function DevelopmentTable(props) {
   const handleAdvanceSalaryModalOpen = async () => {
     try {
       const response = await axios.get(
-        `${URL}/api/advance-salaries?populate=*&filters[date][$eq]=${selectedDate}`,
+        `${URL}/api/advance-salaries?&filters[date][$eq]=${selectedDate}`,
 
         {
           headers: {
@@ -175,6 +174,65 @@ export default function DevelopmentTable(props) {
       console.error("Error fetching driver data:", error);
     }
   };
+
+  const payment = async () => {
+    try {
+      const response = await axios.get(
+        `${URL}/api/driver-salaries?populate=*&filters[date][$eq]=${selectedDate}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const resp = response.data;
+      if (!resp) {
+        console.error("Response data is empty or undefined.");
+        return;
+      }
+      let count = 0;
+      resp.forEach((item) => {
+        const paid = item.paidAmount;
+        count = count + paid;
+        console.log("count", count);
+      });
+      setSumSalary(count);
+      console.log("Resp", resp);
+      // setShowDriverSalaryModal(true);
+    } catch (error) {
+      console.error("Error fetching driver data:", error);
+    }
+  };
+
+  useEffect(() => {
+    // alert("hotelchange");
+    payment();
+  }, [selectedDate]);
+
+  const dataWithTax = useMemo(() => {
+    let cumulativeTax = 0;
+
+    const newData = tableData.map((item) => {
+      const totalPrice = parseFloat(item.totalPrice);
+      const tax = parseFloat((totalPrice * 0.15).toFixed(2)); // 15% tax
+      cumulativeTax += tax;
+      return {
+        ...item,
+        tax: tax.toFixed(2),
+      };
+    });
+
+    setSumofAllTax(cumulativeTax);
+
+    return newData;
+  }, [tableData]);
+
+  useEffect(() => {
+    console.log("Total Tax:", sumofAllTax.toFixed(2));
+  }, [sumofAllTax]);
+  const columns = useMemo(() => columnsData, [columnsData]);
+  const data = useMemo(() => dataWithTax, [dataWithTax]);
+
   const tableInstance = useTable(
     {
       columns,
@@ -328,7 +386,14 @@ export default function DevelopmentTable(props) {
                   if (cell.column.Header === "Total Price") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
-                        {cell.value}
+                        {cell.value}SAR
+                      </Text>
+                    );
+                  }
+                  if (cell.column.Header === "TAX") {
+                    data = (
+                      <Text color={textColor} fontSize="sm" fontWeight="700">
+                        {cell.value}SAR
                       </Text>
                     );
                   }
@@ -367,6 +432,7 @@ export default function DevelopmentTable(props) {
       <Text fontWeight="bold">Total Expense: {totalExpense}</Text>
       <Text fontWeight="bold">Total Sale: {totalSale}</Text>
       <Text fontWeight="bold">Total Advance:{totalAdvanceSalary} </Text>
+      <Text fontWeight="bold">Total today Sale Tax:{sumofAllTax} </Text>
       <Text fontWeight="bold">Total today driver salary:{sumSalary} </Text>
       <Text fontWeight="bold">
         Total Deposit: {totalSale - totalExpense - sumSalary}
@@ -533,16 +599,9 @@ export default function DevelopmentTable(props) {
               <Text color={textColorPrimary} fontWeight="bold">
                 Driver Name: {selectedDriver.attributes.driverName}
                 <br />
-                Total Salary: {selectedDriver.attributes.salary} SAR
-                <br />
-                Paid Salary: {selectedDriver.attributes.paidSalary} SAR
-                <br />
-                Remaining Salary: {
-                  selectedDriver.attributes.remainingSalary
-                }{" "}
-                SAR
                 <br />
                 <Input
+                  type="number"
                   placeholder="Enter paid amount"
                   value={amountPaid}
                   onChange={(e) => setAmountPaid(e.target.value)}
