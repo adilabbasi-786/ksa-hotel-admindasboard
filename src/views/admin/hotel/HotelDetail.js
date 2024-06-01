@@ -33,10 +33,6 @@ const HotelDetail = () => {
       );
       let res = await req.json();
       setHotel(res.data);
-      console.log(
-        "resdata",
-        res.data[0].attributes.liscencePicture.data.attributes.url
-      );
     };
     getData();
   }, [id]);
