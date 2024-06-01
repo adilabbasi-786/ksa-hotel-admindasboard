@@ -115,6 +115,7 @@ export function SidebarResponsive(props) {
               renderView={renderView}
             >
               <Content routes={routes} onClose={onClose} />
+              {console.log("rorrrr", routes)}
             </Scrollbars>
           </DrawerBody>
         </DrawerContent>

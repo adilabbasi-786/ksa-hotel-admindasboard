@@ -121,7 +121,7 @@ export default function Dashboard(props) {
             setToggleSidebar,
           }}
         >
-          <Sidebar routes={Routes()} display="none" {...rest} />
+          <Sidebar routes={Routes} display="none" {...rest} />
           <Box
             float="right"
             minHeight="100vh"
@@ -141,9 +141,9 @@ export default function Dashboard(props) {
                 <Navbar
                   onOpen={onOpen}
                   logoText={"Horizon UI Dashboard PRO"}
-                  brandText={getActiveRoute(Routes())}
-                  secondary={getActiveNavbar(Routes())}
-                  message={getActiveNavbarText(Routes())}
+                  brandText={getActiveRoute(Routes)}
+                  secondary={getActiveNavbar(Routes)}
+                  message={getActiveNavbarText(Routes)}
                   fixed={fixed}
                   {...rest}
                 />
@@ -159,7 +159,7 @@ export default function Dashboard(props) {
                 pt="50px"
               >
                 <Switch>
-                  {getRoutes(Routes())}
+                  {getRoutes(Routes)}
                   <Redirect from="/" to="/admin" />
                 </Switch>
               </Box>

@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import Brand from "components/sidebar/components/Brand";
 import { Box, Flex, Text } from "@chakra-ui/react";
 const Content = ({ routes, onClose }) => {
+  console.log("Content routes:", routes);
   return (
     <Box>
       <Brand />
