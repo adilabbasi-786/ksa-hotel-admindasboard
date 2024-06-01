@@ -34,6 +34,9 @@ const HotelCard = ({
   KafeelPhoneNumber,
   kafeelName,
   managerPhoneNumber,
+  TaxVatPicture,
+  ComercialCertificate,
+  liscencePicture,
   hotelRent,
   image,
   ...rest

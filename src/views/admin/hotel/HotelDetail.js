@@ -1,16 +1,31 @@
-import { Button, SimpleGrid, Text, useColorModeValue } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Image,
+  SimpleGrid,
+  Text,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import Card from "components/card/Card.js";
 import React, { useEffect, useState } from "react";
 import Information from "views/admin/expanses/components/Information";
 import { useParams } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import { URL } from "Utils";
+import FullScreenImageModal from "./FullScreenModal";
 
 const HotelDetail = () => {
   const { id } = useParams();
   const [hotel, setHotel] = useState("");
-  const history = useHistory();
+  const [selectedImage, setSelectedImage] = useState(null);
 
+  const history = useHistory();
+  const openImageModal = (imageUrl) => {
+    setSelectedImage(imageUrl);
+  };
+  const closeImageModal = () => {
+    setSelectedImage(null);
+  };
   useEffect(() => {
     const getData = async () => {
       let req = await fetch(
@@ -18,9 +33,12 @@ const HotelDetail = () => {
       );
       let res = await req.json();
       setHotel(res.data);
+      console.log(
+        "resdata",
+        res.data[0].attributes.liscencePicture.data.attributes.url
+      );
     };
     getData();
-    console.log("data", getData);
   }, [id]);
 
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
@@ -102,8 +120,81 @@ const HotelDetail = () => {
           title="kafeel Phone Number"
           value={hotel[0]?.attributes?.KafeelPhoneNumber}
         />
+        <Information
+          boxShadow={cardShadow}
+          title="kafeel Phone Number"
+          value={hotel[0]?.attributes?.KafeelPhoneNumber}
+        />
+        <Information
+          boxShadow={cardShadow}
+          title="Tax Vat Number"
+          value={hotel[0]?.attributes?.TaxVatNumber}
+        />
+        <Box boxShadow={cardShadow}>
+          <Text fontWeight="semibold">liscence Picture </Text>
+
+          {hotel[0]?.attributes?.liscencePicture?.data?.attributes?.url && (
+            <Box
+              onClick={() =>
+                openImageModal(
+                  `${URL}${hotel[0]?.attributes?.liscencePicture?.data?.attributes?.url}`
+                )
+              }
+              cursor="pointer"
+            >
+              <Image
+                src={`${URL}${hotel[0]?.attributes?.liscencePicture?.data?.attributes?.formats?.thumbnail?.url}`}
+                alt="liscencePicture"
+              />
+            </Box>
+          )}
+        </Box>
+        <Box boxShadow={cardShadow}>
+          <Text fontWeight="semibold">Comercial Certificate picture </Text>
+
+          {hotel[0]?.attributes?.ComercialCertificate?.data?.attributes
+            ?.url && (
+            <Box
+              onClick={() =>
+                openImageModal(
+                  `${URL}${hotel[0]?.attributes?.ComercialCertificate?.data?.attributes?.url}`
+                )
+              }
+              cursor="pointer"
+            >
+              <Image
+                src={`${URL}${hotel[0]?.attributes?.ComercialCertificate?.data?.attributes?.formats?.thumbnail?.url}`}
+                alt="ComercialCertificate"
+              />
+            </Box>
+          )}
+        </Box>
+        <Box boxShadow={cardShadow}>
+          <Text fontWeight="semibold">Tax Vat Picture </Text>
+
+          {hotel[0]?.attributes?.TaxVatPicture?.data?.attributes?.url && (
+            <Box
+              onClick={() =>
+                openImageModal(
+                  `${URL}${hotel[0]?.attributes?.TaxVatPicture?.data?.attributes?.url}`
+                )
+              }
+              cursor="pointer"
+            >
+              <Image
+                src={`${URL}${hotel[0]?.attributes?.TaxVatPicture?.data?.attributes?.formats?.thumbnail?.url}`}
+                alt="TaxVatPicture"
+              />
+            </Box>
+          )}
+        </Box>
         {/* <Information boxShadow={cardShadow} title="Total" value="15000SAR" /> */}
       </SimpleGrid>
+      <FullScreenImageModal
+        isOpen={selectedImage !== null}
+        onClose={closeImageModal}
+        imageUrl={selectedImage}
+      />
     </Card>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Box, Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
 import { useHistory } from "react-router-dom";
 import { URL } from "Utils";
+import axios from "axios";
 
 const HotelForm = () => {
   const history = useHistory();
@@ -14,14 +15,18 @@ const HotelForm = () => {
     managerPhoneNumber: "",
     kafeelName: "",
     KafeelPhoneNumber: "",
+    liscencePicture: null,
+    TaxVatNumber: "",
+    TaxVatPicture: null,
+    ComercialCertificate: null,
   });
   const [roleId] = useState("manager");
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, files } = e.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [name]: value,
+      [name]: files ? files[0] : value,
     }));
   };
 
@@ -64,38 +69,60 @@ const HotelForm = () => {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     const managerId = await registerManager();
 
     if (managerId) {
       try {
-        const response = await fetch(`${URL}/api/hotel-names`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            data: {
-              ...formData,
-              manager: managerId, // Set the manager ID in the hotel data
+        const formDataToSend = new FormData();
+        formDataToSend.append(
+          "data",
+          JSON.stringify({
+            name: formData.name,
+            location: formData.location,
+            manager: managerId,
+            managerEmail: formData.managerEmail,
+            managerPassword: formData.managerPassword,
+            managerPhoneNumber: formData.managerPhoneNumber,
+            kafeelName: formData.kafeelName,
+            KafeelPhoneNumber: formData.KafeelPhoneNumber,
+            TaxVatNumber: formData.TaxVatNumber,
+          })
+        );
+        formDataToSend.append(
+          "files.liscencePicture",
+          formData.liscencePicture
+        );
+        formDataToSend.append("files.TaxVatPicture", formData.TaxVatPicture);
+        formDataToSend.append(
+          "files.ComercialCertificate",
+          formData.ComercialCertificate
+        );
+
+        const response = await axios.post(
+          `${URL}/api/hotel-names`,
+          formDataToSend,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
             },
-            userId: managerId, // Pass userId in request body for backend use
-          }),
-        });
-        if (!response.ok) {
-          throw new Error("Failed to submit form data");
-        }
+          }
+        );
+
         setFormData({
           name: "",
           location: "",
           managerName: "",
           managerEmail: "",
           managerPassword: "",
-          kafalat: "",
-          hotelRent: "",
           kafeelName: "",
           KafeelPhoneNumber: "",
+          liscencePicture: null,
           managerPhoneNumber: "",
+          TaxVatNumber: "",
+          TaxVatPicture: null,
+          ComercialCertificate: null,
         });
         alert("Form submitted successfully!");
         history.push("/admin/hotel");
@@ -168,7 +195,7 @@ const HotelForm = () => {
         />
       </FormControl>
       <FormControl mt={4}>
-        <FormLabel>kafeel Name</FormLabel>
+        <FormLabel>Kafeel Name</FormLabel>
         <Input
           placeholder="Kafeel Name"
           name="kafeelName"
@@ -177,7 +204,7 @@ const HotelForm = () => {
         />
       </FormControl>
       <FormControl mt={4}>
-        <FormLabel>kafeel Phone Number</FormLabel>
+        <FormLabel>Kafeel Phone Number</FormLabel>
         <Input
           placeholder="Kafeel Phone Number"
           name="KafeelPhoneNumber"
@@ -185,13 +212,36 @@ const HotelForm = () => {
           onChange={handleInputChange}
         />
       </FormControl>
-      <Button
-        colorScheme="blue"
-        width="fit-content"
-        mt="10px"
-        alignSelf="flex-end"
-        onClick={handleSubmit}
-      >
+      <FormControl mt={4}>
+        <FormLabel>Tax Vat Number</FormLabel>
+        <Input
+          placeholder="Tax Vat Number"
+          name="TaxVatNumber"
+          value={formData.TaxVatNumber}
+          onChange={handleInputChange}
+        />
+      </FormControl>
+      <FormControl mt={4}>
+        <FormLabel>Licence Picture</FormLabel>
+        <Input
+          type="file"
+          name="liscencePicture"
+          onChange={handleInputChange}
+        />
+      </FormControl>
+      <FormControl mt={4}>
+        <FormLabel>Tax Vat Picture</FormLabel>
+        <Input type="file" name="TaxVatPicture" onChange={handleInputChange} />
+      </FormControl>
+      <FormControl mt={4}>
+        <FormLabel>Comercial Certificate</FormLabel>
+        <Input
+          type="file"
+          name="ComercialCertificate"
+          onChange={handleInputChange}
+        />
+      </FormControl>
+      <Button colorScheme="blue" mt={4} onClick={handleSubmit}>
         Submit
       </Button>
     </Box>

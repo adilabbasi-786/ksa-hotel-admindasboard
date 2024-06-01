@@ -77,6 +77,9 @@ const Hotels = () => {
               managerPhoneNumber={hotel?.attributes?.managerPhoneNumber}
               kafeelName={hotel?.attributes?.kafeelName}
               KafeelPhoneNumber={hotel?.attributes?.KafeelPhoneNumber}
+              liscencePicture={`${URL}${hotel?.attributes?.liscencePicture?.data?.attributes?.url}`}
+              ComercialCertificate={`${URL}${hotel?.attributes?.ComercialCertificate?.data?.attributes?.url}`}
+              TaxVatPicture={`${URL}${hotel?.attributes?.TaxVatPicture?.data?.attributes?.url}`}
             />
           ))}
       </Card>
