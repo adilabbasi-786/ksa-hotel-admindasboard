@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Box, Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
 import { useHistory } from "react-router-dom";
 import { URL } from "Utils";
@@ -23,15 +23,8 @@ const HotelForm = () => {
     ComercialCertificate: null,
   });
   const [roleId] = useState("manager");
-  useEffect(() => {
-    const adminIdentifier = localStorage.getItem("identifier");
-    const adminPassword = localStorage.getItem("password");
-    setFormData((prevData) => ({
-      ...prevData,
-      managerEmail: adminIdentifier,
-      managerPassword: adminPassword,
-    }));
-  }, []);
+  const adminIdentifier = localStorage.getItem("identifier");
+  const adminPassword = localStorage.getItem("password");
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
     setFormData((prevFormData) => ({
@@ -48,8 +41,8 @@ const HotelForm = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          identifier: formData.managerEmail,
-          password: formData.managerPassword,
+          identifier: adminIdentifier,
+          password: adminPassword,
         }),
       });
       const token = await tokenResponse.json();
