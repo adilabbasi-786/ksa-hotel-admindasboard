@@ -41,8 +41,8 @@ const HotelForm = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          identifier: adminIdentifier,
-          password: adminPassword,
+          identifier: "m.adilabbasi786@gmai.com",
+          password: "adil@123",
         }),
       });
       const token = await tokenResponse.json();
