@@ -6,6 +6,8 @@ import axios from "axios";
 
 const HotelForm = () => {
   const history = useHistory();
+  const token = localStorage.getItem("token");
+
   const [formData, setFormData] = useState({
     name: "",
     location: "",
@@ -106,6 +108,7 @@ const HotelForm = () => {
           {
             headers: {
               "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
             },
           }
         );
