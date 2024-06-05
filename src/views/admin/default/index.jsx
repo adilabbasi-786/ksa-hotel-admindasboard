@@ -20,12 +20,17 @@ const UserReports = () => {
   const brandColor = useColorModeValue("brand.500", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
   const history = useHistory();
+  const token = localStorage.getItem("token");
 
   // Fetch hotel names from API
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const req = await fetch(`${URL}/api/hotel-names?populate=*`);
+        const req = await fetch(`${URL}/api/hotel-names?populate=*`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const res = await req.json();
         console.log("ress", res.data);
         setHotels(res.data);
