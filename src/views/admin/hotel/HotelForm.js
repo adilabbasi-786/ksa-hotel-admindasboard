@@ -23,7 +23,8 @@ const HotelForm = () => {
     ComercialCertificate: null,
   });
   const [roleId] = useState("manager");
-
+  const adminIdentifier = localStorage.getItem("adminIdentifier");
+  const adminPassword = localStorage.getItem("adminPassword");
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
     setFormData((prevFormData) => ({
@@ -40,8 +41,8 @@ const HotelForm = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          identifier: "adil@adil.com",
-          password: "adil@123",
+          identifier: adminIdentifier,
+          password: adminPassword,
         }),
       });
       const token = await tokenResponse.json();
