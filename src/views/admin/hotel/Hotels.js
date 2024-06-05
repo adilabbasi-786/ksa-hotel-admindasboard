@@ -10,6 +10,7 @@ const Hotels = () => {
   const history = useHistory();
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem("token");
 
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
@@ -20,7 +21,15 @@ const Hotels = () => {
 
   useEffect(() => {
     const getData = async () => {
-      let req = await fetch(`${URL}/api/hotel-names?populate=*`);
+      let req = await fetch(
+        `${URL}/api/hotel-names?populate=*`,
+
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       let res = await req.json();
       setHotels(res.data);
     };
