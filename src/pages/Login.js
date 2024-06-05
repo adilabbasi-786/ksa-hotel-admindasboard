@@ -53,7 +53,8 @@ const SignIn = () => {
         const jwt = loginRes.data.jwt; // Extract JWT token
         localStorage.setItem("token", jwt);
         auth.setToken(jwt);
-
+        localStorage.setItem("identifier", formData.email);
+        localStorage.setItem("password", formData.password);
         // Step 2: Fetch user's role
         const roleRes = await axios.get(`${URL}/api/users/me?populate=role`, {
           headers: {
