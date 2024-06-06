@@ -25,7 +25,7 @@ import SignInCentered from "views/auth/signout";
 
 const hotelroutes = [
   {
-    name: "Main Dashboard",
+    name: "Hotel Dashboard",
     layout: "/hotel",
     path: "/dashboard",
     icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
