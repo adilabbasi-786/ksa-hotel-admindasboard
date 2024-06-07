@@ -260,6 +260,7 @@ const AddSalary = ({
                 <Select
                   value={month}
                   onChange={(e) => setMonth(e.target.value)}
+                  readOnly={entryType !== "monthly salary"}
                 >
                   {generateMonthOptions()}
                 </Select>
@@ -268,9 +269,10 @@ const AddSalary = ({
             <FormControl>
               <FormLabel>Amount</FormLabel>
               <Input
+                type="number"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                readOnly
+                readOnly={entryType === "monthly salary"}
               />
             </FormControl>
           </VStack>
