@@ -35,7 +35,7 @@ const EmployeesData = ({ selectedHotel }) => {
         }
       );
       setEmployeeData(response.data);
-      console.log("employeedatddddddda", response.data.data);
+      console.log("employeepicture", response.data.data);
     } catch (error) {
       console.error("Error fetching employee data:", error);
     }
