@@ -192,6 +192,7 @@ const HotelForm = () => {
       <FormControl mt={4}>
         <FormLabel>Manager Phone Number</FormLabel>
         <Input
+          type="number"
           placeholder="manager phone number"
           name="managerPhoneNumber"
           value={formData.managerPhoneNumber}
@@ -210,6 +211,7 @@ const HotelForm = () => {
       <FormControl mt={4}>
         <FormLabel>Kafeel Phone Number</FormLabel>
         <Input
+          type="number"
           placeholder="Kafeel Phone Number"
           name="KafeelPhoneNumber"
           value={formData.KafeelPhoneNumber}
