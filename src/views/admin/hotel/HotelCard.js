@@ -15,28 +15,32 @@ import {
   Text,
   useColorModeValue,
   Button,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import hotelImage from "../../../assets/img/THEME_HOTEL_SIGN_FIVE_STARS_FACADE_BUILDING_GettyImages-1320779330-3.jpg";
 import { MdEdit, MdDelete } from "react-icons/md";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import Card from "components/card/Card";
 import { URL } from "Utils";
+
 const HotelCard = ({
   title,
   ranking,
   id,
-  kafalat,
   managerName,
+  onDeleteHotel,
   managerEmail,
   managerPassword,
   KafeelPhoneNumber,
   kafeelName,
   managerPhoneNumber,
-  TaxVatPicture,
-  ComercialCertificate,
-  liscencePicture,
   hotelRent,
   image,
   ...rest
@@ -45,7 +49,6 @@ const HotelCard = ({
   const [isEditMode, setIsEditMode] = useState(false);
   const [updatedHotelData, setUpdatedHotelData] = useState({
     title: title,
-    kafalat: kafalat,
     managerName: managerName,
     managerEmail: managerEmail,
     managerPassword: managerPassword,
@@ -55,6 +58,8 @@ const HotelCard = ({
     KafeelPhoneNumber: KafeelPhoneNumber,
   });
   const [showModal, setShowModal] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const cancelRef = useRef();
   const history = useHistory();
 
   const handleToggleEditMode = () => {
@@ -75,17 +80,21 @@ const HotelCard = ({
         console.error("Error updating data:", error);
       });
   };
+
   const handleDeleteHotel = () => {
     axios
       .delete(`${URL}/api/hotel-names/${id}`)
       .then((response) => {
         console.log("Hotel deleted successfully:", response.data);
+        onDeleteHotel(id);
+        setIsDeleteDialogOpen(false);
         // Additional logic if needed after deletion
       })
       .catch((error) => {
         console.error("Error deleting hotel:", error);
       });
   };
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setUpdatedHotelData((prevData) => ({ ...prevData, [name]: value }));
@@ -152,7 +161,7 @@ const HotelCard = ({
           me="16px"
           ms="auto"
           p="0px !important"
-          onClick={handleDeleteHotel}
+          onClick={() => setIsDeleteDialogOpen(true)} // Open delete confirmation dialog
         >
           <Icon as={MdDelete} color="secondaryGray.500" h="18px" w="18px" />
         </Link>
@@ -174,15 +183,7 @@ const HotelCard = ({
                 value={updatedHotelData.title}
                 onChange={handleInputChange}
               />
-              <Text fontWeight="bold" fontSize="xl" mt="10px">
-                Hotel kafalat
-              </Text>
-              <Input
-                type="number"
-                name="kafalat"
-                value={updatedHotelData.kafalat}
-                onChange={handleInputChange}
-              />
+
               <Text fontWeight="bold" fontSize="xl" mt="10px">
                 Manager name
               </Text>
@@ -214,7 +215,7 @@ const HotelCard = ({
                 Manager Phone Number
               </Text>
               <Input
-                type="text"
+                type="number"
                 name="managerPhoneNumber"
                 value={updatedHotelData.managerPhoneNumber}
                 onChange={handleInputChange}
@@ -232,7 +233,7 @@ const HotelCard = ({
                 kafeel Phone Number
               </Text>
               <Input
-                type="text"
+                type="number"
                 name="KafeelPhoneNumber"
                 value={updatedHotelData.KafeelPhoneNumber}
                 onChange={handleInputChange}
@@ -246,6 +247,37 @@ const HotelCard = ({
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      <AlertDialog
+        isOpen={isDeleteDialogOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={() => setIsDeleteDialogOpen(false)}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Delete Hotel
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure you want to delete this hotel? This action cannot be
+              undone.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button
+                ref={cancelRef}
+                onClick={() => setIsDeleteDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button colorScheme="red" onClick={handleDeleteHotel} ml={3}>
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </>
   );
 };

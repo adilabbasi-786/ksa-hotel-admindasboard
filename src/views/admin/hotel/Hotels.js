@@ -37,10 +37,13 @@ const Hotels = () => {
     console.log("data", getData);
   }, []);
 
+  const handleDeleteHotel = (id) => {
+    setHotels((prevHotels) => prevHotels.filter((hotel) => hotel.id !== id));
+  };
+
   const handleCreateHotel = () => {
     history.push("/admin/hotel/add");
   };
-
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <Flex w="100%">
@@ -72,6 +75,7 @@ const Hotels = () => {
         {hotels &&
           hotels?.map((hotel) => (
             <HotelCard
+              onDeleteHotel={handleDeleteHotel}
               key={hotel?.id}
               id={hotel?.id}
               boxShadow={cardShadow}
