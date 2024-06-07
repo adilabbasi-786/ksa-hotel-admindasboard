@@ -54,6 +54,9 @@ const Banner = ({
     iqamaExpiry: "",
     EmployeePhoneNumber: "",
     salary: "",
+    iqamaPicture: null,
+    passportImage: null,
+    Employee_healtCard: null,
   });
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const token = localStorage.getItem("token");
@@ -92,17 +95,28 @@ const Banner = ({
       updatedEmployeeData.lastActiveDate = new Date().toISOString();
     }
 
+    const formDataToSend = new FormData();
+    formDataToSend.append("data", JSON.stringify(updatedEmployeeData));
+    formDataToSend.append(
+      "files.iqamaPicture",
+      updatedEmployeeData.iqamaPicture
+    );
+    formDataToSend.append(
+      "files.passportImage",
+      updatedEmployeeData.passportImage
+    );
+    formDataToSend.append(
+      "files.Employee_healtCard",
+      updatedEmployeeData.Employee_healtCard
+    );
+
     axios
-      .put(
-        `${URL}/api/employee-data/${id}`,
-        { data: updatedEmployeeData },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      .put(`${URL}/api/employee-data/${id}`, formDataToSend, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then((response) => {
         if (response.status === 200) {
           setShowSuccessMessage(true);
@@ -120,31 +134,14 @@ const Banner = ({
       });
   };
 
-  const handleDeleteEmployee = () => {
-    if (window.confirm("Are you sure you want to delete this employee?")) {
-      axios
-        .delete(`${URL}/api/employee-data/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            alert("Employee deleted successfully");
-            fetchEmployeeData();
-          } else {
-            console.error("Error deleting employee:", response.statusText);
-          }
-        })
-        .catch((error) => {
-          console.error("Error deleting employee:", error);
-        });
-    }
-  };
-
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setUpdatedEmployeeData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleFileInputChange = (event) => {
+    const { name, files } = event.target;
+    setUpdatedEmployeeData((prevData) => ({ ...prevData, [name]: files[0] }));
   };
 
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
@@ -156,6 +153,7 @@ const Banner = ({
 
   const handleViewDetails = () => {
     setIsOpen(true);
+    setIsEditMode(false);
   };
 
   const handleClose = () => {
@@ -280,6 +278,24 @@ const Banner = ({
                   <option value="active">active</option>
                   <option value="inactive">inactive</option>
                 </Select>
+                <FormLabel>iqama Picture:</FormLabel>
+                <Input
+                  type="file"
+                  name="iqamaPicture"
+                  onChange={handleFileInputChange}
+                />
+                <FormLabel>Passport Picture:</FormLabel>
+                <Input
+                  type="file"
+                  name="passportImage"
+                  onChange={handleFileInputChange}
+                />
+                <FormLabel>Employee Health Card Picture:</FormLabel>
+                <Input
+                  type="file"
+                  name="Employee_healtCard"
+                  onChange={handleFileInputChange}
+                />
               </FormControl>
             ) : (
               <EmployeeFullDetail employeeData={employeeData} />
@@ -296,15 +312,6 @@ const Banner = ({
             >
               {isEditMode ? "Save" : "Edit"}
             </Button>
-            {!isEditMode && (
-              <Button
-                colorScheme="red"
-                style={{ marginLeft: "10px" }}
-                onClick={handleDeleteEmployee}
-              >
-                Delete Employee
-              </Button>
-            )}
           </ModalFooter>
         </ModalContent>
       </Modal>

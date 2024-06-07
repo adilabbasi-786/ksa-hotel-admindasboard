@@ -79,7 +79,8 @@ const HotelCard = ({
     axios
       .put(`${URL}/api/hotel-names/${id}`, requestData)
       .then((response) => {
-        console.log("Data updated successfully:", response.data);
+        alert("Data updated successfully:");
+        history.push("/admin/hotel");
         const updatedHotel = {
           ...response.data,
           id, // Ensure the ID is included
