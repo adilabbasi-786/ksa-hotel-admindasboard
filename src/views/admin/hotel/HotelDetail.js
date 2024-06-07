@@ -38,6 +38,7 @@ const HotelDetail = () => {
         }
       );
       let res = await req.json();
+      console.log("aman", res.data);
       setHotel(res.data);
     };
     getData();
@@ -70,11 +71,7 @@ const HotelDetail = () => {
         Hotel Information
       </Text>
       <Text color={textColorSecondary} fontSize="md" me="26px" mb="40px">
-        As we live, our hearts turn colder. Cause pain is what we go through as
-        we become older. We get insulted by others, lose trust for those others.
-        We get back stabbed by friends. It becomes harder for us to give others
-        a hand. We get our heart broken by people we love, even that we give
-        them all...
+        here is the hotel full details
       </Text>
       <SimpleGrid columns={{ base: 1, md: 2 }} gap="20px">
         <Information
@@ -122,11 +119,7 @@ const HotelDetail = () => {
           title="kafeel Phone Number"
           value={hotel[0]?.attributes?.KafeelPhoneNumber}
         />
-        <Information
-          boxShadow={cardShadow}
-          title="kafeel Phone Number"
-          value={hotel[0]?.attributes?.KafeelPhoneNumber}
-        />
+
         <Information
           boxShadow={cardShadow}
           title="Tax Vat Number"

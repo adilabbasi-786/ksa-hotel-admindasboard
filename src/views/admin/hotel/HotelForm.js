@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Box, Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Text,
+} from "@chakra-ui/react";
 import { useHistory } from "react-router-dom";
 import { URL } from "Utils";
 import axios from "axios";
@@ -23,6 +30,7 @@ const HotelForm = () => {
     ComercialCertificate: null,
   });
   const [roleId] = useState("manager");
+  const [validationMessages, setValidationMessages] = useState({});
   const adminIdentifier = localStorage.getItem("identifier");
   const adminPassword = localStorage.getItem("password");
   const handleInputChange = (e) => {
@@ -71,9 +79,38 @@ const HotelForm = () => {
       return false;
     }
   };
+  const validateForm = () => {
+    const messages = {};
+    const requiredFields = [
+      "name",
+      "location",
+      "managerName",
+      "managerEmail",
+      "managerPassword",
+      "managerPhoneNumber",
+      "kafeelName",
+      "KafeelPhoneNumber",
+      "TaxVatNumber",
+      "liscencePicture",
+      "TaxVatPicture",
+      "ComercialCertificate",
+    ];
 
+    requiredFields.forEach((field) => {
+      if (!formData[field]) {
+        messages[field] = "This field is required.";
+      }
+    });
+
+    setValidationMessages(messages);
+    return Object.keys(messages).length === 0;
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) {
+      alert("Please fill in all required fields.");
+      return;
+    }
     const managerId = await registerManager();
 
     if (managerId) {
@@ -85,6 +122,7 @@ const HotelForm = () => {
             name: formData.name,
             location: formData.location,
             manager: managerId,
+            managerName: formData.managerName,
             managerEmail: formData.managerEmail,
             managerPassword: formData.managerPassword,
             managerPhoneNumber: formData.managerPhoneNumber,
@@ -150,6 +188,9 @@ const HotelForm = () => {
           onChange={handleInputChange}
           required
         />
+        {validationMessages.name && (
+          <Text color="red.500">{validationMessages.name}</Text>
+        )}
       </FormControl>
       <FormControl mt={4}>
         <FormLabel>Location</FormLabel>
@@ -159,6 +200,9 @@ const HotelForm = () => {
           value={formData.location}
           onChange={handleInputChange}
         />
+        {validationMessages.location && (
+          <Text color="red.500">{validationMessages.location}</Text>
+        )}
       </FormControl>
       <FormControl mt={4}>
         <FormLabel>Manager Name</FormLabel>
@@ -168,6 +212,9 @@ const HotelForm = () => {
           value={formData.managerName}
           onChange={handleInputChange}
         />
+        {validationMessages.managerName && (
+          <Text color="red.500">{validationMessages.managerName}</Text>
+        )}
       </FormControl>
       <FormControl mt={4}>
         <FormLabel>Manager Email</FormLabel>
@@ -178,6 +225,9 @@ const HotelForm = () => {
           value={formData.managerEmail}
           onChange={handleInputChange}
         />
+        {validationMessages.managerEmail && (
+          <Text color="red.500">{validationMessages.managerEmail}</Text>
+        )}
       </FormControl>
       <FormControl mt={4}>
         <FormLabel>Manager Password</FormLabel>
@@ -188,6 +238,9 @@ const HotelForm = () => {
           value={formData.managerPassword}
           onChange={handleInputChange}
         />
+        {validationMessages.managerPassword && (
+          <Text color="red.500">{validationMessages.managerPassword}</Text>
+        )}
       </FormControl>
       <FormControl mt={4}>
         <FormLabel>Manager Phone Number</FormLabel>
@@ -198,6 +251,9 @@ const HotelForm = () => {
           value={formData.managerPhoneNumber}
           onChange={handleInputChange}
         />
+        {validationMessages.managerPhoneNumber && (
+          <Text color="red.500">{validationMessages.managerPhoneNumber}</Text>
+        )}
       </FormControl>
       <FormControl mt={4}>
         <FormLabel>Kafeel Name</FormLabel>
@@ -207,6 +263,9 @@ const HotelForm = () => {
           value={formData.kafeelName}
           onChange={handleInputChange}
         />
+        {validationMessages.kafeelName && (
+          <Text color="red.500">{validationMessages.kafeelName}</Text>
+        )}
       </FormControl>
       <FormControl mt={4}>
         <FormLabel>Kafeel Phone Number</FormLabel>
@@ -217,6 +276,9 @@ const HotelForm = () => {
           value={formData.KafeelPhoneNumber}
           onChange={handleInputChange}
         />
+        {validationMessages.KafeelPhoneNumber && (
+          <Text color="red.500">{validationMessages.KafeelPhoneNumber}</Text>
+        )}
       </FormControl>
       <FormControl mt={4}>
         <FormLabel>Tax Vat Number</FormLabel>
@@ -226,6 +288,9 @@ const HotelForm = () => {
           value={formData.TaxVatNumber}
           onChange={handleInputChange}
         />
+        {validationMessages.TaxVatNumber && (
+          <Text color="red.500">{validationMessages.TaxVatNumber}</Text>
+        )}
       </FormControl>
       <FormControl mt={4}>
         <FormLabel>Licence Picture</FormLabel>
@@ -234,10 +299,16 @@ const HotelForm = () => {
           name="liscencePicture"
           onChange={handleInputChange}
         />
+        {validationMessages.liscencePicture && (
+          <Text color="red.500">{validationMessages.liscencePicture}</Text>
+        )}
       </FormControl>
       <FormControl mt={4}>
         <FormLabel>Tax Vat Picture</FormLabel>
         <Input type="file" name="TaxVatPicture" onChange={handleInputChange} />
+        {validationMessages.TaxVatPicture && (
+          <Text color="red.500">{validationMessages.TaxVatPicture}</Text>
+        )}
       </FormControl>
       <FormControl mt={4}>
         <FormLabel>Comercial Certificate</FormLabel>
@@ -246,6 +317,9 @@ const HotelForm = () => {
           name="ComercialCertificate"
           onChange={handleInputChange}
         />
+        {validationMessages.ComercialCertificate && (
+          <Text color="red.500">{validationMessages.ComercialCertificate}</Text>
+        )}
       </FormControl>
       <Button colorScheme="blue" mt={4} onClick={handleSubmit}>
         Submit

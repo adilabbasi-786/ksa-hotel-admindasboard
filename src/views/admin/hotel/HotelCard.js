@@ -24,7 +24,7 @@ import {
   FormControl,
   FormLabel,
 } from "@chakra-ui/react";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import hotelImage from "../../../assets/img/THEME_HOTEL_SIGN_FIVE_STARS_FACADE_BUILDING_GettyImages-1320779330-3.jpg";
 import { MdEdit, MdDelete } from "react-icons/md";
 import axios from "axios";
@@ -49,6 +49,7 @@ const HotelCard = ({
 }) => {
   const hotelImageSrc = image || hotelImage;
   const [isEditMode, setIsEditMode] = useState(false);
+
   const [updatedHotelData, setUpdatedHotelData] = useState({
     title: title,
     managerName: managerName,
@@ -59,12 +60,35 @@ const HotelCard = ({
     kafeelName: kafeelName,
     KafeelPhoneNumber: KafeelPhoneNumber,
   });
-  const [fileData, setFileData] = useState({
-    liscencePicture: null,
-    TaxVatPicture: null,
-    ComercialCertificate: null,
-  });
-
+  // const [fileData, setFileData] = useState({
+  //   liscencePicture: null,
+  //   TaxVatPicture: null,
+  //   ComercialCertificate: null,
+  // });
+  // useEffect(() => {
+  //   if (isEditMode) {
+  //     setUpdatedHotelData({
+  //       title: title,
+  //       managerName: managerName,
+  //       managerEmail: managerEmail,
+  //       managerPassword: managerPassword,
+  //       hotelRent: hotelRent,
+  //       managerPhoneNumber: managerPhoneNumber,
+  //       kafeelName: kafeelName,
+  //       KafeelPhoneNumber: KafeelPhoneNumber,
+  //     });
+  //   }
+  // }, [
+  //   isEditMode,
+  //   title,
+  //   managerName,
+  //   managerEmail,
+  //   managerPassword,
+  //   hotelRent,
+  //   managerPhoneNumber,
+  //   kafeelName,
+  //   KafeelPhoneNumber,
+  // ]);
   const [showModal, setShowModal] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const cancelRef = useRef();
@@ -75,43 +99,19 @@ const HotelCard = ({
     setShowModal(true); // Open modal when entering edit mode
   };
 
-  const handleSaveChanges = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("data", JSON.stringify(updatedHotelData));
-
-      // Append files if they exist
-      if (fileData.liscencePicture) {
-        formData.append("files.liscencePicture", fileData.liscencePicture);
-      }
-      if (fileData.TaxVatPicture) {
-        formData.append("files.TaxVatPicture", fileData.TaxVatPicture);
-      }
-      if (fileData.ComercialCertificate) {
-        formData.append(
-          "files.ComercialCertificate",
-          fileData.ComercialCertificate
-        );
-      }
-
-      const response = await axios.put(
-        `${URL}/api/hotel-names/${id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      console.log("Data updated successfully:", response.data);
-      setIsEditMode(false);
-      setShowModal(false);
-    } catch (error) {
-      console.error("Error updating data:", error);
-    }
+  const handleSaveChanges = () => {
+    const requestData = { data: updatedHotelData }; // Wrap updatedHotelData in a "data" property
+    axios
+      .put(`${URL}/api/hotel-names/${id}`, requestData)
+      .then((response) => {
+        console.log("Data updated successfully:", response.data);
+        setIsEditMode(false); // Exit edit mode
+        setShowModal(false); // Close modal after saving changes
+      })
+      .catch((error) => {
+        console.error("Error updating data:", error);
+      });
   };
-
   const handleDeleteHotel = () => {
     axios
       .delete(`${URL}/api/hotel-names/${id}`)
@@ -127,13 +127,8 @@ const HotelCard = ({
   };
 
   const handleInputChange = (event) => {
-    const { name, value, type, files } = event.target;
-
-    if (type === "file") {
-      setFileData((prevData) => ({ ...prevData, [name]: files[0] }));
-    } else {
-      setUpdatedHotelData((prevData) => ({ ...prevData, [name]: value }));
-    }
+    const { name, value } = event.target;
+    setUpdatedHotelData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   // Chakra Color Mode
@@ -203,7 +198,13 @@ const HotelCard = ({
         </Link>
       </Card>
 
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+      <Modal
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false);
+          setIsEditMode(false);
+        }}
+      >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Edit Hotel Details</ModalHeader>
@@ -223,6 +224,7 @@ const HotelCard = ({
               <Text fontWeight="bold" fontSize="xl" mt="10px">
                 Manager name
               </Text>
+              {console.log("managername", managerName)}
               <Input
                 type="text"
                 name="managerName"
@@ -274,30 +276,6 @@ const HotelCard = ({
                 value={updatedHotelData.KafeelPhoneNumber}
                 onChange={handleInputChange}
               />
-              <FormControl mt={4}>
-                <FormLabel>Licence Picture</FormLabel>
-                <Input
-                  type="file"
-                  name="liscencePicture"
-                  onChange={handleInputChange}
-                />
-              </FormControl>
-              <FormControl mt={4}>
-                <FormLabel>Tax Vat Picture</FormLabel>
-                <Input
-                  type="file"
-                  name="TaxVatPicture"
-                  onChange={handleInputChange}
-                />
-              </FormControl>
-              <FormControl mt={4}>
-                <FormLabel>Comercial Certificate</FormLabel>
-                <Input
-                  type="file"
-                  name="ComercialCertificate"
-                  onChange={handleInputChange}
-                />
-              </FormControl>
             </Box>
           </ModalBody>
           <ModalFooter>
