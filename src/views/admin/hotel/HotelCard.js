@@ -24,7 +24,7 @@ import {
   FormControl,
   FormLabel,
 } from "@chakra-ui/react";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import hotelImage from "../../../assets/img/THEME_HOTEL_SIGN_FIVE_STARS_FACADE_BUILDING_GettyImages-1320779330-3.jpg";
 import { MdEdit, MdDelete } from "react-icons/md";
 import axios from "axios";
@@ -37,6 +37,8 @@ const HotelCard = ({
   ranking,
   id,
   managerName,
+  name,
+  onUpdateHotel,
   onDeleteHotel,
   managerEmail,
   managerPassword,
@@ -52,6 +54,7 @@ const HotelCard = ({
 
   const [updatedHotelData, setUpdatedHotelData] = useState({
     title: title,
+    name: name,
     managerName: managerName,
     managerEmail: managerEmail,
     managerPassword: managerPassword,
@@ -60,35 +63,7 @@ const HotelCard = ({
     kafeelName: kafeelName,
     KafeelPhoneNumber: KafeelPhoneNumber,
   });
-  // const [fileData, setFileData] = useState({
-  //   liscencePicture: null,
-  //   TaxVatPicture: null,
-  //   ComercialCertificate: null,
-  // });
-  // useEffect(() => {
-  //   if (isEditMode) {
-  //     setUpdatedHotelData({
-  //       title: title,
-  //       managerName: managerName,
-  //       managerEmail: managerEmail,
-  //       managerPassword: managerPassword,
-  //       hotelRent: hotelRent,
-  //       managerPhoneNumber: managerPhoneNumber,
-  //       kafeelName: kafeelName,
-  //       KafeelPhoneNumber: KafeelPhoneNumber,
-  //     });
-  //   }
-  // }, [
-  //   isEditMode,
-  //   title,
-  //   managerName,
-  //   managerEmail,
-  //   managerPassword,
-  //   hotelRent,
-  //   managerPhoneNumber,
-  //   kafeelName,
-  //   KafeelPhoneNumber,
-  // ]);
+
   const [showModal, setShowModal] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const cancelRef = useRef();
@@ -96,15 +71,24 @@ const HotelCard = ({
 
   const handleToggleEditMode = () => {
     setIsEditMode(!isEditMode);
-    setShowModal(true); // Open modal when entering edit mode
+    setShowModal(true);
   };
 
   const handleSaveChanges = () => {
-    const requestData = { data: updatedHotelData }; // Wrap updatedHotelData in a "data" property
+    const requestData = { data: updatedHotelData };
     axios
       .put(`${URL}/api/hotel-names/${id}`, requestData)
       .then((response) => {
         console.log("Data updated successfully:", response.data);
+        const updatedHotel = {
+          ...response.data,
+          id, // Ensure the ID is included
+        };
+        setUpdatedHotelData(updatedHotel);
+
+        if (onUpdateHotel) {
+          onUpdateHotel(updatedHotel);
+        }
         setIsEditMode(false); // Exit edit mode
         setShowModal(false); // Close modal after saving changes
       })
@@ -112,6 +96,7 @@ const HotelCard = ({
         console.error("Error updating data:", error);
       });
   };
+
   const handleDeleteHotel = () => {
     axios
       .delete(`${URL}/api/hotel-names/${id}`)
@@ -216,15 +201,15 @@ const HotelCard = ({
               </Text>
               <Input
                 type="text"
-                name="title"
-                value={updatedHotelData.title}
+                name="name"
+                value={updatedHotelData.name}
                 onChange={handleInputChange}
               />
 
+              {console.log("managername", name)}
               <Text fontWeight="bold" fontSize="xl" mt="10px">
                 Manager name
               </Text>
-              {console.log("managername", managerName)}
               <Input
                 type="text"
                 name="managerName"

@@ -32,13 +32,20 @@ const Hotels = () => {
       );
       let res = await req.json();
       setHotels(res.data);
+      console.log("data", res.data);
     };
     getData();
-    console.log("data", getData);
   }, []);
 
   const handleDeleteHotel = (id) => {
     setHotels((prevHotels) => prevHotels.filter((hotel) => hotel.id !== id));
+  };
+  const handleUpdateHotel = (updatedHotel) => {
+    setHotels((prevHotels) =>
+      prevHotels.map((hotel) =>
+        hotel.id === updatedHotel.id ? { ...hotel, ...updatedHotel } : hotel
+      )
+    );
   };
 
   const handleCreateHotel = () => {
@@ -76,6 +83,7 @@ const Hotels = () => {
           hotels?.map((hotel) => (
             <HotelCard
               onDeleteHotel={handleDeleteHotel}
+              onUpdateHotel={handleUpdateHotel}
               key={hotel?.id}
               id={hotel?.id}
               boxShadow={cardShadow}
@@ -84,6 +92,7 @@ const Hotels = () => {
               ranking={hotel?.id}
               link={`hotel/${hotel.id}`}
               title={hotel?.attributes?.name}
+              name={hotel?.attributes?.name}
               managerName={hotel?.attributes?.managerName}
               managerEmail={hotel?.attributes?.managerEmail}
               managerPassword={hotel?.attributes?.managerPassword}
