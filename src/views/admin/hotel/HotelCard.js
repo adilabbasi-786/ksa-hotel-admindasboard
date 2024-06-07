@@ -25,13 +25,12 @@ import {
   FormLabel,
 } from "@chakra-ui/react";
 import React, { useState, useRef } from "react";
-import hotelImage from "../../../assets/img/THEME_HOTEL_SIGN_FIVE_STARS_FACADE_BUILDING_GettyImages-1320779330-3.jpg";
 import { MdEdit, MdDelete } from "react-icons/md";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import Card from "components/card/Card";
 import { URL } from "Utils";
-
+import hotelImage from "../../../assets/img/THEME_HOTEL_SIGN_FIVE_STARS_FACADE_BUILDING_GettyImages-1320779330-3.jpg";
 const HotelCard = ({
   title,
   ranking,
@@ -45,6 +44,9 @@ const HotelCard = ({
   KafeelPhoneNumber,
   kafeelName,
   managerPhoneNumber,
+  liscencePicture,
+  ComercialCertificate,
+  TaxVatPicture,
   hotelRent,
   image,
   ...rest
@@ -62,7 +64,11 @@ const HotelCard = ({
     managerPhoneNumber: managerPhoneNumber,
     kafeelName: kafeelName,
     KafeelPhoneNumber: KafeelPhoneNumber,
+    liscencePicture: liscencePicture,
+    TaxVatPicture: TaxVatPicture,
+    ComercialCertificate: ComercialCertificate,
   });
+  const token = localStorage.getItem("token");
 
   const [showModal, setShowModal] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -75,9 +81,28 @@ const HotelCard = ({
   };
 
   const handleSaveChanges = () => {
-    const requestData = { data: updatedHotelData };
+    const formData = new FormData();
+    formData.append("data", JSON.stringify(updatedHotelData));
+    if (updatedHotelData.liscencePicture instanceof File)
+      formData.append(
+        "files.liscencePicture",
+        updatedHotelData.liscencePicture
+      );
+    if (updatedHotelData.TaxVatPicture instanceof File)
+      formData.append("files.TaxVatPicture", updatedHotelData.TaxVatPicture);
+    if (updatedHotelData.ComercialCertificate instanceof File)
+      formData.append(
+        "files.ComercialCertificate",
+        updatedHotelData.ComercialCertificate
+      );
+
     axios
-      .put(`${URL}/api/hotel-names/${id}`, requestData)
+      .put(`${URL}/api/hotel-names/${id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
         alert("Data updated successfully:");
         history.push("/admin/hotel");
@@ -100,7 +125,11 @@ const HotelCard = ({
 
   const handleDeleteHotel = () => {
     axios
-      .delete(`${URL}/api/hotel-names/${id}`)
+      .delete(`${URL}/api/hotel-names/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
         console.log("Hotel deleted successfully:", response.data);
         onDeleteHotel(id);
@@ -117,11 +146,21 @@ const HotelCard = ({
     setUpdatedHotelData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  const handleFileInputChange = (event) => {
+    const { name, files } = event.target;
+    setUpdatedHotelData((prevData) => ({ ...prevData, [name]: files[0] }));
+  };
+
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
   const brandColor = useColorModeValue("brand.500", "white");
   const bg = useColorModeValue("white", "navy.700");
+
+  const getPreviewUrl = (file) => {
+    if (!file) return null;
+    return typeof file === "string" ? file : window.URL.createObjectURL(file);
+  };
 
   return (
     <>
@@ -197,76 +236,167 @@ const HotelCard = ({
           <ModalCloseButton />
           <ModalBody>
             <Box>
-              <Text fontWeight="bold" fontSize="xl" mt="10px">
-                Hotel name
+              <Text fontSize="md" fontWeight="bold" mb="10px">
+                Title:
               </Text>
               <Input
                 type="text"
-                name="name"
+                value={updatedHotelData.title}
+                onChange={handleInputChange}
+                name="title"
+              />
+            </Box>
+            <Box mt="10px">
+              <Text fontSize="md" fontWeight="bold" mb="10px">
+                Name:
+              </Text>
+              <Input
+                type="text"
                 value={updatedHotelData.name}
                 onChange={handleInputChange}
+                name="name"
               />
-
-              {console.log("managername", name)}
-              <Text fontWeight="bold" fontSize="xl" mt="10px">
-                Manager name
+            </Box>
+            <Box mt="10px">
+              <Text fontSize="md" fontWeight="bold" mb="10px">
+                Manager Name:
               </Text>
               <Input
                 type="text"
-                name="managerName"
                 value={updatedHotelData.managerName}
                 onChange={handleInputChange}
+                name="managerName"
               />
-              <Text fontWeight="bold" fontSize="xl" mt="10px">
-                Manager email
+            </Box>
+            <Box mt="10px">
+              <Text fontSize="md" fontWeight="bold" mb="10px">
+                Manager Email:
               </Text>
               <Input
                 type="email"
-                name="managerEmail"
                 value={updatedHotelData.managerEmail}
                 onChange={handleInputChange}
+                name="managerEmail"
               />
-              <Text fontWeight="bold" fontSize="xl" mt="10px">
-                Manager password
+            </Box>
+            <Box mt="10px">
+              <Text fontSize="md" fontWeight="bold" mb="10px">
+                Manager Password:
               </Text>
               <Input
-                type="text"
-                name="managerPassword"
+                type="password"
                 value={updatedHotelData.managerPassword}
                 onChange={handleInputChange}
+                name="managerPassword"
               />
-              <Text fontWeight="bold" fontSize="xl" mt="10px">
-                Manager Phone Number
-              </Text>
-              <Input
-                type="number"
-                name="managerPhoneNumber"
-                value={updatedHotelData.managerPhoneNumber}
-                onChange={handleInputChange}
-              />
-              <Text fontWeight="bold" fontSize="xl" mt="10px">
-                kafeel Name
+            </Box>
+
+            <Box mt="10px">
+              <Text fontSize="md" fontWeight="bold" mb="10px">
+                Manager Phone Number:
               </Text>
               <Input
                 type="text"
-                name="kafeelName"
-                value={updatedHotelData.kafeelName}
+                value={updatedHotelData.managerPhoneNumber}
                 onChange={handleInputChange}
+                name="managerPhoneNumber"
               />
-              <Text fontWeight="bold" fontSize="xl" mt="10px">
-                kafeel Phone Number
+            </Box>
+            <Box mt="10px">
+              <Text fontSize="md" fontWeight="bold" mb="10px">
+                Kafeel Name:
               </Text>
               <Input
-                type="number"
-                name="KafeelPhoneNumber"
+                type="text"
+                value={updatedHotelData.kafeelName}
+                onChange={handleInputChange}
+                name="kafeelName"
+              />
+            </Box>
+            <Box mt="10px">
+              <Text fontSize="md" fontWeight="bold" mb="10px">
+                Kafeel Phone Number:
+              </Text>
+              <Input
+                type="text"
                 value={updatedHotelData.KafeelPhoneNumber}
                 onChange={handleInputChange}
+                name="KafeelPhoneNumber"
               />
+            </Box>
+            <Box mt="10px">
+              <FormControl>
+                <FormLabel>Liscence Picture:</FormLabel>
+                {updatedHotelData.liscencePicture && (
+                  <Image
+                    src={getPreviewUrl(updatedHotelData.liscencePicture)}
+                    alt="Liscence Picture"
+                    boxSize="100px"
+                    objectFit="cover"
+                    mb="10px"
+                  />
+                )}
+                <Input
+                  type="file"
+                  name="liscencePicture"
+                  accept="image/*"
+                  onChange={handleFileInputChange}
+                />
+              </FormControl>
+            </Box>
+            <Box mt="10px">
+              <FormControl>
+                <FormLabel>Tax VAT Picture:</FormLabel>
+                {updatedHotelData.TaxVatPicture && (
+                  <Image
+                    src={getPreviewUrl(updatedHotelData.TaxVatPicture)}
+                    alt="Tax VAT Picture"
+                    boxSize="100px"
+                    objectFit="cover"
+                    mb="10px"
+                  />
+                )}
+                <Input
+                  type="file"
+                  name="TaxVatPicture"
+                  accept="image/*"
+                  onChange={handleFileInputChange}
+                />
+              </FormControl>
+            </Box>
+            <Box mt="10px">
+              <FormControl>
+                <FormLabel>Comercial Certificate:</FormLabel>
+                {updatedHotelData.ComercialCertificate && (
+                  <Image
+                    src={getPreviewUrl(updatedHotelData.ComercialCertificate)}
+                    alt="Comercial Certificate"
+                    boxSize="100px"
+                    objectFit="cover"
+                    mb="10px"
+                  />
+                )}
+                <Input
+                  type="file"
+                  name="ComercialCertificate"
+                  accept="image/*"
+                  onChange={handleFileInputChange}
+                />
+              </FormControl>
             </Box>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" onClick={handleSaveChanges}>
-              Save Changes
+            <Button colorScheme="blue" mr={3} onClick={handleSaveChanges}>
+              Save
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setShowModal(false);
+                setIsEditMode(false);
+              }}
+            >
+              Cancel
             </Button>
           </ModalFooter>
         </ModalContent>
