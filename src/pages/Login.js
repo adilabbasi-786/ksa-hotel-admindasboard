@@ -16,6 +16,9 @@ import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { AuthContext } from "AuthContext";
 import { URL } from "Utils";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { InputAdornment } from "@mui/material";
 const defaultTheme = createTheme();
 
 const SignIn = () => {
@@ -28,6 +31,10 @@ const SignIn = () => {
   });
   const [error, setError] = useState(null);
   const [role, setRole] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -161,11 +168,22 @@ const SignIn = () => {
               fullWidth
               name="password"
               label="Password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
               autoComplete="current-password"
               value={formData.password}
               onChange={handleInputChange}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end" sx={{ cursor: "pointer" }}>
+                    {showPassword ? (
+                      <Visibility onClick={handleTogglePasswordVisibility} />
+                    ) : (
+                      <VisibilityOff onClick={handleTogglePasswordVisibility} />
+                    )}
+                  </InputAdornment>
+                ),
+              }}
             />
             {error && (
               <Typography color="error" variant="body2">
