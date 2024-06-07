@@ -54,6 +54,7 @@ const UserReports = () => {
             borderRadius="lg"
             boxShadow="md"
             background="blue"
+            textColor="white"
             cursor="pointer"
             _hover={{ backgroundColor: "#4343f7" }}
             onClick={() => history.push(`/admin/hotel/${hotel.id}`)}
