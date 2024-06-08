@@ -17,13 +17,13 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { URL } from "Utils";
+
 const AddNewItem = ({
   isOpen,
   onClose,
   onAddItem,
   selectedHotel,
   selectedDate,
-  updateTableData,
   getData,
 }) => {
   const [itemName, setItemName] = useState("");
@@ -31,9 +31,16 @@ const AddNewItem = ({
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const token = localStorage.getItem("token");
 
   const handleAddItem = () => {
+    // Validation logic
+    if (!itemName || !quantity || !price || !category) {
+      setErrorMessage("All fields are required.");
+      return;
+    }
+
     const newItem = {
       itemName,
       quantity,
@@ -42,6 +49,7 @@ const AddNewItem = ({
       hotel_name: selectedHotel,
       date: selectedDate,
     };
+
     axios
       .post(
         `${URL}/api/daily-registers`,
@@ -58,15 +66,15 @@ const AddNewItem = ({
       .then((response) => {
         setSuccessMessage("Item added successfully!");
         onAddItem(newItem);
-        // updateTableData(onAddItem);
         onClose();
-
         getData();
       })
       .catch((error) => {
         console.error(error);
+        setErrorMessage("Failed to add item. Please try again.");
       });
   };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -91,7 +99,6 @@ const AddNewItem = ({
                 onChange={(e) => setCategory(e.target.value)}
               >
                 <option value="kitchen">Kitchen</option>
-
                 <option value="others">Others</option>
               </Select>
             </FormControl>
@@ -107,6 +114,11 @@ const AddNewItem = ({
               <Input value={price} onChange={(e) => setPrice(e.target.value)} />
             </FormControl>
           </VStack>
+          {errorMessage && (
+            <Text color="red.500" fontSize="sm">
+              {errorMessage}
+            </Text>
+          )}
           {successMessage && (
             <Text color="green.500" fontSize="sm">
               {successMessage}
