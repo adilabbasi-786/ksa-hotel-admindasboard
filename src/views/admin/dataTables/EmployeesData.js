@@ -72,7 +72,7 @@ const EmployeesData = ({ selectedHotel }) => {
       >
         Create new Employee
       </Button>
-      <Drivers />
+      {/* <Drivers /> */}
       <Grid
         templateColumns={{
           base: "1fr",
@@ -96,6 +96,7 @@ const EmployeesData = ({ selectedHotel }) => {
               passportImage={`${URL}${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
               banner={banner}
               status={employee.attributes.status}
+              Designation={employee.attributes.Designation}
               iqamaNumber={employee.attributes.iqamaNumber}
               passportExpiry={employee.attributes.passportExpiry}
               iqamaExpiry={employee.attributes.iqamaExpiry}

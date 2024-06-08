@@ -36,6 +36,7 @@ const Banner = ({
   iqamaNumber,
   passportExpiry,
   EmployeePhoneNumber,
+  Designation,
   iqamaExpiry,
   id,
   salary,
@@ -45,6 +46,7 @@ const Banner = ({
   const history = useHistory();
   const [isOpen, setIsOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [updatedEmployeeData, setUpdatedEmployeeData] = useState({
     EmployeeName: "",
     PassportNumber: "",
@@ -53,6 +55,7 @@ const Banner = ({
     passportExpiry: "",
     iqamaExpiry: "",
     EmployeePhoneNumber: "",
+    Designation: "",
     salary: "",
     iqamaPicture: null,
     passportImage: null,
@@ -72,6 +75,7 @@ const Banner = ({
         iqamaExpiry: iqamaExpiry,
         salary: salary,
         EmployeePhoneNumber: EmployeePhoneNumber,
+        Designation: Designation,
       });
     }
   }, [
@@ -84,12 +88,32 @@ const Banner = ({
     iqamaNumber,
     EmployeePhoneNumber,
     salary,
+    Designation,
   ]);
 
   const handleToggleEditMode = () => {
     setIsEditMode(!isEditMode);
   };
+  const handleDelete = async () => {
+    try {
+      const response = await axios.delete(`${URL}/api/employee-data/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
+      if (response.status === 200) {
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          setShowSuccessMessage(false);
+          setIsOpen(false);
+          fetchEmployeeData(); // Refresh the data after deletion
+        }, 1000);
+      }
+    } catch (error) {
+      console.error("Error deleting data:", error);
+    }
+  };
   const handleSaveChanges = () => {
     if (updatedEmployeeData.status === "active") {
       updatedEmployeeData.lastActiveDate = new Date().toISOString();
@@ -278,6 +302,17 @@ const Banner = ({
                   <option value="active">active</option>
                   <option value="inactive">inactive</option>
                 </Select>
+                <FormLabel>Employee Designation</FormLabel>
+                <Select
+                  name="Designation"
+                  placeholder="Select Designation"
+                  value={updatedEmployeeData.Designation}
+                  onChange={handleInputChange}
+                >
+                  <option value="manager">Manager</option>
+                  <option value="driver">Driver</option>
+                  <option value="hotel employee">Hotel Employee</option>
+                </Select>
                 <FormLabel>iqama Picture:</FormLabel>
                 <Input
                   type="file"
@@ -306,11 +341,41 @@ const Banner = ({
               Close
             </Button>
             <Button
+              colorScheme="red"
+              onClick={() => setIsDeleteConfirmOpen(true)}
+              ml={3}
+            >
+              Delete Employee
+            </Button>
+            <Button
               style={{ marginLeft: "10px" }}
               colorScheme="blue"
               onClick={isEditMode ? handleSaveChanges : handleToggleEditMode}
             >
               {isEditMode ? "Save" : "Edit"}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => setIsDeleteConfirmOpen(false)}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Confirm Delete</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>Are you sure you want to delete this employee?</ModalBody>
+          <ModalFooter>
+            <Button colorScheme="red" onClick={handleDelete}>
+              Yes, Delete
+            </Button>
+            <Button
+              colorScheme="blue"
+              onClick={() => setIsDeleteConfirmOpen(false)}
+              ml={3}
+            >
+              Cancel
             </Button>
           </ModalFooter>
         </ModalContent>

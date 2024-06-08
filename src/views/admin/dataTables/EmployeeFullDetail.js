@@ -83,6 +83,11 @@ const EmployeeFullDetail = ({ employeeData }) => {
           title="Employee Phone Number"
           value={employeeData.EmployeePhoneNumber}
         />
+        <Information
+          boxShadow={cardShadow}
+          title="Designation"
+          value={employeeData.Designation}
+        />
         <Box boxShadow={cardShadow}>
           <Text fontWeight="semibold">Iqama Picture</Text>
           <Box

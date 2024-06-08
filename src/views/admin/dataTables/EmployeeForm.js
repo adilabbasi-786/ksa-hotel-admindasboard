@@ -32,6 +32,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
     Employee_healtCard: null,
     hotel_name: selectedHotel,
     EmployeePhoneNumber: "",
+    Designation: "",
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formErrors, setFormErrors] = useState({
@@ -47,6 +48,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
     salary: "",
     EmployeePhoneNumber: "",
     Employee_healtCard: "",
+    Designation: "",
   });
 
   const handleChange = (e, fieldName) => {
@@ -96,6 +98,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
       "status",
       "salary",
       "EmployeePhoneNumber",
+      "Designation",
     ];
     let hasErrors = false;
     const newFormErrors = {};
@@ -184,6 +187,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
             />
             <Text color="red">{formErrors.employeePicture}</Text>
           </FormControl>
+
           <Flex direction={isMobile ? "column" : "row"}>
             <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
               <FormLabel>Employee name</FormLabel>
@@ -198,6 +202,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
             <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
               <FormLabel>Employee Salary</FormLabel>
               <Input
+                type="number"
                 name="EmployeeSalary"
                 value={formData.salary}
                 onChange={(e) => handleChange(e, "salary")}
@@ -208,6 +213,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
             <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
               <FormLabel>Employee Phone Number</FormLabel>
               <Input
+                type="number"
                 name="EmployeePhoneNumber"
                 value={formData.EmployeePhoneNumber}
                 onChange={(e) => handleChange(e, "EmployeePhoneNumber")}
@@ -227,6 +233,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
               <Text color="red">{formErrors.PassportNumber}</Text>
             </FormControl>
           </Flex>
+
           <Flex direction={isMobile ? "column" : "row"}>
             <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
               <FormLabel>Passport Expiry</FormLabel>
@@ -248,6 +255,22 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
                 placeholder="iqama Number"
               />
               <Text color="red">{formErrors.iqamaNumber}</Text>
+            </FormControl>
+          </Flex>
+          <Flex direction={isMobile ? "column" : "row"}>
+            <FormControl mr={!isMobile && 12} mb={isMobile ? 2 : 0}>
+              <FormLabel>Designation</FormLabel>
+              <Select
+                name="Designation"
+                placeholder="Select designation"
+                value={formData.Designation}
+                onChange={(e) => handleChange(e, "Designation")}
+              >
+                <option value="manager">Manager</option>
+                <option value="driver">Driver</option>
+                <option value="hotel employee">Hotel Employee</option>
+              </Select>
+              <Text color="red">{formErrors.designation}</Text>
             </FormControl>
           </Flex>
           <Flex direction={isMobile ? "column" : "row"}>
