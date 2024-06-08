@@ -270,7 +270,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
                 <option value="driver">Driver</option>
                 <option value="hotel employee">Hotel Employee</option>
               </Select>
-              <Text color="red">{formErrors.designation}</Text>
+              <Text color="red">{formErrors.Designation}</Text>
             </FormControl>
           </Flex>
           <Flex direction={isMobile ? "column" : "row"}>

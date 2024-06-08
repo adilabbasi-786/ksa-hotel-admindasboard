@@ -132,6 +132,11 @@ const EmployeeFullDetail = ({ employeeData }) => {
         />
         <Information
           boxShadow={cardShadow}
+          title="Designation"
+          value={employeeData.Designation}
+        />
+        <Information
+          boxShadow={cardShadow}
           title="Salary"
           value={employeeData.salary}
         />

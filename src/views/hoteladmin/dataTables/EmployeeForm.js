@@ -28,6 +28,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
     iqamaExpiry: "",
     status: "",
     salary: "",
+    Designation: "",
     iqamaPicture: null,
     passportImage: null,
     Employee_healtCard: null,
@@ -46,6 +47,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
     passportImage: "",
     salary: "",
     Employee_healtCard: "",
+    Designation: "",
   });
   const handleImageChange = async (e, key) => {
     console.log("E, key", e.target.files[0], key);
@@ -115,6 +117,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
       "status",
       "salary",
       "EmployeePhoneNumber",
+      "Designation",
     ];
     let hasErrors = false;
     const newFormErrors = {};
@@ -169,6 +172,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
           passportImage: formData.passportImage,
           EmployeePhoneNumber: formData.EmployeePhoneNumber,
           Employee_healtCard: formData.Employee_healtCard,
+          Designation: formData.Designation,
         },
       };
 
@@ -253,6 +257,22 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
                 placeholder="Passport Number"
               />
               <Text color="red">{formErrors.PassportNumber}</Text>
+            </FormControl>
+          </Flex>
+          <Flex direction={isMobile ? "column" : "row"}>
+            <FormControl mr={!isMobile && 12} mb={isMobile ? 2 : 0}>
+              <FormLabel>Designation</FormLabel>
+              <Select
+                name="Designation"
+                placeholder="Select designation"
+                value={formData.Designation}
+                onChange={(e) => handleChange(e, "Designation")}
+              >
+                <option value="manager">Manager</option>
+                <option value="driver">Driver</option>
+                <option value="hotel employee">Hotel Employee</option>
+              </Select>
+              <Text color="red">{formErrors.Designation}</Text>
             </FormControl>
           </Flex>
           <Flex direction={isMobile ? "column" : "row"}>
