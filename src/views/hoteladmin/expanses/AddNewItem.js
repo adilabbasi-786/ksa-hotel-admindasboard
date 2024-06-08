@@ -31,9 +31,15 @@ const AddNewItem = ({
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   const token = localStorage.getItem("token");
 
   const handleAddItem = () => {
+    if (!itemName || !quantity || !price || !category) {
+      setErrorMessage("please filled all field, All fields are required.");
+      return;
+    }
     const newItem = {
       itemName,
       quantity,
@@ -107,6 +113,11 @@ const AddNewItem = ({
               <Input value={price} onChange={(e) => setPrice(e.target.value)} />
             </FormControl>
           </VStack>
+          {errorMessage && (
+            <Text color="red.500" fontSize="sm">
+              {errorMessage}
+            </Text>
+          )}
           {successMessage && (
             <Text color="green.500" fontSize="sm">
               {successMessage}
