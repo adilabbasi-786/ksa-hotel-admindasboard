@@ -306,7 +306,6 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
                 placeholder="Active Date"
                 value={formData.lastActiveDate}
                 onChange={(e) => handleChange(e, "lastActiveDate")}
-                readOnly // make this field read-only
               />
               <Text color="red">{formErrors.lastActiveDate}</Text>
             </FormControl>
