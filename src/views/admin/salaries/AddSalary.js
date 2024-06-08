@@ -109,7 +109,7 @@ const AddSalary = ({
     } else {
       setAmount("");
     }
-  }, [entryType, month, employeeSalary]);
+  }, [entryType, month, employeeSalary, lastActiveDate]);
 
   const handleAddItem = async () => {
     if (

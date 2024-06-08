@@ -40,6 +40,14 @@ const AddSalary = ({
       fetchEmployeeName(selectedEmployee);
     }
   }, [selectedEmployee]);
+  useEffect(() => {
+    if (entryType === "monthly salary") {
+      const proratedSalary = calculateProratedSalary();
+      setAmount(proratedSalary.toFixed(2));
+    } else {
+      setAmount("");
+    }
+  }, [entryType, month, employeeSalary, lastActiveDate]);
   const token = localStorage.getItem("token");
 
   const fetchEmployeeName = async (employeeId) => {
