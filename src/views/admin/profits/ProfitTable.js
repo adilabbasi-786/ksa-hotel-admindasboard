@@ -31,6 +31,7 @@ const ProfitTable = ({ selectedHotel }) => {
   const [selectedMonth, setSelectedMonth] = useState("1");
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [partnerToDelete, setPartnerToDelete] = useState(null);
+  const [newlyAddedPartners, setNewlyAddedPartners] = useState([]);
 
   useEffect(() => {
     fetchPartnersData();
@@ -91,20 +92,26 @@ const ProfitTable = ({ selectedHotel }) => {
 
     // Check if adding the new partner will exceed 100% total ratio
     if (currentTotalRatio + newPartnerRatio <= 100) {
-      // Post new partner data to the backend
+      // Create new partner data object
       const newPartnerData = {
-        name: partnerName,
-        ratio: partnerRatio,
-        hotel_names: [selectedHotel],
-        month: selectedMonth,
-        // Other data fields as needed
+        id: Math.random().toString(36).substring(7), // Generate a temporary ID for the new partner
+        attributes: {
+          name: partnerName,
+          ratio: partnerRatio,
+          hotel_names: [selectedHotel],
+          month: selectedMonth,
+        },
       };
 
+      // Add the new partner to the newlyAddedPartners state
+      setNewlyAddedPartners([...newlyAddedPartners, newPartnerData]);
+
+      // Optionally, you can still post the new partner data to the backend if required
       axios
         .post(
           `${URL}/api/partners`,
           {
-            data: newPartnerData,
+            data: newPartnerData.attributes,
           },
           {
             headers: {
@@ -114,7 +121,7 @@ const ProfitTable = ({ selectedHotel }) => {
         )
         .then((response) => {
           console.log("New partner added:", response.data);
-          fetchPartnersData();
+          fetchPartnersData(); // Fetch partners data to update from backend
         })
         .catch((error) => {
           console.error("Error adding new partner:", error);
@@ -139,21 +146,34 @@ const ProfitTable = ({ selectedHotel }) => {
   };
 
   const handleDeletePartner = () => {
-    console.log("deleteing");
-    // Delete the selected partner
     if (partnerToDelete) {
-      // Make a DELETE request to the backend API to delete the partner
-      axios
-        .delete(`${URL}/${partnerToDelete.id}`)
-        .then((response) => {
-          console.log("Partner deleted:", response.data);
-          // After successful deletion, close the confirmation modal and refresh the partner data
-          setDeleteConfirmationOpen(false);
-          fetchPartnersData();
-        })
-        .catch((error) => {
-          console.error("Error deleting partner:", error);
-        });
+      // Check if the partner to delete is a newly added partner
+      const isNewPartner = newlyAddedPartners.some(
+        (partner) => partner.id === partnerToDelete.id
+      );
+
+      if (isNewPartner) {
+        // Remove the partner from the newly added partners state
+        setNewlyAddedPartners(
+          newlyAddedPartners.filter(
+            (partner) => partner.id !== partnerToDelete.id
+          )
+        );
+        setDeleteConfirmationOpen(false);
+      } else {
+        // Make a DELETE request to the backend API to delete the partner
+        axios
+          .delete(`${URL}/${partnerToDelete.id}`)
+          .then((response) => {
+            console.log("Partner deleted:", response.data);
+            // After successful deletion, close the confirmation modal and refresh the partner data
+            setDeleteConfirmationOpen(false);
+            fetchPartnersData();
+          })
+          .catch((error) => {
+            console.error("Error deleting partner:", error);
+          });
+      }
     }
   };
 
@@ -186,7 +206,7 @@ const ProfitTable = ({ selectedHotel }) => {
             Partner Profit Ratios
           </Text>
           <SimpleGrid columns={{ base: 1, md: 3 }} gap="20px" w="100%">
-            {partnersData.map((partner) => (
+            {[...partnersData, ...newlyAddedPartners].map((partner) => (
               <Information
                 key={partner.id}
                 boxShadow={cardShadow}

@@ -94,6 +94,7 @@ const EmployeesData = ({ selectedHotel }) => {
               name={employee.attributes.EmployeeName}
               passportNumber={employee.attributes.PassportNumber}
               avatar={`${URL}${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
+              employeePicture={`${URL}${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
               passportImage={`${URL}${employee?.attributes?.passportImage?.data?.attributes?.url}`}
               iqamaPicture={`${URL}${employee?.attributes?.iqamaPicture?.data?.attributes?.url}`}
               Employee_healtCard={`${URL}${employee?.attributes?.Employee_healtCard?.data?.attributes?.url}`}

@@ -89,6 +89,22 @@ const EmployeeFullDetail = ({ employeeData }) => {
           value={employeeData.Designation}
         />
         <Box boxShadow={cardShadow}>
+          <Text fontWeight="semibold">Employee profile Picture</Text>
+          <Box
+            onClick={() =>
+              openImageModal(
+                `${URL}${employeeData?.employeePicture?.data?.attributes?.url}`
+              )
+            }
+            cursor="pointer"
+          >
+            <Image
+              src={`${URL}${employeeData?.employeePicture?.data?.attributes?.formats?.thumbnail?.url}`}
+              alt="Iqama Picture"
+            />
+          </Box>
+        </Box>
+        <Box boxShadow={cardShadow}>
           <Text fontWeight="semibold">Iqama Picture</Text>
           <Box
             onClick={() =>

@@ -29,6 +29,7 @@ import { URL } from "Utils";
 const Banner = ({
   name,
   passportNumber,
+  employeePicture,
   iqamaPicture,
   status,
   avatar,
@@ -63,10 +64,12 @@ const Banner = ({
     salary: "",
     iqamaPicture: null,
     passportImage: null,
+    employeePicture: null,
     Employee_healtCard: null,
     iqamaPictureUrl: "",
     passportImageUrl: "",
     Employee_healtCardUrl: "",
+    employeePictureUrl: "",
   });
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const token = localStorage.getItem("token");
@@ -86,6 +89,7 @@ const Banner = ({
         iqamaPictureUrl: iqamaPicture,
         passportImageUrl: passportImage,
         Employee_healtCardUrl: Employee_healtCard,
+        employeePictureUrl: employeePicture,
       });
     }
   }, [
@@ -178,6 +182,10 @@ const Banner = ({
     formDataToSend.append(
       "files.Employee_healtCard",
       updatedEmployeeData.Employee_healtCard
+    );
+    formDataToSend.append(
+      "files.employeePicture",
+      updatedEmployeeData.employeePicture
     );
 
     axios
@@ -369,6 +377,19 @@ const Banner = ({
                   <option value="driver">Driver</option>
                   <option value="hotel employee">Hotel Employee</option>
                 </Select>
+                <FormLabel>employee Profile Picture:</FormLabel>
+                {updatedEmployeeData.employeePictureUrl && (
+                  <img
+                    src={updatedEmployeeData.employeePictureUrl}
+                    alt="profile Picture"
+                    width="100"
+                  />
+                )}
+                <Input
+                  type="file"
+                  name="employeePicture"
+                  onChange={handleFileInputChange}
+                />
                 <FormLabel>iqama Picture:</FormLabel>
                 {updatedEmployeeData.iqamaPictureUrl && (
                   <img
