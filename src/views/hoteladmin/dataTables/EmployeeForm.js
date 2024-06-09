@@ -229,6 +229,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
             <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
               <FormLabel>Employee Phone Number</FormLabel>
               <Input
+                type="number"
                 name="EmployeePhoneNumber"
                 value={formData.EmployeePhoneNumber}
                 onChange={(e) => handleChange(e, "EmployeePhoneNumber")}

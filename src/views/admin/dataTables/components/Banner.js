@@ -279,6 +279,7 @@ const Banner = ({
                 />
                 <FormLabel>Employee Phone number:</FormLabel>
                 <Input
+                  type="number"
                   name="EmployeePhoneNumber"
                   value={updatedEmployeeData.EmployeePhoneNumber}
                   onChange={handleInputChange}
