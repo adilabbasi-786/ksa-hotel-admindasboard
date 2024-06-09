@@ -280,7 +280,7 @@ const AddSalary = ({
                 type="number"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                readOnly={entryType === "monthly salary"}
+                // readOnly={entryType === "monthly salary"}
               />
             </FormControl>
           </VStack>
