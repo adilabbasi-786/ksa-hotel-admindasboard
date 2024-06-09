@@ -80,6 +80,30 @@ const HotelCard = ({
   };
 
   const handleSaveChanges = () => {
+    const {
+      title,
+      name,
+      managerName,
+      managerEmail,
+      managerPassword,
+      managerPhoneNumber,
+      kafeelName,
+      KafeelPhoneNumber,
+    } = updatedHotelData;
+
+    if (
+      !title ||
+      !name ||
+      !managerName ||
+      !managerEmail ||
+      !managerPassword ||
+      !managerPhoneNumber ||
+      !kafeelName ||
+      !KafeelPhoneNumber
+    ) {
+      alert("Please fill all the fields before saving.");
+      return;
+    }
     const formData = new FormData();
 
     // Append each field separately
