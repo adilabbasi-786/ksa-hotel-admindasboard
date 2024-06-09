@@ -367,7 +367,7 @@ export default function DevelopmentTable(props) {
                       </Text>
                     );
                   }
-                  if (cell.column.Header === "Unit Price") {
+                  if (cell.column.Header === "Price") {
                     data = (
                       <Text color={textColor} fontSize="sm" fontWeight="700">
                         {cell.value} SAR

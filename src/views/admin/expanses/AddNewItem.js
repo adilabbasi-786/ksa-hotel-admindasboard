@@ -105,13 +105,18 @@ const AddNewItem = ({
             <FormControl>
               <FormLabel>Quantity</FormLabel>
               <Input
+                type="number"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
               />
             </FormControl>
             <FormControl>
               <FormLabel>Price</FormLabel>
-              <Input value={price} onChange={(e) => setPrice(e.target.value)} />
+              <Input
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
             </FormControl>
           </VStack>
           {errorMessage && (
