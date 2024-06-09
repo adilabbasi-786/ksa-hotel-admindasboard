@@ -48,6 +48,7 @@ const HotelCard = ({
   ComercialCertificate,
   TaxVatPicture,
   image,
+  getData,
   ...rest
 }) => {
   const hotelImageSrc = image || hotelImage;
@@ -123,6 +124,7 @@ const HotelCard = ({
       })
       .then((response) => {
         alert("Data updated successfully");
+        getData();
         history.push("/admin/hotel");
 
         const updatedHotel = {

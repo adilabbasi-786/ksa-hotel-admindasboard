@@ -18,22 +18,21 @@ const Hotels = () => {
     "0px 18px 40px rgba(112, 144, 176, 0.12)",
     "unset"
   );
+  const getData = async () => {
+    let req = await fetch(
+      `${URL}/api/hotel-names?populate=*`,
 
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    let res = await req.json();
+    setHotels(res.data);
+    console.log("data", res.data);
+  };
   useEffect(() => {
-    const getData = async () => {
-      let req = await fetch(
-        `${URL}/api/hotel-names?populate=*`,
-
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      let res = await req.json();
-      setHotels(res.data);
-      console.log("data", res.data);
-    };
     getData();
   }, []);
 
@@ -102,6 +101,7 @@ const Hotels = () => {
               liscencePicture={`${URL}${hotel?.attributes?.liscencePicture?.data?.attributes?.url}`}
               ComercialCertificate={`${URL}${hotel?.attributes?.ComercialCertificate?.data?.attributes?.url}`}
               TaxVatPicture={`${URL}${hotel?.attributes?.TaxVatPicture?.data?.attributes?.url}`}
+              getData={getData}
             />
           ))}
       </Card>
