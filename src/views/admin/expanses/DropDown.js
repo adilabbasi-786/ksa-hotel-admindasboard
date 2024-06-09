@@ -46,7 +46,7 @@ const DropDown = ({ onSelectHotel }) => {
   return (
     <Card mb={{ base: "0px", "2xl": "20px" }}>
       <Text color={textColorPrimary} fontWeight="bold" fontSize="xl" mt="10px">
-        Select Hotel
+        Select Hotels
       </Text>
       <Select
         placeholder="Select Hotel"
