@@ -82,29 +82,28 @@ const AddSalary = ({
     }
   };
 
-  const calculateProratedSalary = () => {
-    if (!lastActiveDate) return parseInt(employeeSalary);
+  const calculateProratedSalary = (month) => {
+    if (!lastActiveDate) return parseFloat(employeeSalary);
 
-    const currentDate = new Date();
     const lastActive = new Date(lastActiveDate);
+    const activeMonth = lastActive.getMonth() + 1;
+    const currentMonth = month;
 
-    // Get the day of the month of the last active date
+    if (currentMonth !== activeMonth) {
+      return parseFloat(employeeSalary);
+    }
+
     const dayOfMonth = lastActive.getDate();
-
-    // Calculate the number of days remaining in the month starting from the active date
     const daysRemainingInMonth = Math.min(30, 30 - dayOfMonth + 1);
-
-    // Calculate the daily salary
-    const dailySalary = parseFloat(employeeSalary) / 30; // Assuming 30 days in a month
-
-    // Calculate the prorated salary
+    const dailySalary = parseFloat(employeeSalary) / 30;
     const proratedSalary = dailySalary * daysRemainingInMonth;
 
-    return isNaN(proratedSalary) ? 0 : Math.floor(proratedSalary); // Round down to the nearest integer
+    return isNaN(proratedSalary) ? 0 : Math.floor(proratedSalary);
   };
+
   useEffect(() => {
     if (entryType === "monthly salary") {
-      const proratedSalary = calculateProratedSalary();
+      const proratedSalary = calculateProratedSalary(month);
       setAmount(proratedSalary.toFixed(2));
     } else {
       setAmount("");
@@ -154,6 +153,7 @@ const AddSalary = ({
       console.error("Error adding salary entry:", error);
       alert("Failed to add salary entry. Please try again later.");
     }
+
     if (entryType === "advance") {
       try {
         const advanceResponse = await axios.post(
@@ -286,7 +286,7 @@ const AddSalary = ({
                 type="number"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                readOnly={entryType === "monthly salary"}
+                // readOnly={entryType === "monthly salary"}
               />
             </FormControl>
           </VStack>
