@@ -18,6 +18,7 @@ const KitchenExpanses = ({ selectedHotel }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(getCurrentDate());
   const [tableData, setTableData] = useState([]);
+
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const token = localStorage.getItem("token");
 
@@ -38,11 +39,13 @@ const KitchenExpanses = ({ selectedHotel }) => {
             item.attributes.quantity * item.attributes.price
           ).toFixed(1);
           return {
+            id: item.id,
             itemName: item.attributes.itemName,
             category: item?.attributes?.category,
-            quantity: `${item.attributes.quantity} ${
-              item.attributes.quantity === "kitchen" ? "others" : "kg"
-            }`,
+            quantity: item?.attributes?.quantity,
+            //  ${
+            //   item.attributes.quantity === "kitchen" ? "others" : "kg"
+            // }`,
             price: item.attributes.price,
             totalPrice: totalPrice,
             tax: item.attributes.tax,
@@ -118,6 +121,7 @@ const KitchenExpanses = ({ selectedHotel }) => {
             columnsData={columnsData}
             tableData={tableData}
             updateTableData={handleUpdateTableData}
+            getData={getData}
           />
           <Button
             colorScheme="blue"

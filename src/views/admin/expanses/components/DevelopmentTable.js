@@ -44,6 +44,10 @@ export default function DevelopmentTable(props) {
   const [salary, setSalary] = useState("");
   const [sumSalary, setSumSalary] = useState("");
   const [sumofAllTax, setSumofAllTax] = useState(0);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [editValues, setEditValues] = useState({});
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleTodaySaleModalClose = () => setShowTodaySaleModal(false);
   const handleAdvanceSalaryModalClose = () => setShowAdvanceSalaryModal(false);
@@ -56,6 +60,7 @@ export default function DevelopmentTable(props) {
     selectedHotel,
     selectedDate,
     updateTableData,
+    getData,
   } = props;
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
 
@@ -208,11 +213,88 @@ export default function DevelopmentTable(props) {
 
     return newData;
   }, [tableData]);
-
+  useEffect(() => {
+    console.log("Editing Item:", editingItem);
+    console.log("Edit Values:", editValues);
+  }, [editValues]);
   useEffect(() => {
     console.log("Total Tax:", sumofAllTax.toFixed(2));
   }, [sumofAllTax]);
+  const handleEditClick = (item) => {
+    setEditingItem(item);
 
+    setEditValues({
+      itemName: item.itemName,
+      category: item.category,
+      quantity: String(item.quantity),
+      price: item.price,
+    });
+    setIsEditMode(true);
+  };
+  const handleSaveEdit = async () => {
+    if (!editingItem || !editingItem.id) {
+      console.error("Editing item or its ID is not defined.");
+      return;
+    }
+
+    // Check if any fields are empty
+    if (
+      !editValues.itemName ||
+      !editValues.category ||
+      !editValues.quantity ||
+      !editValues.price
+    ) {
+      setErrorMessage("All fields should be filled.");
+      return;
+    }
+
+    try {
+      const response = await axios.put(
+        `${URL}/api/daily-registers/${editingItem.id}`,
+        {
+          data: {
+            itemName: editValues.itemName,
+            category: editValues.category,
+            quantity: editValues.quantity,
+            price: editValues.price,
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Update local state with the new data
+      const updatedData = tableData.map((item) =>
+        item.id === editingItem.id
+          ? {
+              ...item,
+              itemName: editValues.itemName,
+              category: editValues.category,
+              quantity: editValues.quantity,
+              price: editValues.price,
+              totalPrice: (editValues.quantity * editValues.price).toFixed(2), // Update totalPrice
+            }
+          : item
+      );
+
+      // Update the table data state
+      updateTableData(updatedData);
+      getData();
+
+      // Reset modal state
+      setIsEditMode(false);
+      setEditingItem(null);
+      setEditValues({});
+      setErrorMessage(""); // Clear error message
+
+      console.log("Item updated successfully:", response.data);
+    } catch (error) {
+      console.error("Error updating the item:", error);
+    }
+  };
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => dataWithTax, [dataWithTax]);
 
@@ -402,7 +484,7 @@ export default function DevelopmentTable(props) {
                   );
                 })}
                 <Td>
-                  <Button>
+                  <Button onClick={() => handleEditClick(row.original)}>
                     <MdEdit color={iconColor} />
                   </Button>
                 </Td>
@@ -598,6 +680,84 @@ export default function DevelopmentTable(props) {
               Pay
             </Button>
             <Button colorScheme="blue" ml={3} onClick={handlePaymentModalClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={isEditMode} onClose={() => setIsEditMode(false)} size="sm">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit Daily Expense</ModalHeader>
+          <ModalBody>
+            {errorMessage && (
+              <Text color="red" mb="4">
+                {errorMessage}
+              </Text>
+            )}
+            {editingItem && (
+              <div>
+                <Text color={textColorPrimary} fontWeight="bold">
+                  Item Name:
+                  <Input
+                    type="text"
+                    value={editValues.itemName || ""}
+                    onChange={(e) =>
+                      setEditValues({
+                        ...editValues,
+                        itemName: e.target.value,
+                      })
+                    }
+                  />
+                </Text>
+                <Text color={textColorPrimary} fontWeight="bold">
+                  Category:
+                  <Input
+                    type="text"
+                    value={editValues.category || ""}
+                    onChange={(e) =>
+                      setEditValues({
+                        ...editValues,
+                        category: e.target.value,
+                      })
+                    }
+                  />
+                </Text>
+                <Text color={textColorPrimary} fontWeight="bold">
+                  Quantity:
+                  <Input
+                    type="number"
+                    value={editValues.quantity}
+                    onChange={(e) =>
+                      setEditValues({
+                        ...editValues,
+                        quantity: e.target.value,
+                      })
+                    }
+                  />
+                </Text>
+                <Text color={textColorPrimary} fontWeight="bold">
+                  Price:
+                  <Input
+                    type="number"
+                    value={editValues.price || ""}
+                    onChange={(e) =>
+                      setEditValues({ ...editValues, price: e.target.value })
+                    }
+                  />
+                </Text>
+              </div>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" onClick={handleSaveEdit}>
+              Save
+            </Button>
+            <Button
+              colorScheme="blue"
+              ml={3}
+              onClick={() => setIsEditMode(false)}
+            >
               Close
             </Button>
           </ModalFooter>
