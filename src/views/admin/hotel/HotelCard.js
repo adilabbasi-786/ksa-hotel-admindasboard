@@ -47,7 +47,6 @@ const HotelCard = ({
   liscencePicture,
   ComercialCertificate,
   TaxVatPicture,
-  hotelRent,
   image,
   ...rest
 }) => {
@@ -60,7 +59,6 @@ const HotelCard = ({
     managerName: managerName,
     managerEmail: managerEmail,
     managerPassword: managerPassword,
-    hotelRent: hotelRent,
     managerPhoneNumber: managerPhoneNumber,
     kafeelName: kafeelName,
     KafeelPhoneNumber: KafeelPhoneNumber,
@@ -82,19 +80,39 @@ const HotelCard = ({
 
   const handleSaveChanges = () => {
     const formData = new FormData();
-    formData.append("data", JSON.stringify(updatedHotelData));
-    if (updatedHotelData.liscencePicture instanceof File)
+
+    // Append each field separately
+    formData.append("title", updatedHotelData.title || "");
+    formData.append("name", updatedHotelData.name || "");
+    formData.append("managerName", updatedHotelData.managerName || "");
+    formData.append("managerEmail", updatedHotelData.managerEmail || "");
+    formData.append("managerPassword", updatedHotelData.managerPassword || "");
+    formData.append(
+      "managerPhoneNumber",
+      updatedHotelData.managerPhoneNumber || ""
+    );
+    formData.append("kafeelName", updatedHotelData.kafeelName || "");
+    formData.append(
+      "KafeelPhoneNumber",
+      updatedHotelData.KafeelPhoneNumber || ""
+    );
+
+    // Append files only if they are instances of File
+    if (updatedHotelData.liscencePicture instanceof File) {
       formData.append(
         "files.liscencePicture",
         updatedHotelData.liscencePicture
       );
-    if (updatedHotelData.TaxVatPicture instanceof File)
+    }
+    if (updatedHotelData.TaxVatPicture instanceof File) {
       formData.append("files.TaxVatPicture", updatedHotelData.TaxVatPicture);
-    if (updatedHotelData.ComercialCertificate instanceof File)
+    }
+    if (updatedHotelData.ComercialCertificate instanceof File) {
       formData.append(
         "files.ComercialCertificate",
         updatedHotelData.ComercialCertificate
       );
+    }
 
     axios
       .put(`${URL}/api/hotel-names/${id}`, formData, {
@@ -104,8 +122,9 @@ const HotelCard = ({
         },
       })
       .then((response) => {
-        alert("Data updated successfully:");
+        alert("Data updated successfully");
         history.push("/admin/hotel");
+
         const updatedHotel = {
           ...response.data,
           id, // Ensure the ID is included
@@ -160,6 +179,10 @@ const HotelCard = ({
   const getPreviewUrl = (file) => {
     if (!file) return null;
     return typeof file === "string" ? file : window.URL.createObjectURL(file);
+  };
+  const getFilename = (file) => {
+    if (!file) return "No file chosen";
+    return typeof file === "string" ? file.split("/").pop() : file.name;
   };
 
   return (
@@ -235,7 +258,7 @@ const HotelCard = ({
           <ModalHeader>Edit Hotel Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Box>
+            {/* <Box>
               <Text fontSize="md" fontWeight="bold" mb="10px">
                 Title:
               </Text>
@@ -245,7 +268,7 @@ const HotelCard = ({
                 onChange={handleInputChange}
                 name="title"
               />
-            </Box>
+            </Box> */}
             <Box mt="10px">
               <Text fontSize="md" fontWeight="bold" mb="10px">
                 Name:
@@ -326,11 +349,11 @@ const HotelCard = ({
             </Box>
             <Box mt="10px">
               <FormControl>
-                <FormLabel>Liscence Picture:</FormLabel>
+                <FormLabel>License Picture:</FormLabel>
                 {updatedHotelData.liscencePicture && (
                   <Image
                     src={getPreviewUrl(updatedHotelData.liscencePicture)}
-                    alt="Liscence Picture"
+                    alt="License Picture"
                     boxSize="100px"
                     objectFit="cover"
                     mb="10px"
@@ -342,8 +365,10 @@ const HotelCard = ({
                   accept="image/*"
                   onChange={handleFileInputChange}
                 />
+                <Text>{getFilename(updatedHotelData.liscencePicture)}</Text>
               </FormControl>
             </Box>
+
             <Box mt="10px">
               <FormControl>
                 <FormLabel>Tax VAT Picture:</FormLabel>
@@ -362,15 +387,17 @@ const HotelCard = ({
                   accept="image/*"
                   onChange={handleFileInputChange}
                 />
+                <Text>{getFilename(updatedHotelData.TaxVatPicture)}</Text>
               </FormControl>
             </Box>
+
             <Box mt="10px">
               <FormControl>
-                <FormLabel>Comercial Certificate:</FormLabel>
+                <FormLabel>Commercial Certificate:</FormLabel>
                 {updatedHotelData.ComercialCertificate && (
                   <Image
                     src={getPreviewUrl(updatedHotelData.ComercialCertificate)}
-                    alt="Comercial Certificate"
+                    alt="Commercial Certificate"
                     boxSize="100px"
                     objectFit="cover"
                     mb="10px"
@@ -382,6 +409,9 @@ const HotelCard = ({
                   accept="image/*"
                   onChange={handleFileInputChange}
                 />
+                <Text>
+                  {getFilename(updatedHotelData.ComercialCertificate)}
+                </Text>
               </FormControl>
             </Box>
           </ModalBody>
