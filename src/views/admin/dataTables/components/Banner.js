@@ -39,7 +39,6 @@ const Banner = ({
   EmployeePhoneNumber,
   Employee_healtCard,
   passportImage,
-
   Designation,
   iqamaExpiry,
   id,
@@ -51,6 +50,7 @@ const Banner = ({
   const [isOpen, setIsOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [showErrorMessage, setShowErrorMessage] = useState(false); // Error message state
   const [updatedEmployeeData, setUpdatedEmployeeData] = useState({
     EmployeeName: "",
     PassportNumber: "",
@@ -104,6 +104,7 @@ const Banner = ({
   const handleToggleEditMode = () => {
     setIsEditMode(!isEditMode);
   };
+
   const handleDelete = async () => {
     try {
       const response = await axios.delete(`${URL}/api/employee-data/${id}`, {
@@ -124,7 +125,42 @@ const Banner = ({
       console.error("Error deleting data:", error);
     }
   };
+
+  // Validation Function
+  const validateFormData = () => {
+    const {
+      EmployeeName,
+      PassportNumber,
+      status,
+      iqamaNumber,
+      passportExpiry,
+      iqamaExpiry,
+      EmployeePhoneNumber,
+      Designation,
+      salary,
+    } = updatedEmployeeData;
+
+    return (
+      EmployeeName &&
+      PassportNumber &&
+      status &&
+      iqamaNumber &&
+      passportExpiry &&
+      iqamaExpiry &&
+      EmployeePhoneNumber &&
+      Designation &&
+      salary
+    );
+  };
+
   const handleSaveChanges = () => {
+    if (!validateFormData()) {
+      setShowErrorMessage(true); // Show error message if validation fails
+      return;
+    }
+
+    setShowErrorMessage(false); // Hide error message if validation passes
+
     if (updatedEmployeeData.status === "active") {
       updatedEmployeeData.lastActiveDate = new Date().toISOString();
     }
@@ -359,7 +395,6 @@ const Banner = ({
                   name="passportImage"
                   onChange={handleFileInputChange}
                 />
-
                 <FormLabel>Employee Health Card Picture:</FormLabel>
                 {updatedEmployeeData.Employee_healtCardUrl && (
                   <img
@@ -376,6 +411,13 @@ const Banner = ({
               </FormControl>
             ) : (
               <EmployeeFullDetail employeeData={employeeData} />
+            )}
+            {/* Error Message */}
+            {showErrorMessage && (
+              <Alert status="error" mt="4" borderRadius="md">
+                <AlertIcon />
+                Please fill out all required fields.
+              </Alert>
             )}
           </ModalBody>
           <ModalFooter>
