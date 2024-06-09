@@ -85,6 +85,7 @@ const EmployeesData = ({ selectedHotel }) => {
         gap={{ base: "20px", xl: "20px" }}
       >
         {employeeData?.data?.map((employee) => {
+          console.log("employeedata", employeeData.data[0].attributes);
           return (
             <Banner
               id={employee.id}
@@ -93,7 +94,9 @@ const EmployeesData = ({ selectedHotel }) => {
               name={employee.attributes.EmployeeName}
               passportNumber={employee.attributes.PassportNumber}
               avatar={`${URL}${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
-              passportImage={`${URL}${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
+              passportImage={`${URL}${employee?.attributes?.passportImage?.data?.attributes?.url}`}
+              iqamaPicture={`${URL}${employee?.attributes?.iqamaPicture?.data?.attributes?.url}`}
+              Employee_healtCard={`${URL}${employee?.attributes?.Employee_healtCard?.data?.attributes?.url}`}
               banner={banner}
               status={employee.attributes.status}
               Designation={employee.attributes.Designation}

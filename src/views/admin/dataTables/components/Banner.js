@@ -29,6 +29,7 @@ import { URL } from "Utils";
 const Banner = ({
   name,
   passportNumber,
+  iqamaPicture,
   status,
   avatar,
   banner,
@@ -36,6 +37,9 @@ const Banner = ({
   iqamaNumber,
   passportExpiry,
   EmployeePhoneNumber,
+  Employee_healtCard,
+  passportImage,
+
   Designation,
   iqamaExpiry,
   id,
@@ -60,6 +64,9 @@ const Banner = ({
     iqamaPicture: null,
     passportImage: null,
     Employee_healtCard: null,
+    iqamaPictureUrl: "",
+    passportImageUrl: "",
+    Employee_healtCardUrl: "",
   });
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const token = localStorage.getItem("token");
@@ -76,6 +83,9 @@ const Banner = ({
         salary: salary,
         EmployeePhoneNumber: EmployeePhoneNumber,
         Designation: Designation,
+        iqamaPictureUrl: iqamaPicture,
+        passportImageUrl: passportImage,
+        Employee_healtCardUrl: Employee_healtCard,
       });
     }
   }, [
@@ -165,7 +175,16 @@ const Banner = ({
 
   const handleFileInputChange = (event) => {
     const { name, files } = event.target;
-    setUpdatedEmployeeData((prevData) => ({ ...prevData, [name]: files[0] }));
+    if (files.length > 0) {
+      const file = files[0];
+      const previewUrl = window.URL.createObjectURL(file);
+
+      setUpdatedEmployeeData((prevData) => ({
+        ...prevData,
+        [name]: file,
+        [`${name}Url`]: previewUrl,
+      }));
+    }
   };
 
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
@@ -314,18 +333,40 @@ const Banner = ({
                   <option value="hotel employee">Hotel Employee</option>
                 </Select>
                 <FormLabel>iqama Picture:</FormLabel>
+                {updatedEmployeeData.iqamaPictureUrl && (
+                  <img
+                    src={updatedEmployeeData.iqamaPictureUrl}
+                    alt="Iqama Picture"
+                    width="100"
+                  />
+                )}
                 <Input
                   type="file"
                   name="iqamaPicture"
                   onChange={handleFileInputChange}
                 />
                 <FormLabel>Passport Picture:</FormLabel>
+                {updatedEmployeeData.passportImageUrl && (
+                  <img
+                    src={updatedEmployeeData.passportImageUrl}
+                    alt="Passport Picture"
+                    width="100"
+                  />
+                )}
                 <Input
                   type="file"
                   name="passportImage"
                   onChange={handleFileInputChange}
                 />
+
                 <FormLabel>Employee Health Card Picture:</FormLabel>
+                {updatedEmployeeData.Employee_healtCardUrl && (
+                  <img
+                    src={updatedEmployeeData.Employee_healtCardUrl}
+                    alt="Health Card Picture"
+                    width="100"
+                  />
+                )}
                 <Input
                   type="file"
                   name="Employee_healtCard"
