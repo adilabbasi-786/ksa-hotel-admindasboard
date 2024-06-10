@@ -76,7 +76,7 @@ const AddSalary = ({
       setEmployeeName(employeeData.attributes.EmployeeName);
       setEmployeeSalary(employeeData.attributes.salary);
       setLastActiveDate(employeeData.attributes.lastActiveDate);
-      setAmount(employeeData.attributes.salary);
+      // setAmount(employeeData.attributes.salary);
     } catch (error) {
       console.error("Error fetching employee details:", error);
     }
@@ -104,7 +104,7 @@ const AddSalary = ({
   useEffect(() => {
     if (entryType === "monthly salary") {
       const proratedSalary = calculateProratedSalary(month);
-      setAmount(proratedSalary.toFixed(2));
+      setAmount("");
     } else {
       setAmount("");
     }
