@@ -29,7 +29,7 @@ const AddSalary = ({
 }) => {
   const [entryType, setEntryType] = useState("monthly salary");
   const [amount, setAmount] = useState("");
-  const [month, setMonth] = useState(new Date().getMonth() + 1);
+  const [month, setMonth] = useState("");
   const [employeeName, setEmployeeName] = useState(""); // State to store employee name
   const [employeeSalary, setEmployeeSalary] = useState("");
   const [lastActiveDate, setLastActiveDate] = useState("");
@@ -41,9 +41,14 @@ const AddSalary = ({
     }
   }, [selectedEmployee]);
   useEffect(() => {
+    if (isOpen) {
+      setAmount(""); // Clear the amount when the modal is opened
+      setMonth(""); // Clear the month when the modal is opened
+    }
+  }, [isOpen]);
+  useEffect(() => {
     if (entryType === "monthly salary") {
-      const proratedSalary = calculateProratedSalary();
-      setAmount(proratedSalary.toFixed(2));
+      setAmount("");
     } else {
       setAmount("");
     }
@@ -65,7 +70,7 @@ const AddSalary = ({
       setEmployeeName(employeeData.attributes.EmployeeName);
       setEmployeeSalary(employeeData.attributes.salary);
       setLastActiveDate(employeeData.attributes.lastActiveDate);
-      setAmount(employeeData.attributes.salary);
+      // setAmount(employeeData.attributes.salary);
     } catch (error) {
       console.error("Error fetching employee name:", error);
     }
@@ -92,8 +97,7 @@ const AddSalary = ({
   };
   useEffect(() => {
     if (entryType === "monthly salary") {
-      const proratedSalary = calculateProratedSalary();
-      setAmount(proratedSalary.toFixed(2));
+      setAmount("");
     } else {
       setAmount("");
     }
