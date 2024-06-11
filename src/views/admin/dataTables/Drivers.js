@@ -6,6 +6,7 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
+  ModalFooter,
   Button,
   Text,
   Input,
@@ -32,6 +33,7 @@ const Drivers = () => {
   const [passportPicture, setPassportPicture] = useState(null);
   const [healthCard, sethealthCard] = useState(null);
   const [selectedDriver, setSelectedDriver] = useState(null);
+  const [EmployeePicture, setEmployeePicture] = useState(null);
   const [selectedDriverDetails, setSelectedDriverDetails] = useState(null);
   const [token, setToken] = useState("");
 
@@ -87,6 +89,9 @@ const Drivers = () => {
       const healthCardUpload = healthCard
         ? await handleFileUpload(healthCard)
         : null;
+      const employeepicutreUpload = EmployeePicture
+        ? await handleFileUpload(EmployeePicture)
+        : null;
 
       const response = await axios.post(
         `${URL}/api/driver-details`,
@@ -103,6 +108,7 @@ const Drivers = () => {
             iqamaPicture: iqamaPictureUpload?.id,
             passportImage: passportPictureUpload?.id,
             healthCard: healthCardUpload?.id,
+            EmployeePicture: employeepicutreUpload?.id,
           },
         },
         {
@@ -116,9 +122,15 @@ const Drivers = () => {
       setNewDriverName("");
       setNewDriverLicenseNumber("");
       setNewSalary("");
+      setNewPassportNumber("");
+      setNewiqamaNumber("");
+      setNewdriverPhoneNumber("");
+      setNewpassportExpiry("");
+      setNewiqamaExpiry("");
       setIqamaPicture(null);
       setPassportPicture(null);
       sethealthCard(null);
+      setEmployeePicture(null);
       onAddModalClose();
     } catch (error) {
       console.error("Error adding new driver:", error);
@@ -153,6 +165,14 @@ const Drivers = () => {
             driverName: newDriverName,
             driverLisenceNumber: newDriverLicenseNumber,
             salary: newSalary,
+            PassportNumber: newPassportNumber,
+            iqamaNumber: newiqamaNumber,
+            driverPhoneNumber: newdriverPhoneNumber,
+            passportExpiry: newpassportExpiry,
+            iqamaExpiry: newiqamaExpiry,
+            iqamaPicture: iqamaPicture,
+            passportImage: passportPicture,
+            healthCard: healthCard,
           },
         },
         {
@@ -171,6 +191,14 @@ const Drivers = () => {
       setNewDriverName("");
       setNewDriverLicenseNumber("");
       setNewSalary("");
+      setNewPassportNumber("");
+      setNewiqamaNumber("");
+      setNewdriverPhoneNumber("");
+      setNewpassportExpiry("");
+      setNewiqamaExpiry("");
+      setIqamaPicture(null);
+      setPassportPicture(null);
+      sethealthCard(null);
       onEditModalClose();
     } catch (error) {
       console.error("Error editing driver:", error);
@@ -203,7 +231,7 @@ const Drivers = () => {
     setSelectedDriver(driver);
     try {
       const response = await axios.get(
-        `${URL}/api/driver-details/${driver.id}`,
+        `${URL}/api/driver-details/${driver.id}?populate=*`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -335,6 +363,13 @@ const Drivers = () => {
               onChange={(e) => setNewiqamaExpiry(e.target.value)}
               mb="4"
             />
+            <FormLabel>Driver profile Picture</FormLabel>
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setEmployeePicture(e.target.files[0])}
+              mb="4"
+            />
             <FormLabel>Iqama Picture</FormLabel>
             <Input
               type="file"
@@ -423,6 +458,11 @@ const Drivers = () => {
               <DriversFullDetail driver={selectedDriverDetails} />
             )}
           </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" onClick={onDetailModalClose}>
+              Close
+            </Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
     </>
