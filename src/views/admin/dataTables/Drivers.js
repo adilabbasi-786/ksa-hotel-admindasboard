@@ -13,6 +13,8 @@ import {
   Flex,
   useDisclosure,
   FormLabel,
+  Spinner,
+  useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { URL } from "Utils";
@@ -32,10 +34,13 @@ const Drivers = () => {
   const [iqamaPicture, setIqamaPicture] = useState(null);
   const [passportPicture, setPassportPicture] = useState(null);
   const [healthCard, sethealthCard] = useState(null);
-  const [selectedDriver, setSelectedDriver] = useState(null);
   const [EmployeePicture, setEmployeePicture] = useState(null);
+  const [selectedDriver, setSelectedDriver] = useState(null);
   const [selectedDriverDetails, setSelectedDriverDetails] = useState(null);
   const [token, setToken] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const toast = useToast();
 
   const {
     isOpen: isViewModalOpen,
@@ -48,77 +53,89 @@ const Drivers = () => {
     onClose: onAddModalClose,
   } = useDisclosure();
   const {
-    isOpen: isEditModalOpen,
-    onOpen: onEditModalOpen,
-    onClose: onEditModalClose,
-  } = useDisclosure();
-  const {
     isOpen: isDetailModalOpen,
     onOpen: onDetailModalOpen,
     onClose: onDetailModalClose,
   } = useDisclosure();
 
+  const fetchDrivers = async () => {
+    try {
+      const response = await axios.get(`${URL}/api/driver-details`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setDriversData(response.data.data);
+    } catch (error) {
+      console.error("Error fetching drivers data:", error);
+    }
+  };
+
+  // Move fetchDrivers outside the useEffect so it can be used in multiple places
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     setToken(storedToken);
-
-    const fetchDrivers = async () => {
-      try {
-        const response = await axios.get(`${URL}/api/driver-details`, {
-          headers: {
-            Authorization: `Bearer ${storedToken}`,
-          },
-        });
-        setDriversData(response.data.data);
-      } catch (error) {
-        console.error("Error fetching drivers data:", error);
-      }
-    };
-
     fetchDrivers();
   }, []);
 
   const handleAddDriver = async () => {
+    // Perform validations and handle empty field checks here...
+    if (
+      !newDriverName ||
+      !newDriverLicenseNumber ||
+      !newSalary ||
+      !newPassportNumber ||
+      !newiqamaNumber ||
+      !newdriverPhoneNumber ||
+      !newpassportExpiry ||
+      !newiqamaExpiry ||
+      !iqamaPicture ||
+      !passportPicture ||
+      !healthCard ||
+      !EmployeePicture
+    ) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+
     try {
-      const iqamaPictureUpload = iqamaPicture
-        ? await handleFileUpload(iqamaPicture)
-        : null;
-      const passportPictureUpload = passportPicture
-        ? await handleFileUpload(passportPicture)
-        : null;
-      const healthCardUpload = healthCard
-        ? await handleFileUpload(healthCard)
-        : null;
-      const employeepicutreUpload = EmployeePicture
-        ? await handleFileUpload(EmployeePicture)
-        : null;
+      const iqamaPictureUpload = await handleFileUpload(iqamaPicture);
+      const passportPictureUpload = await handleFileUpload(passportPicture);
+      const healthCardUpload = await handleFileUpload(healthCard);
+      const employeepicutreUpload = await handleFileUpload(EmployeePicture);
+
+      const newDriver = {
+        driverName: newDriverName,
+        driverLisenceNumber: newDriverLicenseNumber,
+        salary: newSalary,
+        PassportNumber: newPassportNumber,
+        iqamaNumber: newiqamaNumber,
+        driverPhoneNumber: newdriverPhoneNumber,
+        passportExpiry: newpassportExpiry,
+        iqamaExpiry: newiqamaExpiry,
+        iqamaPicture: iqamaPictureUpload?.id,
+        passportImage: passportPictureUpload?.id,
+        healthCard: healthCardUpload?.id,
+        EmployeePicture: employeepicutreUpload?.id,
+      };
 
       const response = await axios.post(
         `${URL}/api/driver-details`,
+        { data: newDriver },
         {
-          data: {
-            driverName: newDriverName,
-            driverLisenceNumber: newDriverLicenseNumber,
-            salary: newSalary,
-            PassportNumber: newPassportNumber,
-            iqamaNumber: newiqamaNumber,
-            driverPhoneNumber: newdriverPhoneNumber,
-            passportExpiry: newpassportExpiry,
-            iqamaExpiry: newiqamaExpiry,
-            iqamaPicture: iqamaPictureUpload?.id,
-            passportImage: passportPictureUpload?.id,
-            healthCard: healthCardUpload?.id,
-            EmployeePicture: employeepicutreUpload?.id,
-          },
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      setDriversData([...driversData, response.data.data]);
+      setDriversData((prevDriversData) => [
+        ...prevDriversData,
+        response.data.data,
+      ]);
+
+      // Reset fields after successful addition
       setNewDriverName("");
       setNewDriverLicenseNumber("");
       setNewSalary("");
@@ -131,9 +148,13 @@ const Drivers = () => {
       setPassportPicture(null);
       sethealthCard(null);
       setEmployeePicture(null);
+
       onAddModalClose();
+      alert("driver created Sucessful");
     } catch (error) {
       console.error("Error adding new driver:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -156,79 +177,9 @@ const Drivers = () => {
     }
   };
 
-  const handleEditDriver = async () => {
-    try {
-      const response = await axios.put(
-        `${URL}/api/driver-details/${selectedDriver.id}`,
-        {
-          data: {
-            driverName: newDriverName,
-            driverLisenceNumber: newDriverLicenseNumber,
-            salary: newSalary,
-            PassportNumber: newPassportNumber,
-            iqamaNumber: newiqamaNumber,
-            driverPhoneNumber: newdriverPhoneNumber,
-            passportExpiry: newpassportExpiry,
-            iqamaExpiry: newiqamaExpiry,
-            iqamaPicture: iqamaPicture,
-            passportImage: passportPicture,
-            healthCard: healthCard,
-          },
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setDriversData(
-        driversData.map((driver) =>
-          driver.id === selectedDriver.id ? response.data.data : driver
-        )
-      );
-
-      setNewDriverName("");
-      setNewDriverLicenseNumber("");
-      setNewSalary("");
-      setNewPassportNumber("");
-      setNewiqamaNumber("");
-      setNewdriverPhoneNumber("");
-      setNewpassportExpiry("");
-      setNewiqamaExpiry("");
-      setIqamaPicture(null);
-      setPassportPicture(null);
-      sethealthCard(null);
-      onEditModalClose();
-    } catch (error) {
-      console.error("Error editing driver:", error);
-    }
-  };
-
-  const handleDeleteDriver = async (driverId) => {
-    try {
-      await axios.delete(`${URL}/api/driver-details/${driverId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setDriversData(driversData.filter((driver) => driver.id !== driverId));
-    } catch (error) {
-      console.error("Error deleting driver:", error);
-    }
-  };
-
-  const openEditModal = (driver) => {
-    setSelectedDriver(driver);
-    setNewDriverName(driver.attributes.driverName);
-    setNewDriverLicenseNumber(driver.attributes.driverLisenceNumber);
-    setNewSalary(driver.attributes.salary);
-    onEditModalOpen();
-  };
-
   const openDetailModal = async (driver) => {
     setSelectedDriver(driver);
+    setSelectedDriverDetails(null);
     try {
       const response = await axios.get(
         `${URL}/api/driver-details/${driver.id}?populate=*`,
@@ -258,14 +209,13 @@ const Drivers = () => {
       </Button>
 
       <Modal isOpen={isViewModalOpen} onClose={onViewModalClose}>
-        {/* View Drivers Modal */}
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Drivers Information</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             {driversData.map((driver, index) => (
-              <Card mb={{ base: "0px", "2xl": "20px" }} key={index}>
+              <Card key={index} mb={{ base: "0px", "2xl": "20px" }}>
                 <Text>Name: {driver?.attributes?.driverName}</Text>
                 <Text>
                   License Number: {driver?.attributes?.driverLisenceNumber}
@@ -303,6 +253,7 @@ const Drivers = () => {
           <ModalHeader>Add New Driver</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            {error && <Text color="red.500">{error}</Text>}
             <FormLabel>Driver Name</FormLabel>
             <Input
               placeholder="Name"
@@ -339,15 +290,14 @@ const Drivers = () => {
               onChange={(e) => setNewiqamaNumber(e.target.value)}
               mb="4"
             />
-            <FormLabel>Phone Number</FormLabel>
+            <FormLabel>Driver Phone Number</FormLabel>
             <Input
-              type="number"
-              placeholder="Driver Phone Number"
+              placeholder="Phone Number"
               value={newdriverPhoneNumber}
               onChange={(e) => setNewdriverPhoneNumber(e.target.value)}
               mb="4"
             />
-            <FormLabel>Passport Expiry Date</FormLabel>
+            <FormLabel>Passport Expiry</FormLabel>
             <Input
               type="date"
               placeholder="Passport Expiry"
@@ -355,7 +305,7 @@ const Drivers = () => {
               onChange={(e) => setNewpassportExpiry(e.target.value)}
               mb="4"
             />
-            <FormLabel>Iqama Expiry Date</FormLabel>
+            <FormLabel>Iqama Expiry</FormLabel>
             <Input
               type="date"
               placeholder="Iqama Expiry"
@@ -363,108 +313,51 @@ const Drivers = () => {
               onChange={(e) => setNewiqamaExpiry(e.target.value)}
               mb="4"
             />
-            <FormLabel>Driver profile Picture</FormLabel>
-            <Input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setEmployeePicture(e.target.files[0])}
-              mb="4"
-            />
             <FormLabel>Iqama Picture</FormLabel>
             <Input
               type="file"
-              accept="image/*"
               onChange={(e) => setIqamaPicture(e.target.files[0])}
               mb="4"
             />
             <FormLabel>Passport Picture</FormLabel>
             <Input
               type="file"
-              accept="image/*"
               onChange={(e) => setPassportPicture(e.target.files[0])}
               mb="4"
             />
-            <FormLabel>Health card Picture</FormLabel>
+            <FormLabel>Health Card</FormLabel>
             <Input
               type="file"
-              accept="image/*"
               onChange={(e) => sethealthCard(e.target.files[0])}
               mb="4"
             />
+            <FormLabel>Employee Picture</FormLabel>
+            <Input
+              type="file"
+              onChange={(e) => setEmployeePicture(e.target.files[0])}
+              mb="4"
+            />
+          </ModalBody>
+          <ModalFooter>
             <Button
               colorScheme="blue"
               onClick={handleAddDriver}
-              disabled={
-                !newDriverName ||
-                !newDriverLicenseNumber ||
-                !newSalary ||
-                !newPassportNumber ||
-                !newiqamaNumber ||
-                !newdriverPhoneNumber ||
-                !newpassportExpiry ||
-                !newiqamaExpiry
-              }
+              isLoading={isLoading}
             >
-              Add Driver
-            </Button>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-
-      <Modal isOpen={isEditModalOpen} onClose={onEditModalClose}>
-        {/* Edit Driver Modal */}
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Edit Driver</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Input
-              placeholder="Name"
-              value={newDriverName}
-              onChange={(e) => setNewDriverName(e.target.value)}
-              mb="2"
-            />
-            <Input
-              placeholder="License Number"
-              value={newDriverLicenseNumber}
-              onChange={(e) => setNewDriverLicenseNumber(e.target.value)}
-              mb="4"
-            />
-            <Input
-              placeholder="Salary"
-              value={newSalary}
-              onChange={(e) => setNewSalary(e.target.value)}
-              mb="4"
-            />
-            <Button
-              colorScheme="blue"
-              onClick={handleEditDriver}
-              disabled={!newDriverName || !newDriverLicenseNumber}
-            >
-              Save Changes
-            </Button>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-
-      <Modal isOpen={isDetailModalOpen} onClose={onDetailModalClose}>
-        {/* Driver Full Details Modal */}
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Driver Full Details</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            {selectedDriverDetails && (
-              <DriversFullDetail driver={selectedDriverDetails} />
-            )}
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" onClick={onDetailModalClose}>
-              Close
+              Save
             </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {selectedDriverDetails && (
+        <DriversFullDetail
+          fetchDrivers={fetchDrivers}
+          driver={selectedDriverDetails}
+          isOpen={isDetailModalOpen}
+          onClose={onDetailModalClose}
+        />
+      )}
     </>
   );
 };
