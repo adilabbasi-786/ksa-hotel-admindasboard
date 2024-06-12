@@ -135,6 +135,10 @@ const EmployeeFullDetail = ({ employeeData }) => {
               alt="Passport Picture"
             />
           </Box>
+          <p>
+            hello
+            <Image src={employeeData.employeePicture2} alt="Passport Picture" />
+          </p>
         </Box>
         <Box boxShadow={cardShadow}>
           <Text fontWeight="semibold">Employee Health Card Picture</Text>

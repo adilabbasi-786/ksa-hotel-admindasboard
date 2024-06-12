@@ -30,6 +30,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
     iqamaPicture: null,
     passportImage: null,
     Employee_healtCard: null,
+    employeePicture2: null,
     hotel_name: selectedHotel,
     EmployeePhoneNumber: "",
     Designation: "",
@@ -50,6 +51,13 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
     Employee_healtCard: "",
     Designation: "",
   });
+  const handleChange2 = (e) => {
+    const data = new FileReader();
+    data.addEventListener(`load`, () => {
+      setFormData({ ...formData, employeePicture2: data.result });
+    });
+    data.readAsDataURL(e.target.files[0]);
+  };
 
   const handleChange = (e, fieldName) => {
     const { files, value } = e.target;
@@ -144,6 +152,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
       formDataToSend.append("files.employeePicture", formData.employeePicture);
       formDataToSend.append("files.iqamaPicture", formData.iqamaPicture);
       formDataToSend.append("files.passportImage", formData.passportImage);
+
       formDataToSend.append(
         "files.Employee_healtCard",
         formData.Employee_healtCard
@@ -159,6 +168,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
         }
       );
       console.log("Form submitted successfully!", response.data);
+
       setFormSubmitted(true);
       fetchEmployeeData();
       setTimeout(() => {
@@ -336,6 +346,11 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
                 accept="image/*"
                 onChange={(e) => handleChange(e, "passportImage")}
               />
+              <Text color="red">{formErrors.passportImage}</Text>
+            </FormControl>
+            <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
+              <FormLabel>employee picture2</FormLabel>
+              <Input type="file" accept="image/*" onChange={handleChange2} />
               <Text color="red">{formErrors.passportImage}</Text>
             </FormControl>
           </Flex>
