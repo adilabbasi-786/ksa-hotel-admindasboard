@@ -221,13 +221,18 @@ const Banner = ({
     const { name, files } = event.target;
     if (files.length > 0) {
       const file = files[0];
-      const previewUrl = window.URL.createObjectURL(file);
+      const reader = new FileReader();
 
-      setUpdatedEmployeeData((prevData) => ({
-        ...prevData,
-        [name]: file,
-        [`${name}Url`]: previewUrl,
-      }));
+      reader.onloadend = () => {
+        const base64String = reader.result;
+        setUpdatedEmployeeData((prevData) => ({
+          ...prevData,
+          [name]: base64String,
+          [`${name}Url`]: base64String, // Use the base64 string as the preview URL
+        }));
+      };
+
+      reader.readAsDataURL(file);
     }
   };
 

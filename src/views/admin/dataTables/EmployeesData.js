@@ -93,11 +93,11 @@ const EmployeesData = ({ selectedHotel }) => {
               gridArea="1 / 1 / 2 / 2"
               name={employee.attributes.EmployeeName}
               passportNumber={employee.attributes.PassportNumber}
-              avatar={`${URL}${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
-              employeePicture={`${URL}${employee?.attributes?.employeePicture?.data?.attributes?.url}`}
-              passportImage={`${URL}${employee?.attributes?.passportImage?.data?.attributes?.url}`}
-              iqamaPicture={`${URL}${employee?.attributes?.iqamaPicture?.data?.attributes?.url}`}
-              Employee_healtCard={`${URL}${employee?.attributes?.Employee_healtCard?.data?.attributes?.url}`}
+              avatar={employee?.attributes?.employeePicture}
+              employeePicture={employee?.attributes?.employeePicture}
+              passportImage={employee?.attributes?.passportImage}
+              iqamaPicture={employee?.attributes?.iqamaPicture}
+              Employee_healtCard={employee?.attributes?.Employee_healtCard}
               banner={banner}
               status={employee.attributes.status}
               Designation={employee.attributes.Designation}

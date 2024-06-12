@@ -17,6 +17,7 @@ import { URL } from "Utils";
 const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const token = localStorage.getItem("token");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     employeePicture: null,
     EmployeeName: "",
@@ -51,36 +52,30 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
     Employee_healtCard: "",
     Designation: "",
   });
-  const handleChange2 = (e) => {
-    const data = new FileReader();
-    data.addEventListener(`load`, () => {
-      setFormData({ ...formData, employeePicture2: data.result });
-    });
-    data.readAsDataURL(e.target.files[0]);
+
+  const handleFileChange = (e, fieldName) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prevData) => ({
+          ...prevData,
+          [fieldName]: reader.result,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleChange = (e, fieldName) => {
-    const { files, value } = e.target;
-    const newValue = files ? files[0] : value;
-
-    // Update formData
-    setFormData((prevData) => {
-      let updatedData = { ...prevData, [fieldName]: newValue };
-
-      // If status is set to "active", update lastActiveDate to the current date
-      if (fieldName === "status") {
-        if (newValue === "active") {
-          updatedData.lastActiveDate = new Date().toISOString().split("T")[0];
-        } else if (newValue === "inactive") {
-          updatedData.lastActiveDate = "";
-        }
-      }
-
-      return updatedData;
-    });
+    const { value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [fieldName]: value,
+    }));
 
     // Validate if field is empty
-    if (newValue === "") {
+    if (value === "") {
       setFormErrors((prevErrors) => ({
         ...prevErrors,
         [fieldName]: `Please fill ${fieldName}`,
@@ -118,52 +113,31 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
       }
     });
 
-    // Check if employee picture, iqama picture, and passport picture are not empty
-    if (!formData.employeePicture) {
-      newFormErrors.employeePicture = "Please upload Employee picture";
-      hasErrors = true;
-    }
-    if (!formData.iqamaPicture) {
-      newFormErrors.iqamaPicture = "Please upload iqama picture";
-      hasErrors = true;
-    }
-    if (!formData.passportImage) {
-      newFormErrors.passportImage = "Please upload Passport picture";
-      hasErrors = true;
-    }
-    if (!formData.Employee_healtCard) {
-      newFormErrors.Employee_healtCard =
-        "Please upload Employee_healtCard picture";
+    // Check if any picture fields are empty
+    if (
+      !formData.employeePicture ||
+      !formData.iqamaPicture ||
+      !formData.passportImage ||
+      !formData.Employee_healtCard
+    ) {
+      newFormErrors["pictures"] = "Please upload all pictures";
+      alert("please upload all pictures");
       hasErrors = true;
     }
 
-    // If there are errors, update state and stop form submission
     if (hasErrors) {
-      setFormErrors((prevErrors) => ({
-        ...prevErrors,
-        ...newFormErrors,
-      }));
-      return; // Stop further execution
+      setFormErrors(newFormErrors);
+      return;
     }
 
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("data", JSON.stringify(formData));
-      formDataToSend.append("files.employeePicture", formData.employeePicture);
-      formDataToSend.append("files.iqamaPicture", formData.iqamaPicture);
-      formDataToSend.append("files.passportImage", formData.passportImage);
-
-      formDataToSend.append(
-        "files.Employee_healtCard",
-        formData.Employee_healtCard
-      );
       const response = await axios.post(
         `${URL}/api/employee-data`,
-        formDataToSend,
+        { data: formData },
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/json",
           },
         }
       );
@@ -172,13 +146,14 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
       setFormSubmitted(true);
       fetchEmployeeData();
       setTimeout(() => {
-        onClose(); // Close the modal after 2 seconds
+        onClose();
+        setIsSubmitting(false);
       }, 2000);
     } catch (error) {
       console.error("Error submitting form data:", error);
+      setIsSubmitting(false);
     }
   };
-
   return (
     <Box p={10} bg="white">
       {formSubmitted ? (
@@ -187,17 +162,16 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
         </Box>
       ) : (
         <form>
-          <FormControl width="300px" height="280px" mt={4} mb={-20}>
+          <FormControl width="300px" height="280px" mt={2} mb={-20}>
             <FormLabel>Employee picture</FormLabel>
             <Input
               name="employeePicture"
               type="file"
               accept="image/*"
-              onChange={(e) => handleChange(e, "employeePicture")}
+              onChange={(e) => handleFileChange(e, "employeePicture")}
             />
             <Text color="red">{formErrors.employeePicture}</Text>
           </FormControl>
-
           <Flex direction={isMobile ? "column" : "row"}>
             <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
               <FormLabel>Employee name</FormLabel>
@@ -233,7 +207,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
             </FormControl>
 
             <FormControl flex="1">
-              <FormLabel>passport Number</FormLabel>
+              <FormLabel>Passport Number</FormLabel>
               <Input
                 name="PassportNumber"
                 value={formData.PassportNumber}
@@ -257,12 +231,12 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
               <Text color="red">{formErrors.passportExpiry}</Text>
             </FormControl>
             <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
-              <FormLabel>iqama number</FormLabel>
+              <FormLabel>Iqama Number</FormLabel>
               <Input
                 name="iqamaNumber"
                 value={formData.iqamaNumber}
                 onChange={(e) => handleChange(e, "iqamaNumber")}
-                placeholder="iqama Number"
+                placeholder="Iqama Number"
               />
               <Text color="red">{formErrors.iqamaNumber}</Text>
             </FormControl>
@@ -285,7 +259,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
           </Flex>
           <Flex direction={isMobile ? "column" : "row"}>
             <FormControl>
-              <FormLabel>iqama Expiry</FormLabel>
+              <FormLabel>Iqama Expiry</FormLabel>
               <Input
                 type="date"
                 name="iqamaExpiry"
@@ -303,13 +277,13 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
                 value={formData.status}
                 onChange={(e) => handleChange(e, "status")}
               >
-                <option value="active">active</option>
-                <option value="inactive">inactive</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
               </Select>
               <Text color="red">{formErrors.status}</Text>
             </FormControl>
             <FormControl>
-              <FormLabel>lastActiveDate</FormLabel>
+              <FormLabel>Last Active Date</FormLabel>
               <Input
                 type="date"
                 name="lastActiveDate"
@@ -326,7 +300,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
               <Input
                 type="file"
                 accept="image/*"
-                onChange={(e) => handleChange(e, "iqamaPicture")}
+                onChange={(e) => handleFileChange(e, "iqamaPicture")}
               />
               <Text color="red">{formErrors.iqamaPicture}</Text>
             </FormControl>
@@ -335,7 +309,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
               <Input
                 type="file"
                 accept="image/*"
-                onChange={(e) => handleChange(e, "Employee_healtCard")}
+                onChange={(e) => handleFileChange(e, "Employee_healtCard")}
               />
               <Text color="red">{formErrors.Employee_healtCard}</Text>
             </FormControl>
@@ -344,13 +318,8 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
               <Input
                 type="file"
                 accept="image/*"
-                onChange={(e) => handleChange(e, "passportImage")}
+                onChange={(e) => handleFileChange(e, "passportImage")}
               />
-              <Text color="red">{formErrors.passportImage}</Text>
-            </FormControl>
-            <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
-              <FormLabel>employee picture2</FormLabel>
-              <Input type="file" accept="image/*" onChange={handleChange2} />
               <Text color="red">{formErrors.passportImage}</Text>
             </FormControl>
           </Flex>
@@ -365,9 +334,8 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
             mt={4}
             onClick={handleSubmit}
           >
-            Submit
+            {isSubmitting ? "Submitting..." : "Submit"}
           </Button>
-          {console.log("submit", handleSubmit)}
         </form>
       )}
     </Box>
