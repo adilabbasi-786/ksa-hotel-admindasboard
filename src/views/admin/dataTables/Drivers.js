@@ -71,15 +71,24 @@ const Drivers = () => {
     }
   };
 
-  // Move fetchDrivers outside the useEffect so it can be used in multiple places
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     setToken(storedToken);
     fetchDrivers();
   }, []);
 
+  const handleFileChange = (e, setState) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setState(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleAddDriver = async () => {
-    // Perform validations and handle empty field checks here...
     if (
       !newDriverName ||
       !newDriverLicenseNumber ||
@@ -102,11 +111,6 @@ const Drivers = () => {
     setError("");
 
     try {
-      const iqamaPictureUpload = await handleFileUpload(iqamaPicture);
-      const passportPictureUpload = await handleFileUpload(passportPicture);
-      const healthCardUpload = await handleFileUpload(healthCard);
-      const employeepicutreUpload = await handleFileUpload(EmployeePicture);
-
       const newDriver = {
         driverName: newDriverName,
         driverLisenceNumber: newDriverLicenseNumber,
@@ -116,10 +120,10 @@ const Drivers = () => {
         driverPhoneNumber: newdriverPhoneNumber,
         passportExpiry: newpassportExpiry,
         iqamaExpiry: newiqamaExpiry,
-        iqamaPicture: iqamaPictureUpload?.id,
-        passportImage: passportPictureUpload?.id,
-        healthCard: healthCardUpload?.id,
-        EmployeePicture: employeepicutreUpload?.id,
+        iqamaPicture: iqamaPicture,
+        passportImage: passportPicture,
+        healthCard: healthCard,
+        EmployeePicture: EmployeePicture,
       };
 
       const response = await axios.post(
@@ -135,7 +139,6 @@ const Drivers = () => {
         response.data.data,
       ]);
 
-      // Reset fields after successful addition
       setNewDriverName("");
       setNewDriverLicenseNumber("");
       setNewSalary("");
@@ -150,30 +153,16 @@ const Drivers = () => {
       setEmployeePicture(null);
 
       onAddModalClose();
-      alert("driver created Sucessful");
+      toast({
+        title: "Driver created successfully.",
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
     } catch (error) {
       console.error("Error adding new driver:", error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleFileUpload = async (file) => {
-    const formData = new FormData();
-    formData.append("files", file);
-
-    try {
-      const response = await axios.post(`${URL}/api/upload`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      return response.data[0];
-    } catch (error) {
-      console.error("Error uploading file:", error);
-      throw error;
     }
   };
 
@@ -316,25 +305,25 @@ const Drivers = () => {
             <FormLabel>Iqama Picture</FormLabel>
             <Input
               type="file"
-              onChange={(e) => setIqamaPicture(e.target.files[0])}
+              onChange={(e) => handleFileChange(e, setIqamaPicture)}
               mb="4"
             />
             <FormLabel>Passport Picture</FormLabel>
             <Input
               type="file"
-              onChange={(e) => setPassportPicture(e.target.files[0])}
+              onChange={(e) => handleFileChange(e, setPassportPicture)}
               mb="4"
             />
             <FormLabel>Health Card</FormLabel>
             <Input
               type="file"
-              onChange={(e) => sethealthCard(e.target.files[0])}
+              onChange={(e) => handleFileChange(e, sethealthCard)}
               mb="4"
             />
             <FormLabel>Employee Picture</FormLabel>
             <Input
               type="file"
-              onChange={(e) => setEmployeePicture(e.target.files[0])}
+              onChange={(e) => handleFileChange(e, setEmployeePicture)}
               mb="4"
             />
           </ModalBody>
