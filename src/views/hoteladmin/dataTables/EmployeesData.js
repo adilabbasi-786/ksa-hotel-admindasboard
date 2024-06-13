@@ -96,7 +96,7 @@ const EmployeesData = () => {
               iqamaPicture={`${URL}${employee?.iqamaPicture?.url}`}
               status={employee.status}
               EmployeePhoneNumber={employee.EmployeePhoneNumber}
-              avatar={`${URL}${employee?.employeePicture?.url}`}
+              avatar={employee?.employeePicture}
               healthCard={`${URL}${employee?.Employee_healtCard?.url}`}
               banner={banner}
               employeeData={employee}

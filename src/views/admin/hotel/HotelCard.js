@@ -65,6 +65,7 @@ const HotelCard = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const cancelRef = useRef();
   const history = useHistory();
+  const [roleId] = useState("manager");
 
   const [updatedHotelData, setUpdatedHotelData] = useState({
     title: title,

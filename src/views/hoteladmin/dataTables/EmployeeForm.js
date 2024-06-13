@@ -14,29 +14,31 @@ import {
 import EmployeeContext from "EmployeeContext";
 import { URL } from "Utils";
 
-const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
+const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const token = localStorage.getItem("token");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     employeePicture: null,
     EmployeeName: "",
     PassportNumber: "",
     passportExpiry: "",
-    EmployeePhoneNumber: "",
-    lastActiveDate: "",
     iqamaNumber: "",
     iqamaExpiry: "",
     status: "",
     salary: "",
-    Designation: "",
+    lastActiveDate: "",
     iqamaPicture: null,
     passportImage: null,
     Employee_healtCard: null,
+    employeePicture2: null,
+    hotel_name: selectedHotel,
+    EmployeePhoneNumber: "",
+    Designation: "",
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formErrors, setFormErrors] = useState({
     EmployeeName: "",
-    EmployeePhoneNumber: "",
     PassportNumber: "",
     passportExpiry: "",
     iqamaNumber: "",
@@ -46,45 +48,27 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
     iqamaPicture: "",
     passportImage: "",
     salary: "",
+    EmployeePhoneNumber: "",
     Employee_healtCard: "",
     Designation: "",
   });
-  const handleImageChange = async (e, key) => {
-    console.log("E, key", e.target.files[0], key);
-    const requestFormdata = new FormData();
-    requestFormdata.append("files", e.target.files[0]);
 
-    const requestOptions = {
-      method: "POST",
-      body: requestFormdata,
-    };
-    try {
-      const response = await fetch(`${URL}/api/upload`, requestOptions);
-      const result = await response.json();
-      const imgId = result[0].id;
-      console.log("result", result);
-      console.log("imgId", imgId);
-
-      setFormData({ ...formData, [key]: imgId });
-    } catch (error) {
-      console.error(error);
+  const handleFileChange = (e, fieldName) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prevData) => ({
+          ...prevData,
+          [fieldName]: reader.result,
+        }));
+      };
+      reader.readAsDataURL(file);
     }
   };
+
   const handleChange = (e, fieldName) => {
-    const { files } = e.target;
-    const value = files ? files[0] : e.target.value;
-
-    // Update lastActiveDate based on status
-    if (fieldName === "status") {
-      const newLastActiveDate =
-        value === "active" ? new Date().toISOString().split("T")[0] : "";
-      setFormData((prevData) => ({
-        ...prevData,
-        lastActiveDate: newLastActiveDate,
-      }));
-    }
-
-    // Update formData
+    const { value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [fieldName]: value,
@@ -129,56 +113,27 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
       }
     });
 
-    // Check if employee picture, iqama picture, and passport picture are not empty
-    if (!formData.employeePicture) {
-      newFormErrors.employeePicture = "Please upload Employee picture";
-      hasErrors = true;
-    }
-    if (!formData.iqamaPicture) {
-      newFormErrors.iqamaPicture = "Please upload iqama picture";
-      hasErrors = true;
-    }
-    if (!formData.passportImage) {
-      newFormErrors.passportImage = "Please upload Passport picture";
-      hasErrors = true;
-    }
-    if (!formData.Employee_healtCard) {
-      newFormErrors.Employee_healtCard =
-        "Please upload Employee_healtCard picture";
+    // Check if any picture fields are empty
+    if (
+      !formData.employeePicture ||
+      !formData.iqamaPicture ||
+      !formData.passportImage ||
+      !formData.Employee_healtCard
+    ) {
+      newFormErrors["pictures"] = "Please upload all pictures";
+      alert("please upload all pictures");
       hasErrors = true;
     }
 
-    // If there are errors, update state and stop form submission
     if (hasErrors) {
-      setFormErrors((prevErrors) => ({
-        ...prevErrors,
-        ...newFormErrors,
-      }));
-      return; // Add return to stop form submission if there are errors
+      setFormErrors(newFormErrors);
+      return;
     }
 
     try {
-      const employeeData = {
-        data: {
-          EmployeeName: formData.EmployeeName,
-          PassportNumber: formData.PassportNumber,
-          passportExpiry: formData.passportExpiry,
-          iqamaNumber: formData.iqamaNumber,
-          iqamaExpiry: formData.iqamaExpiry,
-          status: formData.status,
-          salary: formData.salary,
-          employeePicture: formData.employeePicture,
-          iqamaPicture: formData.iqamaPicture,
-          passportImage: formData.passportImage,
-          EmployeePhoneNumber: formData.EmployeePhoneNumber,
-          Employee_healtCard: formData.Employee_healtCard,
-          Designation: formData.Designation,
-        },
-      };
-
       const response = await axios.post(
         `${URL}/api/employee-data`,
-        employeeData,
+        { data: formData },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -187,16 +142,18 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
         }
       );
       console.log("Form submitted successfully!", response.data);
+
       setFormSubmitted(true);
       fetchEmployeeData();
       setTimeout(() => {
-        onClose(); // Close the modal after 2 seconds
+        onClose();
+        setIsSubmitting(false);
       }, 2000);
     } catch (error) {
       console.error("Error submitting form data:", error);
+      setIsSubmitting(false);
     }
   };
-
   return (
     <Box p={10} bg="white">
       {formSubmitted ? (
@@ -205,13 +162,13 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
         </Box>
       ) : (
         <form>
-          <FormControl width="300px" height="280px" mt={4} mb={-40}>
+          <FormControl width="300px" height="280px" mt={2} mb={-20}>
             <FormLabel>Employee picture</FormLabel>
             <Input
               name="employeePicture"
               type="file"
               accept="image/*"
-              onChange={(e) => handleImageChange(e, "employeePicture")}
+              onChange={(e) => handleFileChange(e, "employeePicture")}
             />
             <Text color="red">{formErrors.employeePicture}</Text>
           </FormControl>
@@ -227,30 +184,30 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
               <Text color="red">{formErrors.EmployeeName}</Text>
             </FormControl>
             <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
-              <FormLabel>Employee Phone Number</FormLabel>
-              <Input
-                type="number"
-                name="EmployeePhoneNumber"
-                value={formData.EmployeePhoneNumber}
-                onChange={(e) => handleChange(e, "EmployeePhoneNumber")}
-                placeholder="Employee Phone number"
-              />
-              <Text color="red">{formErrors.EmployeePhoneNumber}</Text>
-            </FormControl>
-            <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
               <FormLabel>Employee Salary</FormLabel>
               <Input
-                name="EmployeeName"
                 type="number"
+                name="EmployeeSalary"
                 value={formData.salary}
                 onChange={(e) => handleChange(e, "salary")}
                 placeholder="Employee salary"
               />
               <Text color="red">{formErrors.salary}</Text>
             </FormControl>
+            <FormControl flex="1" mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
+              <FormLabel>Employee Phone Number</FormLabel>
+              <Input
+                type="number"
+                name="EmployeePhoneNumber"
+                value={formData.EmployeePhoneNumber}
+                onChange={(e) => handleChange(e, "EmployeePhoneNumber")}
+                placeholder="Employee Phone Number"
+              />
+              <Text color="red">{formErrors.EmployeePhoneNumber}</Text>
+            </FormControl>
 
             <FormControl flex="1">
-              <FormLabel>passport Number</FormLabel>
+              <FormLabel>Passport Number</FormLabel>
               <Input
                 name="PassportNumber"
                 value={formData.PassportNumber}
@@ -258,6 +215,30 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
                 placeholder="Passport Number"
               />
               <Text color="red">{formErrors.PassportNumber}</Text>
+            </FormControl>
+          </Flex>
+
+          <Flex direction={isMobile ? "column" : "row"}>
+            <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
+              <FormLabel>Passport Expiry</FormLabel>
+              <Input
+                type="date"
+                name="passportExpiry"
+                placeholder="Passport Expiry"
+                value={formData.passportExpiry}
+                onChange={(e) => handleChange(e, "passportExpiry")}
+              />
+              <Text color="red">{formErrors.passportExpiry}</Text>
+            </FormControl>
+            <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
+              <FormLabel>Iqama Number</FormLabel>
+              <Input
+                name="iqamaNumber"
+                value={formData.iqamaNumber}
+                onChange={(e) => handleChange(e, "iqamaNumber")}
+                placeholder="Iqama Number"
+              />
+              <Text color="red">{formErrors.iqamaNumber}</Text>
             </FormControl>
           </Flex>
           <Flex direction={isMobile ? "column" : "row"}>
@@ -277,31 +258,8 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
             </FormControl>
           </Flex>
           <Flex direction={isMobile ? "column" : "row"}>
-            <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
-              <FormLabel>Passport Expiry</FormLabel>
-              <Input
-                type="date"
-                name="passportExpiry"
-                placeholder="Passport Expiry"
-                value={formData.passportExpiry}
-                onChange={(e) => handleChange(e, "passportExpiry")}
-              />
-              <Text color="red">{formErrors.passportExpiry}</Text>
-            </FormControl>
-            <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
-              <FormLabel>iqama number</FormLabel>
-              <Input
-                name="iqamaNumber"
-                value={formData.iqamaNumber}
-                onChange={(e) => handleChange(e, "iqamaNumber")}
-                placeholder="iqama Number"
-              />
-              <Text color="red">{formErrors.iqamaNumber}</Text>
-            </FormControl>
-          </Flex>
-          <Flex direction={isMobile ? "column" : "row"}>
             <FormControl>
-              <FormLabel>iqama Expiry</FormLabel>
+              <FormLabel>Iqama Expiry</FormLabel>
               <Input
                 type="date"
                 name="iqamaExpiry"
@@ -319,13 +277,13 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
                 value={formData.status}
                 onChange={(e) => handleChange(e, "status")}
               >
-                <option value="active">active</option>
-                <option value="inactive">inactive</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
               </Select>
               <Text color="red">{formErrors.status}</Text>
             </FormControl>
             <FormControl>
-              <FormLabel>lastActiveDate</FormLabel>
+              <FormLabel>Last Active Date</FormLabel>
               <Input
                 type="date"
                 name="lastActiveDate"
@@ -342,27 +300,27 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
               <Input
                 type="file"
                 accept="image/*"
-                onChange={(e) => handleImageChange(e, "iqamaPicture")}
+                onChange={(e) => handleFileChange(e, "iqamaPicture")}
               />
               <Text color="red">{formErrors.iqamaPicture}</Text>
+            </FormControl>
+            <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
+              <FormLabel>HealtCard picture</FormLabel>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleFileChange(e, "Employee_healtCard")}
+              />
+              <Text color="red">{formErrors.Employee_healtCard}</Text>
             </FormControl>
             <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
               <FormLabel>Passport picture</FormLabel>
               <Input
                 type="file"
                 accept="image/*"
-                onChange={(e) => handleImageChange(e, "passportImage")}
+                onChange={(e) => handleFileChange(e, "passportImage")}
               />
               <Text color="red">{formErrors.passportImage}</Text>
-            </FormControl>
-            <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
-              <FormLabel>Health Card</FormLabel>
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleImageChange(e, "Employee_healtCard")}
-              />
-              <Text color="red">{formErrors.Employee_healtCard}</Text>
             </FormControl>
           </Flex>
 
@@ -376,9 +334,8 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
             mt={4}
             onClick={handleSubmit}
           >
-            Submit
+            {isSubmitting ? "Submitting..." : "Submit"}
           </Button>
-          {console.log("submit", handleSubmit)}
         </form>
       )}
     </Box>
