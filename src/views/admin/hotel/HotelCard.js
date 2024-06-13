@@ -1,9 +1,12 @@
+import React, { useState, useRef } from "react";
 import {
   Box,
   Flex,
   Icon,
   Image,
   Input,
+  InputGroup,
+  InputRightElement,
   Link,
   Modal,
   ModalOverlay,
@@ -24,13 +27,18 @@ import {
   FormControl,
   FormLabel,
 } from "@chakra-ui/react";
-import React, { useState, useRef } from "react";
-import { MdEdit, MdDelete } from "react-icons/md";
+import {
+  MdEdit,
+  MdDelete,
+  MdVisibility,
+  MdVisibilityOff,
+} from "react-icons/md";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import Card from "components/card/Card";
 import { URL } from "Utils";
 import hotelImage from "../../../assets/img/THEME_HOTEL_SIGN_FIVE_STARS_FACADE_BUILDING_GettyImages-1320779330-3.jpg";
+
 const HotelCard = ({
   title,
   ranking,
@@ -53,6 +61,10 @@ const HotelCard = ({
 }) => {
   const hotelImageSrc = image || hotelImage;
   const [isEditMode, setIsEditMode] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const cancelRef = useRef();
+  const history = useHistory();
 
   const [updatedHotelData, setUpdatedHotelData] = useState({
     title: title,
@@ -67,12 +79,15 @@ const HotelCard = ({
     TaxVatPicture: TaxVatPicture,
     ComercialCertificate: ComercialCertificate,
   });
-  const token = localStorage.getItem("token");
 
-  const [showModal, setShowModal] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const cancelRef = useRef();
-  const history = useHistory();
+  // State for new modal
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [updatedManagerEmail, setUpdatedManagerEmail] = useState(managerEmail);
+  const [updatedManagerPassword, setUpdatedManagerPassword] =
+    useState(managerPassword);
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
+
+  const token = localStorage.getItem("token");
 
   const handleToggleEditMode = () => {
     setIsEditMode(!isEditMode);
@@ -105,8 +120,6 @@ const HotelCard = ({
       return;
     }
     const formData = new FormData();
-
-    // Append each field separately
     formData.append("title", updatedHotelData.title || "");
     formData.append("name", updatedHotelData.name || "");
     formData.append("managerName", updatedHotelData.managerName || "");
@@ -122,7 +135,6 @@ const HotelCard = ({
       updatedHotelData.KafeelPhoneNumber || ""
     );
 
-    // Append files only if they are instances of File
     if (updatedHotelData.liscencePicture instanceof File) {
       formData.append(
         "files.liscencePicture",
@@ -150,21 +162,64 @@ const HotelCard = ({
         alert("Data updated successfully");
         getData();
         history.push("/admin/hotel");
-
         const updatedHotel = {
           ...response.data,
           id, // Ensure the ID is included
         };
         setUpdatedHotelData(updatedHotel);
-
         if (onUpdateHotel) {
           onUpdateHotel(updatedHotel);
         }
-        setIsEditMode(false); // Exit edit mode
-        setShowModal(false); // Close modal after saving changes
+        setIsEditMode(false);
+        setShowModal(false);
       })
       .catch((error) => {
         console.error("Error updating data:", error);
+      });
+  };
+  const handleSaveEmailChanges = () => {
+    // Validate the password length
+    if (updatedManagerPassword.length < 6) {
+      alert("Password should be at least 6 characters long.");
+      return;
+    }
+
+    // Prepare the data to be sent
+    const emailData = {
+      hotelId: id,
+      managerEmail: updatedManagerEmail,
+      password: updatedManagerPassword,
+    };
+
+    // Send a POST request to update the manager's email and password
+    axios
+      .post(`${URL}/api/updatemanager`, emailData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        if (response.data.status === "ok") {
+          alert("Manager email and password updated successfully");
+          // Update the local state and trigger data refresh
+          getData();
+          history.push("/admin/hotel");
+          setUpdatedHotelData((prevData) => ({
+            ...prevData,
+            managerEmail: updatedManagerEmail,
+            managerPassword: updatedManagerPassword,
+          }));
+          // Close the modal
+          setShowEmailModal(false);
+        } else {
+          alert("Failed to update manager email and password.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error updating email:", error);
+        alert(
+          "An error occurred while updating the manager email and password."
+        );
       });
   };
 
@@ -179,7 +234,6 @@ const HotelCard = ({
         console.log("Hotel deleted successfully:", response.data);
         onDeleteHotel(id);
         setIsDeleteDialogOpen(false);
-        // Additional logic if needed after deletion
       })
       .catch((error) => {
         console.error("Error deleting hotel:", error);
@@ -196,7 +250,10 @@ const HotelCard = ({
     setUpdatedHotelData((prevData) => ({ ...prevData, [name]: files[0] }));
   };
 
-  // Chakra Color Mode
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
   const brandColor = useColorModeValue("brand.500", "white");
@@ -206,6 +263,7 @@ const HotelCard = ({
     if (!file) return null;
     return typeof file === "string" ? file : window.URL.createObjectURL(file);
   };
+
   const getFilename = (file) => {
     if (!file) return "No file chosen";
     return typeof file === "string" ? file.split("/").pop() : file.name;
@@ -242,7 +300,7 @@ const HotelCard = ({
                 fontWeight="500"
                 color={brandColor}
                 fontSize="sm"
-                style={{ cursor: "pointer" }}
+                _hover={{ cursor: "pointer" }}
                 onClick={() => history.push(`/admin/hotel/${ranking}`)}
               >
                 See Hotel details
@@ -266,7 +324,7 @@ const HotelCard = ({
           me="16px"
           ms="auto"
           p="0px !important"
-          onClick={() => setIsDeleteDialogOpen(true)} // Open delete confirmation dialog
+          onClick={() => setIsDeleteDialogOpen(true)}
         >
           <Icon as={MdDelete} color="secondaryGray.500" h="18px" w="18px" />
         </Link>
@@ -284,17 +342,6 @@ const HotelCard = ({
           <ModalHeader>Edit Hotel Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {/* <Box>
-              <Text fontSize="md" fontWeight="bold" mb="10px">
-                Title:
-              </Text>
-              <Input
-                type="text"
-                value={updatedHotelData.title}
-                onChange={handleInputChange}
-                name="title"
-              />
-            </Box> */}
             <Box mt="10px">
               <Text fontSize="md" fontWeight="bold" mb="10px">
                 Name:
@@ -317,29 +364,6 @@ const HotelCard = ({
                 name="managerName"
               />
             </Box>
-            <Box mt="10px">
-              <Text fontSize="md" fontWeight="bold" mb="10px">
-                Manager Email:
-              </Text>
-              <Input
-                type="email"
-                value={updatedHotelData.managerEmail}
-                onChange={handleInputChange}
-                name="managerEmail"
-              />
-            </Box>
-            <Box mt="10px">
-              <Text fontSize="md" fontWeight="bold" mb="10px">
-                Manager Password:
-              </Text>
-              <Input
-                type="password"
-                value={updatedHotelData.managerPassword}
-                onChange={handleInputChange}
-                name="managerPassword"
-              />
-            </Box>
-
             <Box mt="10px">
               <Text fontSize="md" fontWeight="bold" mb="10px">
                 Manager Phone Number:
@@ -394,7 +418,6 @@ const HotelCard = ({
                 <Text>{getFilename(updatedHotelData.liscencePicture)}</Text>
               </FormControl>
             </Box>
-
             <Box mt="10px">
               <FormControl>
                 <FormLabel>Tax VAT Picture:</FormLabel>
@@ -416,7 +439,6 @@ const HotelCard = ({
                 <Text>{getFilename(updatedHotelData.TaxVatPicture)}</Text>
               </FormControl>
             </Box>
-
             <Box mt="10px">
               <FormControl>
                 <FormLabel>Commercial Certificate:</FormLabel>
@@ -454,6 +476,65 @@ const HotelCard = ({
             >
               Cancel
             </Button>
+            <Button colorScheme="teal" onClick={() => setShowEmailModal(true)}>
+              Edit Manager Email
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* New Modal for Editing Email */}
+      <Modal isOpen={showEmailModal} onClose={() => setShowEmailModal(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit Manager Email</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Box mt="10px">
+              <Text fontSize="md" fontWeight="bold" mb="10px">
+                Manager Email:
+              </Text>
+              <Input
+                type="email"
+                value={updatedManagerEmail}
+                onChange={(e) => setUpdatedManagerEmail(e.target.value)}
+                name="managerEmail"
+              />
+            </Box>
+            <Box mt="10px">
+              <Text fontSize="md" fontWeight="bold" mb="10px">
+                Manager Password:
+              </Text>
+              <InputGroup>
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  value={updatedManagerPassword}
+                  onChange={(e) => setUpdatedManagerPassword(e.target.value)}
+                  name="managerPassword"
+                  minLength="6"
+                />
+                <InputRightElement>
+                  <Icon
+                    as={showPassword ? MdVisibilityOff : MdVisibility}
+                    cursor="pointer"
+                    onClick={handleTogglePasswordVisibility}
+                  />
+                </InputRightElement>
+              </InputGroup>
+              {updatedManagerPassword.length < 6 && (
+                <Text color="red.500" fontSize="sm">
+                  Password must be at least 6 characters long.
+                </Text>
+              )}
+            </Box>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={handleSaveEmailChanges}>
+              Save
+            </Button>
+            <Button variant="ghost" onClick={() => setShowEmailModal(false)}>
+              Cancel
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -468,12 +549,10 @@ const HotelCard = ({
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
               Delete Hotel
             </AlertDialogHeader>
-
             <AlertDialogBody>
               Are you sure you want to delete this hotel? This action cannot be
               undone.
             </AlertDialogBody>
-
             <AlertDialogFooter>
               <Button
                 ref={cancelRef}
