@@ -14,6 +14,7 @@ import axios from "axios";
 const HotelForm = () => {
   const history = useHistory();
   const token = localStorage.getItem("token");
+  const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -128,6 +129,7 @@ const HotelForm = () => {
       alert("Please fill in all required fields.");
       return;
     }
+    setIsLoading(true);
     const managerId = await registerManager();
 
     if (managerId) {
@@ -171,6 +173,7 @@ const HotelForm = () => {
     } else {
       alert("Failed to register manager. Please try again later.");
     }
+    setIsLoading(false);
   };
 
   return (
@@ -324,7 +327,12 @@ const HotelForm = () => {
           <Text color="red.500">{validationMessages.ComercialCertificate}</Text>
         )}
       </FormControl>
-      <Button mt={4} colorScheme="blue" onClick={handleSubmit}>
+      <Button
+        mt={4}
+        colorScheme="blue"
+        onClick={handleSubmit}
+        isLoading={isLoading}
+      >
         Submit
       </Button>
     </Box>

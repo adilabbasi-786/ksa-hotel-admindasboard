@@ -18,6 +18,8 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const token = localStorage.getItem("token");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     employeePicture: null,
     EmployeeName: "",
@@ -129,7 +131,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
       setFormErrors(newFormErrors);
       return;
     }
-
+    setIsLoading(true);
     try {
       const response = await axios.post(
         `${URL}/api/employee-data`,
@@ -149,6 +151,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
         onClose();
         setIsSubmitting(false);
       }, 2000);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error submitting form data:", error);
       setIsSubmitting(false);
@@ -333,8 +336,9 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
             ml={4}
             mt={4}
             onClick={handleSubmit}
+            isLoading={isLoading}
           >
-            {isSubmitting ? "Submitting..." : "Submit"}
+            Submit
           </Button>
         </form>
       )}
