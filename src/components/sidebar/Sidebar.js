@@ -21,12 +21,13 @@ import {
 } from "components/scrollbar/Scrollbar";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import PropTypes from "prop-types";
+import Routes from "routes";
 
 // Assets
 import { IoMenuOutline } from "react-icons/io5";
 
 function Sidebar(props) {
-  const { routes } = props;
+  const routes = Routes();
 
   let variantChange = "0.2s linear";
   let shadow = useColorModeValue(
@@ -76,7 +77,7 @@ export function SidebarResponsive(props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = React.useRef();
 
-  const { routes } = props;
+  const routes = Routes();
   // let isWindows = navigator.platform.startsWith("Win");
   //  BRAND
 
