@@ -128,17 +128,15 @@ const HotelDetail = () => {
         <Box boxShadow={cardShadow}>
           <Text fontWeight="semibold">liscence Picture </Text>
 
-          {hotel[0]?.attributes?.liscencePicture?.data?.attributes?.url && (
+          {hotel[0]?.attributes?.liscencePicture && (
             <Box
               onClick={() =>
-                openImageModal(
-                  `${URL}${hotel[0]?.attributes?.liscencePicture?.data?.attributes?.url}`
-                )
+                openImageModal(hotel[0]?.attributes?.liscencePicture)
               }
               cursor="pointer"
             >
               <Image
-                src={`${URL}${hotel[0]?.attributes?.liscencePicture?.data?.attributes?.formats?.thumbnail?.url}`}
+                src={hotel[0]?.attributes?.liscencePicture}
                 alt="liscencePicture"
               />
             </Box>
@@ -147,18 +145,15 @@ const HotelDetail = () => {
         <Box boxShadow={cardShadow}>
           <Text fontWeight="semibold">Comercial Certificate picture </Text>
 
-          {hotel[0]?.attributes?.ComercialCertificate?.data?.attributes
-            ?.url && (
+          {hotel[0]?.attributes?.ComercialCertificate && (
             <Box
               onClick={() =>
-                openImageModal(
-                  `${URL}${hotel[0]?.attributes?.ComercialCertificate?.data?.attributes?.url}`
-                )
+                openImageModal(hotel[0]?.attributes?.ComercialCertificate)
               }
               cursor="pointer"
             >
               <Image
-                src={`${URL}${hotel[0]?.attributes?.ComercialCertificate?.data?.attributes?.formats?.thumbnail?.url}`}
+                src={hotel[0]?.attributes?.ComercialCertificate}
                 alt="ComercialCertificate"
               />
             </Box>
@@ -167,17 +162,15 @@ const HotelDetail = () => {
         <Box boxShadow={cardShadow}>
           <Text fontWeight="semibold">Tax Vat Picture </Text>
 
-          {hotel[0]?.attributes?.TaxVatPicture?.data?.attributes?.url && (
+          {hotel[0]?.attributes?.TaxVatPicture && (
             <Box
               onClick={() =>
-                openImageModal(
-                  `${URL}${hotel[0]?.attributes?.TaxVatPicture?.data?.attributes?.url}`
-                )
+                openImageModal(hotel[0]?.attributes?.TaxVatPicture)
               }
               cursor="pointer"
             >
               <Image
-                src={`${URL}${hotel[0]?.attributes?.TaxVatPicture?.data?.attributes?.formats?.thumbnail?.url}`}
+                src={hotel[0]?.attributes?.TaxVatPicture}
                 alt="TaxVatPicture"
               />
             </Box>

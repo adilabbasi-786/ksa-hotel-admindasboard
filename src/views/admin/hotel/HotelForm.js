@@ -33,12 +33,27 @@ const HotelForm = () => {
   const [validationMessages, setValidationMessages] = useState({});
   const adminIdentifier = localStorage.getItem("identifier");
   const adminPassword = localStorage.getItem("password");
+
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: files ? files[0] : value,
-    }));
+    if (files) {
+      const file = files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            [name]: reader.result,
+          }));
+        };
+        reader.readAsDataURL(file);
+      }
+    } else {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: value,
+      }));
+    }
   };
 
   const registerManager = async () => {
@@ -79,6 +94,7 @@ const HotelForm = () => {
       return false;
     }
   };
+
   const validateForm = () => {
     const messages = {};
     const requiredFields = [
@@ -105,6 +121,7 @@ const HotelForm = () => {
     setValidationMessages(messages);
     return Object.keys(messages).length === 0;
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
@@ -115,38 +132,17 @@ const HotelForm = () => {
 
     if (managerId) {
       try {
-        const formDataToSend = new FormData();
-        formDataToSend.append(
-          "data",
-          JSON.stringify({
-            name: formData.name,
-            location: formData.location,
-            manager: managerId,
-            managerName: formData.managerName,
-            managerEmail: formData.managerEmail,
-            managerPassword: formData.managerPassword,
-            managerPhoneNumber: formData.managerPhoneNumber,
-            kafeelName: formData.kafeelName,
-            KafeelPhoneNumber: formData.KafeelPhoneNumber,
-            TaxVatNumber: formData.TaxVatNumber,
-          })
-        );
-        formDataToSend.append(
-          "files.liscencePicture",
-          formData.liscencePicture
-        );
-        formDataToSend.append("files.TaxVatPicture", formData.TaxVatPicture);
-        formDataToSend.append(
-          "files.ComercialCertificate",
-          formData.ComercialCertificate
-        );
-
         const response = await axios.post(
           `${URL}/api/hotel-names`,
-          formDataToSend,
+          {
+            data: {
+              ...formData,
+              manager: managerId,
+            },
+          },
           {
             headers: {
-              "Content-Type": "multipart/form-data",
+              "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
           }
@@ -158,10 +154,10 @@ const HotelForm = () => {
           managerName: "",
           managerEmail: "",
           managerPassword: "",
+          managerPhoneNumber: "",
           kafeelName: "",
           KafeelPhoneNumber: "",
           liscencePicture: null,
-          managerPhoneNumber: "",
           TaxVatNumber: "",
           TaxVatPicture: null,
           ComercialCertificate: null,
@@ -297,6 +293,7 @@ const HotelForm = () => {
         <Input
           type="file"
           name="liscencePicture"
+          accept="image/*"
           onChange={handleInputChange}
         />
         {validationMessages.liscencePicture && (
@@ -305,7 +302,12 @@ const HotelForm = () => {
       </FormControl>
       <FormControl mt={4}>
         <FormLabel>Tax Vat Picture</FormLabel>
-        <Input type="file" name="TaxVatPicture" onChange={handleInputChange} />
+        <Input
+          type="file"
+          name="TaxVatPicture"
+          accept="image/*"
+          onChange={handleInputChange}
+        />
         {validationMessages.TaxVatPicture && (
           <Text color="red.500">{validationMessages.TaxVatPicture}</Text>
         )}
@@ -315,13 +317,14 @@ const HotelForm = () => {
         <Input
           type="file"
           name="ComercialCertificate"
+          accept="image/*"
           onChange={handleInputChange}
         />
         {validationMessages.ComercialCertificate && (
           <Text color="red.500">{validationMessages.ComercialCertificate}</Text>
         )}
       </FormControl>
-      <Button colorScheme="blue" mt={4} onClick={handleSubmit}>
+      <Button mt={4} colorScheme="blue" onClick={handleSubmit}>
         Submit
       </Button>
     </Box>
