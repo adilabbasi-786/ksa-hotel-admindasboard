@@ -21,13 +21,19 @@ import {
 } from "components/scrollbar/Scrollbar";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import PropTypes from "prop-types";
+import { useLocation } from "react-router-dom";
 import Routes from "routes";
+import hotelRoutes from "../.././hotelRoutes";
 
 // Assets
 import { IoMenuOutline } from "react-icons/io5";
 
 function Sidebar(props) {
   const routes = Routes();
+  const location = useLocation();
+  const currentRoutes = location.pathname.startsWith("/hotel")
+    ? hotelRoutes
+    : Routes();
 
   let variantChange = "0.2s linear";
   let shadow = useColorModeValue(
@@ -62,7 +68,7 @@ function Sidebar(props) {
           renderThumbVertical={renderThumb}
           renderView={renderView}
         >
-          <Content routes={routes} />
+          <Content routes={currentRoutes} />
         </Scrollbars>
       </Box>
     </Box>
@@ -78,6 +84,10 @@ export function SidebarResponsive(props) {
   const btnRef = React.useRef();
 
   const routes = Routes();
+  const location = useLocation();
+  const currentRoutes = location.pathname.startsWith("/hotel")
+    ? hotelRoutes
+    : Routes();
   // let isWindows = navigator.platform.startsWith("Win");
   //  BRAND
 
@@ -115,7 +125,7 @@ export function SidebarResponsive(props) {
               renderThumbVertical={renderThumb}
               renderView={renderView}
             >
-              <Content routes={routes} onClose={onClose} />
+              <Content routes={currentRoutes} onClose={onClose} />
               {console.log("rorrrr", routes)}
             </Scrollbars>
           </DrawerBody>
