@@ -110,7 +110,7 @@ const Routes = () => {
             <Badge
               position="absolute"
               top="-1px"
-              right="-1px"
+              right="-150px"
               borderRadius="full"
               bg="red.500"
               color="white"
