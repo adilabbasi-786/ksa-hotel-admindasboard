@@ -331,16 +331,16 @@ export default function DevelopmentTable(props) {
     parseFloat(totalExpense) + parseFloat(totalTax)
   ).toFixed(1);
 
-  const totalAdvanceSalary = advanceSalaryData?.data?.reduce(
-    (total, item) => total + item.attributes.amount,
+  const totalAdvanceSalary = (advanceSalaryData?.data || []).reduce(
+    (total, item) => total + (item.attributes.amount || 0),
     0
   );
-  const totalCashSale = todaySaleData?.data?.reduce(
+  const totalCashSale = (todaySaleData?.data || []).reduce(
     (total, item) => total + (item.attributes.cashSale || 0),
     0
   );
 
-  const totalCreditSale = todaySaleData?.data?.reduce(
+  const totalCreditSale = (todaySaleData?.data || []).reduce(
     (total, item) => total + (item.attributes.creditSale || 0),
     0
   );
