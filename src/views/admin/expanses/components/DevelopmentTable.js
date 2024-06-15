@@ -48,6 +48,7 @@ export default function DevelopmentTable(props) {
   const [editingItem, setEditingItem] = useState(null);
   const [editValues, setEditValues] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleTodaySaleModalClose = () => setShowTodaySaleModal(false);
   const handleAdvanceSalaryModalClose = () => setShowAdvanceSalaryModal(false);
@@ -120,12 +121,13 @@ export default function DevelopmentTable(props) {
       });
 
       setDriverData(response.data.data);
+      setShowDriverSalaryModal(true);
+      getData();
       console.log("resss", response.data.data);
       console.log("selectedHotel", selectedHotel);
       if (response.data.data.length > 0) {
         setSalary(response.data.data[0].attributes.salary);
       }
-      setShowDriverSalaryModal(true);
     } catch (error) {
       console.error("Error fetching driver data:", error);
     }
@@ -167,6 +169,8 @@ export default function DevelopmentTable(props) {
   }, [selectedHotel, selectedDate]);
 
   const handlePayment = async () => {
+    setIsLoading(true);
+
     try {
       // Assuming there's an API to update the driver's paid salary
       await axios.post(
@@ -193,6 +197,7 @@ export default function DevelopmentTable(props) {
     } catch (error) {
       console.error("Error making payment:", error);
     }
+    setIsLoading(false);
   };
 
   // Calculate the tax for each item in tableData
@@ -675,6 +680,7 @@ export default function DevelopmentTable(props) {
             <Button
               colorScheme="blue"
               onClick={handlePayment}
+              isLoading={isLoading}
               isDisabled={!amountPaid}
             >
               Pay

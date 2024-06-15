@@ -15,6 +15,7 @@ const Index = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     setError("");

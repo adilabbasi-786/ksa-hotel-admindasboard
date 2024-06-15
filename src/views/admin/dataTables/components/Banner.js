@@ -72,6 +72,8 @@ const Banner = ({
     employeePictureUrl: "",
   });
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -187,6 +189,7 @@ const Banner = ({
       "files.employeePicture",
       updatedEmployeeData.employeePicture
     );
+    setIsLoading(true);
 
     axios
       .put(`${URL}/api/employee-data/${id}`, formDataToSend, {
@@ -210,6 +213,7 @@ const Banner = ({
       .catch((error) => {
         console.error("Error saving data:", error);
       });
+    setIsLoading(false);
   };
 
   const handleInputChange = (event) => {

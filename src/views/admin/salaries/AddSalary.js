@@ -34,6 +34,7 @@ const AddSalary = ({
   const [employeeSalary, setEmployeeSalary] = useState(0);
   const [lastActiveDate, setLastActiveDate] = useState("");
   const [paidMonths, setPaidMonths] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (selectedEmployee) {
@@ -127,9 +128,11 @@ const AddSalary = ({
         amount: amount,
       },
     };
+
     if (entryType === "monthly salary") {
       requestData.data.month = month;
     }
+    setIsLoading(true);
 
     try {
       const response = await axios.post(`${URL}/api/salaries`, requestData, {
@@ -181,6 +184,7 @@ const AddSalary = ({
         return;
       }
     }
+    setIsLoading(false);
   };
 
   const generateMonthOptions = () => {
@@ -292,7 +296,12 @@ const AddSalary = ({
           </VStack>
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={handleAddItem}>
+          <Button
+            colorScheme="blue"
+            mr={3}
+            onClick={handleAddItem}
+            isLoading={isLoading}
+          >
             Pay Salary
           </Button>
           <Button onClick={onClose}>Cancel</Button>

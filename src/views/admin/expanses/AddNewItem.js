@@ -32,6 +32,8 @@ const AddNewItem = ({
   const [category, setCategory] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   const token = localStorage.getItem("token");
 
   const handleAddItem = () => {
@@ -49,6 +51,7 @@ const AddNewItem = ({
       hotel_name: selectedHotel,
       date: selectedDate,
     };
+    setIsLoading(true);
 
     axios
       .post(
@@ -73,6 +76,7 @@ const AddNewItem = ({
         console.error(error);
         setErrorMessage("Failed to add item. Please try again.");
       });
+    setIsLoading(false);
   };
 
   return (
@@ -131,7 +135,12 @@ const AddNewItem = ({
           )}
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={handleAddItem}>
+          <Button
+            colorScheme="blue"
+            mr={3}
+            onClick={handleAddItem}
+            isLoading={isLoading}
+          >
             Add Item
           </Button>
           <Button onClick={onClose}>Cancel</Button>

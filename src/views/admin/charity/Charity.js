@@ -34,6 +34,8 @@ const Charity = ({ selectedHotel }) => {
   const [charityCost, setCharityCost] = useState("");
   const [dailyCharity, setDailyCharity] = useState(null);
   const [isCharityPaid, setIsCharityPaid] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -76,6 +78,8 @@ const Charity = ({ selectedHotel }) => {
   };
 
   const handleAddCharity = async () => {
+    setIsLoading(true);
+
     try {
       await axios.post(
         `${URL}/api/charities`,
@@ -100,6 +104,7 @@ const Charity = ({ selectedHotel }) => {
     } catch (error) {
       console.error("Error adding daily charity:", error);
     }
+    setIsLoading(false);
   };
 
   return (
@@ -186,7 +191,11 @@ const Charity = ({ selectedHotel }) => {
             />
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" onClick={handleAddCharity}>
+            <Button
+              colorScheme="blue"
+              onClick={handleAddCharity}
+              isLoading={isLoading}
+            >
               Add
             </Button>
             <Button onClick={handleCloseModal}>Cancel</Button>

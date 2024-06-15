@@ -37,6 +37,8 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
     Designation: "",
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [formErrors, setFormErrors] = useState({
     EmployeeName: "",
     PassportNumber: "",
@@ -129,6 +131,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
       setFormErrors(newFormErrors);
       return;
     }
+    setIsLoading(true);
 
     try {
       const response = await axios.post(
@@ -147,12 +150,11 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
       fetchEmployeeData();
       setTimeout(() => {
         onClose();
-        setIsSubmitting(false);
       }, 2000);
     } catch (error) {
       console.error("Error submitting form data:", error);
-      setIsSubmitting(false);
     }
+    setIsLoading(false);
   };
   return (
     <Box p={10} bg="white">
@@ -251,7 +253,6 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
                 onChange={(e) => handleChange(e, "Designation")}
               >
                 <option value="manager">Manager</option>
-                <option value="driver">Driver</option>
                 <option value="hotel employee">Hotel Employee</option>
               </Select>
               <Text color="red">{formErrors.Designation}</Text>
@@ -333,8 +334,9 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
             ml={4}
             mt={4}
             onClick={handleSubmit}
+            isLoading={isLoading}
           >
-            {isSubmitting ? "Submitting..." : "Submit"}
+            submit
           </Button>
         </form>
       )}
