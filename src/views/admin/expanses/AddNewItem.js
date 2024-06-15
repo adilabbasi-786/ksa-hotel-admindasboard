@@ -42,6 +42,7 @@ const AddNewItem = ({
       setErrorMessage("All fields are required.");
       return;
     }
+    setIsLoading(true);
 
     const newItem = {
       itemName,
@@ -51,7 +52,6 @@ const AddNewItem = ({
       hotel_name: selectedHotel,
       date: selectedDate,
     };
-    setIsLoading(true);
 
     axios
       .post(

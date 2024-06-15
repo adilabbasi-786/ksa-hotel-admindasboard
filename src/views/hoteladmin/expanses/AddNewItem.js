@@ -32,6 +32,7 @@ const AddNewItem = ({
   const [category, setCategory] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const token = localStorage.getItem("token");
 
@@ -40,6 +41,8 @@ const AddNewItem = ({
       setErrorMessage("please filled all field, All fields are required.");
       return;
     }
+    setIsLoading(true);
+
     const newItem = {
       itemName,
       quantity,
@@ -68,10 +71,14 @@ const AddNewItem = ({
         onClose();
 
         getData();
+        setQuantity("");
+        setPrice("");
+        setItemName("");
       })
       .catch((error) => {
         console.error(error);
       });
+    setIsLoading(false);
   };
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -130,7 +137,12 @@ const AddNewItem = ({
           )}
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={handleAddItem}>
+          <Button
+            colorScheme="blue"
+            mr={3}
+            onClick={handleAddItem}
+            isLoading={isLoading}
+          >
             Add Item
           </Button>
           <Button onClick={onClose}>Cancel</Button>
