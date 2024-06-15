@@ -41,7 +41,7 @@ const ProfitTable = ({ selectedHotel }) => {
   const fetchPartnersData = async () => {
     try {
       const response = await axios.get(
-        `${URL}/api/partners?populate=*&filters[hotel_names][id][$in]=${selectedHotel}&filters[month]=${selectedMonth}`
+        `${URL}/api/partners?populate=*&filters[hotel_names][id][$in]=${selectedHotel}`
       );
       const partnersWithProfit = response.data.data.map((partner) => ({
         ...partner,

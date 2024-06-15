@@ -20,6 +20,7 @@ import Profits from "views/admin/profits";
 import Kafalat from "views/admin/hotelrentkafalat";
 import Charity from "views/admin/charity";
 import Notifications from "views/admin/notifications";
+import adminPassword from "views/admin/adminPassword";
 import SignInCentered from "views/auth/signout";
 import { useUnreadNotifications } from "UnreadNotificationsContext";
 
@@ -122,6 +123,13 @@ const Routes = () => {
         </Box>
       ),
       component: Notifications,
+    },
+    {
+      name: "Change Password",
+      layout: "/admin",
+      path: "/updatePassword",
+      icon: <Icon as={MdLogout} width="20px" height="20px" color="inherit" />,
+      component: adminPassword,
     },
     {
       name: "signout",
