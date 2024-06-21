@@ -207,6 +207,8 @@ export default function DevelopmentTable(props) {
   useEffect(() => {
     // alert("hotelchange");
     payment();
+    handleTodaySaleModalOpen();
+    handleAdvanceSalaryModalOpen();
   }, [selectedDate]);
 
   const dataWithTax = useMemo(() => {

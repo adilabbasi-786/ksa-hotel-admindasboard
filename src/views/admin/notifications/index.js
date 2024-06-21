@@ -77,7 +77,6 @@ const Index = () => {
         <VStack spacing={4} align="start">
           {localNotifications.map((notification) => (
             <Box
-              key={notification.id}
               w="100%"
               p={4}
               bg={notification.attributes.read ? "white" : "gray.200"}
@@ -89,8 +88,20 @@ const Index = () => {
                   notification.attributes.read
                 )
               }
+              display="flex"
+              justifyContent="space-between"
             >
               <Text>{notification.attributes.message}</Text>
+              <Text>
+                {new Date(notification.attributes.createdAt).toLocaleDateString(
+                  "en-US",
+                  {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  }
+                )}
+              </Text>
             </Box>
           ))}
         </VStack>
