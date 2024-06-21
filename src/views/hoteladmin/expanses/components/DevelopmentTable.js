@@ -57,7 +57,7 @@ export default function DevelopmentTable(props) {
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
 
   const token = localStorage.getItem("token");
-  const handleTodaySaleModalOpen = async () => {
+  const handleTodaySaleModalOpen = async (openModal = false) => {
     try {
       const response = await axios.get(
         `${URL}/api/daily-sales?populate=*&filters[date][$eq]=${selectedDate}`,
@@ -70,14 +70,15 @@ export default function DevelopmentTable(props) {
 
       setTodaySaleData(response.data);
       console.log("salesresponse", response.data);
-
-      setShowTodaySaleModal(true);
+      if (openModal) {
+        setShowTodaySaleModal(true);
+      }
     } catch (error) {
       console.error("Error fetching today's sale data:", error);
     }
   };
 
-  const handleAdvanceSalaryModalOpen = async () => {
+  const handleAdvanceSalaryModalOpen = async (openModal = false) => {
     try {
       const response = await axios.get(
         `${URL}/api/advance-salaries?&filters[date][$eq]=${selectedDate}`,
@@ -91,7 +92,9 @@ export default function DevelopmentTable(props) {
 
       setAdvanceSalaryData(response.data);
       console.log("Responseadvacne", response);
-      setShowAdvanceSalaryModal(true);
+      if (openModal) {
+        setShowAdvanceSalaryModal(true);
+      }
     } catch (error) {
       console.error("Error fetching advance salary data:", error);
     }
@@ -207,7 +210,7 @@ export default function DevelopmentTable(props) {
   useEffect(() => {
     // alert("hotelchange");
     payment();
-    handleTodaySaleModalOpen();
+    handleTodaySaleModalOpen(false);
     handleAdvanceSalaryModalOpen();
   }, [selectedDate]);
 
