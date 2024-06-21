@@ -3,12 +3,16 @@ import axios from "axios";
 import { Box, Text, VStack, useToast } from "@chakra-ui/react";
 import { URL } from "Utils";
 import { useUnreadNotifications } from "UnreadNotificationsContext";
+import Pagination from "./Pagination";
 
 const Index = () => {
   const toast = useToast();
-  const { notifications, markAsRead } = useUnreadNotifications();
+  const { notifications, markAsRead, currentPage, setCurrentPage, totalPages } =
+    useUnreadNotifications();
   const [localNotifications, setLocalNotifications] = useState([]);
-
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
   useEffect(() => {
     // Sort notifications based on timestamp in descending order
     const sortedNotifications = notifications.sort((a, b) => {
@@ -91,6 +95,11 @@ const Index = () => {
           ))}
         </VStack>
       )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
     </Box>
   );
 };

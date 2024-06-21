@@ -9,6 +9,10 @@ const UnreadNotificationsContext = createContext();
 export const UnreadNotificationsProvider = ({ children }) => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
+  const [totalPages, setTotalPages] = useState(0);
+
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -19,6 +23,8 @@ export const UnreadNotificationsProvider = ({ children }) => {
             Authorization: `Bearer ${token}`,
           },
         });
+        const totalNotifications = response.data.meta.pagination.total;
+        setTotalPages(Math.ceil(totalNotifications / perPage));
 
         // Sort notifications based on timestamp in descending order
         const sortedNotifications = response.data.data.sort((a, b) => {
@@ -49,7 +55,7 @@ export const UnreadNotificationsProvider = ({ children }) => {
     };
 
     fetchUnreadCount();
-  }, [token]);
+  }, [token, currentPage]);
 
   const markAsRead = async (id) => {
     try {
@@ -77,10 +83,22 @@ export const UnreadNotificationsProvider = ({ children }) => {
       console.error("Error updating notification:", error);
     }
   };
+  const paginatedNotifications = notifications.slice(
+    (currentPage - 1) * perPage,
+    currentPage * perPage
+  );
 
   return (
     <UnreadNotificationsContext.Provider
-      value={{ unreadCount, setUnreadCount, notifications, markAsRead }}
+      value={{
+        unreadCount,
+        setUnreadCount,
+        notifications: paginatedNotifications,
+        markAsRead,
+        currentPage,
+        setCurrentPage,
+        totalPages,
+      }}
     >
       {children}
     </UnreadNotificationsContext.Provider>
