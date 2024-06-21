@@ -37,10 +37,11 @@ const Drivers = () => {
   const [EmployeePicture, setEmployeePicture] = useState(null);
   const [selectedDriver, setSelectedDriver] = useState(null);
   const [selectedDriverDetails, setSelectedDriverDetails] = useState(null);
-  const [token, setToken] = useState("");
+  // const [token, setToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const toast = useToast();
+  const token = localStorage.getItem("token");
 
   const {
     isOpen: isViewModalOpen,
@@ -72,8 +73,8 @@ const Drivers = () => {
   };
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    setToken(storedToken);
+    // const storedToken = localStorage.getItem("token");
+    // setToken(storedToken);
     fetchDrivers();
   }, []);
 
@@ -130,7 +131,9 @@ const Drivers = () => {
         `${URL}/api/driver-details`,
         { data: newDriver },
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
