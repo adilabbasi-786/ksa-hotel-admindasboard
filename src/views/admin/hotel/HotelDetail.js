@@ -29,11 +29,14 @@ const HotelDetail = () => {
   };
   useEffect(() => {
     const getData = async () => {
-      let req = await fetch(`${URL}/api/hotel-names?&[filters][id]=${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      let req = await fetch(
+        `${URL}/api/hotel-names?populate=*&[filters][id]=${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       let res = await req.json();
       console.log("aman", res.data);
       setHotel(res.data);
@@ -125,15 +128,20 @@ const HotelDetail = () => {
         <Box boxShadow={cardShadow}>
           <Text fontWeight="semibold">liscence Picture </Text>
 
-          {hotel[0]?.attributes?.liscencePicture && (
+          {hotel[0]?.attributes?.liscencePicture?.data?.attributes?.url && (
             <Box
               onClick={() =>
-                openImageModal(hotel[0]?.attributes?.liscencePicture)
+                openImageModal(
+                  hotel[0]?.attributes?.liscencePicture?.data?.attributes?.url
+                )
               }
               cursor="pointer"
             >
               <Image
-                src={hotel[0]?.attributes?.liscencePicture}
+                src={
+                  hotel[0]?.attributes?.liscencePicture?.data?.attributes
+                    ?.formats?.thumbnail?.url
+                }
                 alt="liscencePicture"
               />
             </Box>
@@ -142,15 +150,22 @@ const HotelDetail = () => {
         <Box boxShadow={cardShadow}>
           <Text fontWeight="semibold">Comercial Certificate picture </Text>
 
-          {hotel[0]?.attributes?.ComercialCertificate && (
+          {hotel[0]?.attributes?.ComercialCertificate?.data?.attributes
+            ?.url && (
             <Box
               onClick={() =>
-                openImageModal(hotel[0]?.attributes?.ComercialCertificate)
+                openImageModal(
+                  hotel[0]?.attributes?.ComercialCertificate?.data?.attributes
+                    ?.url
+                )
               }
               cursor="pointer"
             >
               <Image
-                src={hotel[0]?.attributes?.ComercialCertificate}
+                src={
+                  hotel[0]?.attributes?.ComercialCertificate?.data?.attributes
+                    ?.formats?.thumbnail?.url
+                }
                 alt="ComercialCertificate"
               />
             </Box>
@@ -159,15 +174,20 @@ const HotelDetail = () => {
         <Box boxShadow={cardShadow}>
           <Text fontWeight="semibold">Tax Vat Picture </Text>
 
-          {hotel[0]?.attributes?.TaxVatPicture && (
+          {hotel[0]?.attributes?.TaxVatPicture?.data?.attributes?.url && (
             <Box
               onClick={() =>
-                openImageModal(hotel[0]?.attributes?.TaxVatPicture)
+                openImageModal(
+                  hotel[0]?.attributes?.TaxVatPicture?.data?.attributes?.url
+                )
               }
               cursor="pointer"
             >
               <Image
-                src={hotel[0]?.attributes?.TaxVatPicture}
+                src={
+                  hotel[0]?.attributes?.TaxVatPicture?.data?.attributes?.formats
+                    ?.thumbnail?.url
+                }
                 alt="TaxVatPicture"
               />
             </Box>

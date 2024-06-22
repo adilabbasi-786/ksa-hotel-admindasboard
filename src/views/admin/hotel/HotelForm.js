@@ -37,24 +37,11 @@ const HotelForm = () => {
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
-    if (files) {
-      const file = files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setFormData((prevFormData) => ({
-            ...prevFormData,
-            [name]: reader.result,
-          }));
-        };
-        reader.readAsDataURL(file);
-      }
-    } else {
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        [name]: value,
-      }));
-    }
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+      [name]: files ? files[0] : value,
+    }));
   };
 
   const registerManager = async () => {
@@ -125,26 +112,41 @@ const HotelForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-    setIsLoading(true);
     const managerId = await registerManager();
 
     if (managerId) {
       try {
+        const formDataToSend = new FormData();
+        formDataToSend.append(
+          "data",
+          JSON.stringify({
+            name: formData.name,
+            location: formData.location,
+            manager: managerId,
+            managerEmail: formData.managerEmail,
+            managerPassword: formData.managerPassword,
+            managerPhoneNumber: formData.managerPhoneNumber,
+            kafeelName: formData.kafeelName,
+            KafeelPhoneNumber: formData.KafeelPhoneNumber,
+            TaxVatNumber: formData.TaxVatNumber,
+          })
+        );
+        formDataToSend.append(
+          "files.liscencePicture",
+          formData.liscencePicture
+        );
+        formDataToSend.append("files.TaxVatPicture", formData.TaxVatPicture);
+        formDataToSend.append(
+          "files.ComercialCertificate",
+          formData.ComercialCertificate
+        );
+
         const response = await axios.post(
           `${URL}/api/hotel-names`,
-          {
-            data: {
-              ...formData,
-              manager: managerId,
-            },
-          },
+          formDataToSend,
           {
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "multipart/form-data",
               Authorization: `Bearer ${token}`,
             },
           }
@@ -156,10 +158,10 @@ const HotelForm = () => {
           managerName: "",
           managerEmail: "",
           managerPassword: "",
-          managerPhoneNumber: "",
           kafeelName: "",
           KafeelPhoneNumber: "",
           liscencePicture: null,
+          managerPhoneNumber: "",
           TaxVatNumber: "",
           TaxVatPicture: null,
           ComercialCertificate: null,
@@ -173,7 +175,6 @@ const HotelForm = () => {
     } else {
       alert("Failed to register manager. Please try again later.");
     }
-    setIsLoading(false);
   };
 
   return (
@@ -295,8 +296,8 @@ const HotelForm = () => {
         <FormLabel>Licence Picture</FormLabel>
         <Input
           type="file"
-          name="liscencePicture"
           accept="image/*"
+          name="liscencePicture"
           onChange={handleInputChange}
         />
         {validationMessages.liscencePicture && (
