@@ -26,7 +26,7 @@ const UserReports = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const req = await fetch(`${URL}/api/hotel-names?populate=*`, {
+        const req = await fetch(`${URL}/api/hotel-names`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

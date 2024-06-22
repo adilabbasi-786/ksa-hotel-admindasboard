@@ -20,7 +20,7 @@ const Hotels = () => {
   );
   const getData = async () => {
     let req = await fetch(
-      `${URL}/api/hotel-names?populate=*`,
+      `${URL}/api/hotel-names`,
 
       {
         headers: {
