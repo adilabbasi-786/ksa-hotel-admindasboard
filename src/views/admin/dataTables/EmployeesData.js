@@ -27,7 +27,7 @@ const EmployeesData = ({ selectedHotel }) => {
 
     try {
       const response = await axios.get(
-        `${URL}/api/employee-data?populate=*&filters[hotel_name][id][$in]=${selectedHotel}`,
+        `${URL}/api/employee-data?&filters[hotel_name][id][$in]=${selectedHotel}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

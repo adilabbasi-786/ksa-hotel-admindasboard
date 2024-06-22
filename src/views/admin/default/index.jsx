@@ -26,7 +26,7 @@ const UserReports = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const req = await fetch(`${URL}/api/hotel-names`, {
+        const req = await fetch(`${URL}/api/hotel-names?fields[0]=name`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
