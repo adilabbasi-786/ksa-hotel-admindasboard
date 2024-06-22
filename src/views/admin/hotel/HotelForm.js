@@ -123,6 +123,7 @@ const HotelForm = () => {
             name: formData.name,
             location: formData.location,
             manager: managerId,
+            managerName: formData.managerName,
             managerEmail: formData.managerEmail,
             managerPassword: formData.managerPassword,
             managerPhoneNumber: formData.managerPhoneNumber,
