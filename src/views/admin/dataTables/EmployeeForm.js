@@ -55,29 +55,28 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
     Designation: "",
   });
 
-  const handleFileChange = (e, fieldName) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prevData) => ({
-          ...prevData,
-          [fieldName]: reader.result,
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleChange = (e, fieldName) => {
-    const { value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [fieldName]: value,
-    }));
+    const { files, value } = e.target;
+    const newValue = files ? files[0] : value;
+
+    // Update formData
+    setFormData((prevData) => {
+      let updatedData = { ...prevData, [fieldName]: newValue };
+
+      // If status is set to "active", update lastActiveDate to the current date
+      if (fieldName === "status") {
+        if (newValue === "active") {
+          updatedData.lastActiveDate = new Date().toISOString().split("T")[0];
+        } else if (newValue === "inactive") {
+          updatedData.lastActiveDate = "";
+        }
+      }
+
+      return updatedData;
+    });
 
     // Validate if field is empty
-    if (value === "") {
+    if (newValue === "") {
       setFormErrors((prevErrors) => ({
         ...prevErrors,
         [fieldName]: `Please fill ${fieldName}`,
@@ -115,31 +114,52 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
       }
     });
 
-    // Check if any picture fields are empty
-    if (
-      !formData.employeePicture ||
-      !formData.iqamaPicture ||
-      !formData.passportImage ||
-      !formData.Employee_healtCard
-    ) {
-      newFormErrors["pictures"] = "Please upload all pictures";
-      alert("please upload all pictures");
+    // Check if employee picture, iqama picture, and passport picture are not empty
+    if (!formData.employeePicture) {
+      newFormErrors.employeePicture = "Please upload Employee picture";
+      hasErrors = true;
+    }
+    if (!formData.iqamaPicture) {
+      newFormErrors.iqamaPicture = "Please upload iqama picture";
+      hasErrors = true;
+    }
+    if (!formData.passportImage) {
+      newFormErrors.passportImage = "Please upload Passport picture";
+      hasErrors = true;
+    }
+    if (!formData.Employee_healtCard) {
+      newFormErrors.Employee_healtCard =
+        "Please upload Employee_healtCard picture";
       hasErrors = true;
     }
 
+    // If there are errors, update state and stop form submission
     if (hasErrors) {
-      setFormErrors(newFormErrors);
-      return;
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        ...newFormErrors,
+      }));
+      return; // Stop further execution
     }
     setIsLoading(true);
     try {
+      const formDataToSend = new FormData();
+      formDataToSend.append("data", JSON.stringify(formData));
+      formDataToSend.append("files.employeePicture", formData.employeePicture);
+      formDataToSend.append("files.iqamaPicture", formData.iqamaPicture);
+      formDataToSend.append("files.passportImage", formData.passportImage);
+
+      formDataToSend.append(
+        "files.Employee_healtCard",
+        formData.Employee_healtCard
+      );
       const response = await axios.post(
         `${URL}/api/employee-data`,
-        { data: formData },
+        formDataToSend,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -148,13 +168,11 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
       setFormSubmitted(true);
       fetchEmployeeData();
       setTimeout(() => {
-        onClose();
-        setIsSubmitting(false);
+        onClose(); // Close the modal after 2 seconds
       }, 2000);
       setIsLoading(false);
     } catch (error) {
       console.error("Error submitting form data:", error);
-      setIsSubmitting(false);
     }
   };
   return (
@@ -171,7 +189,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
               name="employeePicture"
               type="file"
               accept="image/*"
-              onChange={(e) => handleFileChange(e, "employeePicture")}
+              onChange={(e) => handleChange(e, "employeePicture")}
             />
             <Text color="red">{formErrors.employeePicture}</Text>
           </FormControl>
@@ -303,7 +321,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
               <Input
                 type="file"
                 accept="image/*"
-                onChange={(e) => handleFileChange(e, "iqamaPicture")}
+                onChange={(e) => handleChange(e, "iqamaPicture")}
               />
               <Text color="red">{formErrors.iqamaPicture}</Text>
             </FormControl>
@@ -312,7 +330,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
               <Input
                 type="file"
                 accept="image/*"
-                onChange={(e) => handleFileChange(e, "Employee_healtCard")}
+                onChange={(e) => handleChange(e, "Employee_healtCard")}
               />
               <Text color="red">{formErrors.Employee_healtCard}</Text>
             </FormControl>
@@ -321,7 +339,7 @@ const EmployeeForm = ({ onClose, selectedHotel, fetchEmployeeData }) => {
               <Input
                 type="file"
                 accept="image/*"
-                onChange={(e) => handleFileChange(e, "passportImage")}
+                onChange={(e) => handleChange(e, "passportImage")}
               />
               <Text color="red">{formErrors.passportImage}</Text>
             </FormControl>
