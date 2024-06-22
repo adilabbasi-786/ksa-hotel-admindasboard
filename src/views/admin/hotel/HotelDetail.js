@@ -29,14 +29,11 @@ const HotelDetail = () => {
   };
   useEffect(() => {
     const getData = async () => {
-      let req = await fetch(
-        `${URL}/api/hotel-names?populate=*&[filters][id]=${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      let req = await fetch(`${URL}/api/hotel-names?&[filters][id]=${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       let res = await req.json();
       console.log("aman", res.data);
       setHotel(res.data);
