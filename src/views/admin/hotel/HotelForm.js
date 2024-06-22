@@ -113,7 +113,7 @@ const HotelForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const managerId = await registerManager();
-
+    setIsLoading(true);
     if (managerId) {
       try {
         const formDataToSend = new FormData();
@@ -168,6 +168,7 @@ const HotelForm = () => {
         });
         alert("Form submitted successfully!");
         history.push("/admin/hotel");
+        setIsLoading(false);
       } catch (error) {
         console.error("Error submitting form data:", error);
         alert("Failed to submit form data. Please try again later.");
