@@ -416,7 +416,7 @@ const HotelCard = ({
                   accept="image/*"
                   onChange={handleFileInputChange}
                 />
-                <Text>{getFilename(updatedHotelData.liscencePicture)}</Text>
+                {/* <Text>{getFilename(updatedHotelData.liscencePicture)}</Text> */}
               </FormControl>
             </Box>
             <Box mt="10px">

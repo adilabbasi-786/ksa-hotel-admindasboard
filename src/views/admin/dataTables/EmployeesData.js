@@ -27,7 +27,7 @@ const EmployeesData = ({ selectedHotel }) => {
 
     try {
       const response = await axios.get(
-        `${URL}/api/employee-data?&filters[hotel_name][id][$in]=${selectedHotel}`,
+        `${URL}/api/employee-data?populate=*&filters[hotel_name][id][$in]=${selectedHotel}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -93,11 +93,21 @@ const EmployeesData = ({ selectedHotel }) => {
               gridArea="1 / 1 / 2 / 2"
               name={employee.attributes.EmployeeName}
               passportNumber={employee.attributes.PassportNumber}
-              avatar={employee?.attributes?.employeePicture}
-              employeePicture={employee?.attributes?.employeePicture}
-              passportImage={employee?.attributes?.passportImage}
-              iqamaPicture={employee?.attributes?.iqamaPicture}
-              Employee_healtCard={employee?.attributes?.Employee_healtCard}
+              avatar={
+                employee?.attributes?.employeePicture?.data?.attributes?.url
+              }
+              employeePicture={
+                employee?.attributes?.employeePicture?.data?.attributes?.url
+              }
+              passportImage={
+                employee?.attributes?.passportImage?.data?.attributes?.url
+              }
+              iqamaPicture={
+                employee?.attributes?.iqamaPicture?.data?.attributes?.url
+              }
+              Employee_healtCard={
+                employee?.attributes?.Employee_healtCard?.data?.attributes?.url
+              }
               banner={banner}
               status={employee.attributes.status}
               Designation={employee.attributes.Designation}

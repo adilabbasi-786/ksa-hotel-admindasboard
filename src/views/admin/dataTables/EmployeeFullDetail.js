@@ -91,38 +91,71 @@ const EmployeeFullDetail = ({ employeeData }) => {
         <Box boxShadow={cardShadow}>
           <Text fontWeight="semibold">Employee profile Picture</Text>
           <Box
-            onClick={() => openImageModal(employeeData?.employeePicture)}
+            onClick={() =>
+              openImageModal(
+                employeeData?.employeePicture?.data?.attributes?.url
+              )
+            }
             cursor="pointer"
           >
-            <Image src={employeeData?.employeePicture} alt="Employee Picture" />
+            <Image
+              src={
+                employeeData?.employeePicture?.data?.attributes?.formats
+                  ?.thumbnail?.url
+              }
+              alt="Iqama Picture"
+            />
           </Box>
         </Box>
         <Box boxShadow={cardShadow}>
           <Text fontWeight="semibold">Iqama Picture</Text>
           <Box
-            onClick={() => openImageModal(employeeData?.iqamaPicture)}
+            onClick={() =>
+              openImageModal(employeeData?.iqamaPicture?.data?.attributes?.url)
+            }
             cursor="pointer"
           >
-            <Image src={employeeData?.iqamaPicture} alt="Iqama Picture" />
+            <Image
+              src={
+                employeeData?.iqamaPicture?.data?.attributes?.formats?.thumbnail
+                  ?.url
+              }
+              alt="Iqama Picture"
+            />
           </Box>
         </Box>
         <Box boxShadow={cardShadow}>
           <Text fontWeight="semibold">Passport Picture</Text>
           <Box
-            onClick={() => openImageModal(employeeData?.passportImage)}
+            onClick={() =>
+              openImageModal(employeeData?.passportImage?.data?.attributes?.url)
+            }
             cursor="pointer"
           >
-            <Image src={employeeData?.passportImage} alt="Passport Picture" />
+            <Image
+              src={
+                employeeData?.passportImage?.data?.attributes?.formats
+                  ?.thumbnail?.url
+              }
+              alt="Passport Picture"
+            />
           </Box>
         </Box>
         <Box boxShadow={cardShadow}>
           <Text fontWeight="semibold">Employee Health Card Picture</Text>
           <Box
-            onClick={() => openImageModal(employeeData?.Employee_healtCard)}
+            onClick={() =>
+              openImageModal(
+                employeeData?.Employee_healtCard?.data?.attributes?.url
+              )
+            }
             cursor="pointer"
           >
             <Image
-              src={employeeData?.Employee_healtCard}
+              src={
+                employeeData?.Employee_healtCard?.data?.attributes?.formats
+                  ?.thumbnail?.url
+              }
               alt="Passport Picture"
             />
           </Box>
