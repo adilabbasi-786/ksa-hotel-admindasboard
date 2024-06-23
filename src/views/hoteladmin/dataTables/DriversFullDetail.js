@@ -383,29 +383,6 @@ const DriversFullDetail = ({ driver, isOpen, onClose, fetchDrivers }) => {
             </>
           )}
         </ModalBody>
-        <ModalFooter>
-          {isEditing ? (
-            <>
-              <Button colorScheme="blue" onClick={handleEditDriver} mr="3">
-                Save
-              </Button>
-              <Button onClick={() => setIsEditing(false)}>Cancel</Button>
-            </>
-          ) : (
-            <>
-              <Button
-                colorScheme="blue"
-                onClick={() => setIsEditing(true)}
-                mr="3"
-              >
-                Edit
-              </Button>
-              <Button colorScheme="red" onClick={onConfirmOpen}>
-                Delete
-              </Button>
-            </>
-          )}
-        </ModalFooter>
       </ModalContent>
       <Modal isOpen={isConfirmOpen} onClose={onConfirmClose}>
         <ModalOverlay />
