@@ -23,6 +23,11 @@ import FullScreenImageModal from "./FullScreenModal";
 const DriversFullDetail = ({ driver, isOpen, onClose, fetchDrivers }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [driverName, setDriverName] = useState(driver.attributes.driverName);
+  const [liscenceExpiryDate, setLiscenceExpiryDate] = useState(
+    driver.attributes.liscenceExpiryDate
+  );
+  const [isLoading, setIsLoading] = useState(false);
+
   const [driverLisenceNumber, setDriverLicenseNumber] = useState(
     driver.attributes.driverLisenceNumber
   );
@@ -38,18 +43,10 @@ const DriversFullDetail = ({ driver, isOpen, onClose, fetchDrivers }) => {
     driver.attributes.passportExpiry
   );
   const [iqamaExpiry, setiqamaExpiry] = useState(driver.attributes.iqamaExpiry);
-  const [iqamaPicture, setIqamaPicture] = useState(
-    driver.attributes.iqamaPicture
-  );
-  const [passportPicture, setPassportPicture] = useState(
-    driver.attributes.passportImage
-  );
-  const [healthCardPicture, sethealthCardPicture] = useState(
-    driver.attributes.healthCard
-  );
-  const [EmployeePicture, setEmployeePicture] = useState(
-    driver.attributes.EmployeePicture
-  );
+  const [iqamaPicture, setIqamaPicture] = useState(null);
+  const [passportPicture, setPassportPicture] = useState(null);
+  const [healthCardPicture, sethealthCardPicture] = useState(null);
+  const [EmployeePicture, setEmployeePicture] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
 
   const [token, setToken] = useState(localStorage.getItem("token"));
@@ -72,44 +69,67 @@ const DriversFullDetail = ({ driver, isOpen, onClose, fetchDrivers }) => {
     setSelectedImage(null);
   };
 
-  const handleFileChange = (e, setState) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setState(reader.result);
-      };
-      reader.readAsDataURL(file);
+  const handleFileUpload = async (file) => {
+    const formData = new FormData();
+    formData.append("files", file);
+    setIsLoading(true);
+
+    try {
+      const response = await axios.post(`${URL}/api/upload`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      return response.data[0];
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      throw error;
     }
   };
 
   const handleEditDriver = async () => {
     try {
-      const updatedDriver = {
-        driverName,
-        driverLisenceNumber,
-        salary,
-        PassportNumber,
-        iqamaNumber,
-        driverPhoneNumber,
-        passportExpiry,
-        iqamaExpiry,
-        iqamaPicture,
-        passportImage: passportPicture,
-        healthCard: healthCardPicture,
-        EmployeePicture,
-      };
+      const iqamaPictureUpload = iqamaPicture
+        ? await handleFileUpload(iqamaPicture)
+        : driver.attributes.iqamaPicture;
+      const passportPictureUpload = passportPicture
+        ? await handleFileUpload(passportPicture)
+        : driver.attributes.passportImage;
+      const healthCardPictureUpload = healthCardPicture
+        ? await handleFileUpload(healthCardPicture)
+        : driver.attributes.healthCard;
+      const EmployeePictureUpload = EmployeePicture
+        ? await handleFileUpload(EmployeePicture)
+        : driver.attributes.EmployeePicture;
 
       await axios.put(
         `${URL}/api/driver-details/${driver.id}`,
-        { data: updatedDriver },
+        {
+          data: {
+            driverName,
+            driverLisenceNumber,
+            salary,
+            PassportNumber,
+            iqamaNumber,
+            driverPhoneNumber,
+            passportExpiry,
+            iqamaExpiry,
+            liscenceExpiryDate,
+            iqamaPicture: iqamaPictureUpload.id,
+            passportImage: passportPictureUpload.id,
+            healthCard: healthCardPictureUpload.id,
+            EmployeePicture: EmployeePictureUpload.id,
+          },
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-
       fetchDrivers();
       setIsEditing(false);
     } catch (error) {
@@ -153,6 +173,12 @@ const DriversFullDetail = ({ driver, isOpen, onClose, fetchDrivers }) => {
                 onChange={(e) => setDriverLicenseNumber(e.target.value)}
                 mb="4"
               />
+              <FormLabel>Driver License Expiry</FormLabel>
+              <Input
+                value={liscenceExpiryDate}
+                onChange={(e) => setLiscenceExpiryDate(e.target.value)}
+                mb="4"
+              />
               <FormLabel>Salary</FormLabel>
               <Input
                 type="number"
@@ -191,51 +217,99 @@ const DriversFullDetail = ({ driver, isOpen, onClose, fetchDrivers }) => {
                 mb="4"
               />
               <FormLabel>Iqama Picture</FormLabel>
-              {iqamaPicture && (
-                <Box onClick={() => openImageModal(iqamaPicture)}>
-                  <Image src={iqamaPicture} alt="Iqama Picture" mb="2" />
-                </Box>
-              )}
-              <Input
-                type="file"
-                onChange={(e) => handleFileChange(e, setIqamaPicture)}
-                mb="4"
-              />
-              <FormLabel>Passport Picture</FormLabel>
-              {passportPicture && (
-                <Box onClick={() => openImageModal(passportPicture)}>
-                  <Image src={passportPicture} alt="Passport Picture" mb="2" />
-                </Box>
-              )}
-              <Input
-                type="file"
-                onChange={(e) => handleFileChange(e, setPassportPicture)}
-                mb="4"
-              />
-              <FormLabel>Health Card Picture</FormLabel>
-              {healthCardPicture && (
-                <Box onClick={() => openImageModal(healthCardPicture)}>
+              {driver.attributes.iqamaPicture && (
+                <Box
+                  onClick={() =>
+                    openImageModal(
+                      driver.attributes.iqamaPicture.data.attributes.url
+                    )
+                  }
+                >
                   <Image
-                    src={healthCardPicture}
-                    alt="Health Card Picture"
+                    src={
+                      driver.attributes.iqamaPicture.data.attributes.formats
+                        .thumbnail.url
+                    }
+                    alt="Iqama Picture"
                     mb="2"
                   />
                 </Box>
               )}
               <Input
                 type="file"
-                onChange={(e) => handleFileChange(e, sethealthCardPicture)}
+                onChange={(e) => setIqamaPicture(e.target.files[0])}
                 mb="4"
               />
-              <FormLabel>Employee Profile Picture</FormLabel>
-              {EmployeePicture && (
-                <Box onClick={() => openImageModal(EmployeePicture)}>
-                  <Image src={EmployeePicture} alt="Employee Picture" mb="2" />
+              <FormLabel>Passport Picture</FormLabel>
+              {driver.attributes.passportImage && (
+                <Box
+                  onClick={() =>
+                    openImageModal(
+                      driver.attributes.passportImage.data.attributes.url
+                    )
+                  }
+                >
+                  <Image
+                    src={
+                      driver.attributes.passportImage.data.attributes.formats
+                        .thumbnail.url
+                    }
+                    alt="Passport Picture"
+                    mb="2"
+                  />
                 </Box>
               )}
               <Input
                 type="file"
-                onChange={(e) => handleFileChange(e, setEmployeePicture)}
+                onChange={(e) => setPassportPicture(e.target.files[0])}
+                mb="4"
+              />
+              <FormLabel>HealthCard Picture</FormLabel>
+              {driver.attributes.healthCard && (
+                <Box
+                  onClick={() =>
+                    openImageModal(
+                      driver.attributes.healthCard.data.attributes.url
+                    )
+                  }
+                >
+                  <Image
+                    src={
+                      driver.attributes.healthCard.data.attributes.formats
+                        .thumbnail.url
+                    }
+                    alt="HealthCard Picture"
+                    mb="2"
+                  />
+                </Box>
+              )}
+              <Input
+                type="file"
+                onChange={(e) => sethealthCardPicture(e.target.files[0])}
+                mb="4"
+              />
+              <FormLabel>Employee Profile Picture</FormLabel>
+              {driver.attributes.EmployeePicture && (
+                <Box
+                  onClick={() =>
+                    openImageModal(
+                      driver.attributes.EmployeePicture.data.attributes.url
+                    )
+                  }
+                >
+                  <Image
+                    src={
+                      driver.attributes.EmployeePicture.data.attributes.formats
+                        .thumbnail.url
+                    }
+                    alt="Employee Picture"
+                    mb="2"
+                  />
+                </Box>
+              )}
+              <Input
+                type="file"
+                onChange={(e) => setEmployeePicture(e.target.files[0])}
                 mb="4"
               />
             </>
@@ -246,43 +320,84 @@ const DriversFullDetail = ({ driver, isOpen, onClose, fetchDrivers }) => {
               <Text>Salary: {salary}</Text>
               <Text>Passport Number: {PassportNumber}</Text>
               <Text>Iqama Number: {iqamaNumber}</Text>
+              <Text>Driver Lisence Expiry date: {liscenceExpiryDate}</Text>
               <Text>Phone Number: {driverPhoneNumber}</Text>
               <Text>Passport Expiry: {passportExpiry}</Text>
               <Text>Iqama Expiry: {iqamaExpiry}</Text>
               <Box boxShadow={cardShadow}>
                 <Text fontWeight="semibold">Driver Profile Picture</Text>
                 <Box
-                  onClick={() => openImageModal(EmployeePicture)}
+                  onClick={() =>
+                    openImageModal(
+                      driver?.attributes?.EmployeePicture?.data?.attributes?.url
+                    )
+                  }
                   cursor="pointer"
                 >
-                  <Image src={EmployeePicture} alt="Employee Picture" />
+                  <Image
+                    src={
+                      driver?.attributes?.EmployeePicture?.data?.attributes
+                        ?.formats?.thumbnail?.url
+                    }
+                    alt="Iqama Picture"
+                  />
                 </Box>
               </Box>
               <Box boxShadow={cardShadow}>
                 <Text fontWeight="semibold">Driver Iqama Picture</Text>
                 <Box
-                  onClick={() => openImageModal(iqamaPicture)}
+                  onClick={() =>
+                    openImageModal(
+                      driver?.attributes?.iqamaPicture?.data?.attributes?.url
+                    )
+                  }
                   cursor="pointer"
                 >
-                  <Image src={iqamaPicture} alt="Iqama Picture" />
+                  <Image
+                    src={
+                      driver?.attributes?.iqamaPicture?.data?.attributes
+                        ?.formats?.thumbnail?.url
+                    }
+                    alt="Iqama Picture"
+                  />
                 </Box>
               </Box>
               <Box boxShadow={cardShadow}>
                 <Text fontWeight="semibold">Driver Passport Picture</Text>
                 <Box
-                  onClick={() => openImageModal(passportPicture)}
+                  onClick={() =>
+                    openImageModal(
+                      driver?.attributes?.passportImage?.data?.attributes?.url
+                    )
+                  }
                   cursor="pointer"
                 >
-                  <Image src={passportPicture} alt="Passport Picture" />
+                  <Image
+                    src={
+                      driver?.attributes?.passportImage?.data?.attributes
+                        ?.formats?.thumbnail?.url
+                    }
+                    alt="Iqama Picture"
+                  />
                 </Box>
               </Box>
               <Box boxShadow={cardShadow}>
                 <Text fontWeight="semibold">Driver Health Card Picture</Text>
                 <Box
-                  onClick={() => openImageModal(healthCardPicture)}
+                  onClick={() =>
+                    openImageModal(
+                      driver?.attributes?.healthCard?.data?.attributes?.url
+                    )
+                  }
                   cursor="pointer"
                 >
-                  <Image src={healthCardPicture} alt="Health Card Picture" />
+                  <Image
+                    src={
+                      driver?.attributes?.healthCard?.data?.attributes?.formats
+                        ?.thumbnail?.url
+                    }
+                    alt="Iqama Picture"
+                  />
                 </Box>
               </Box>
             </>
@@ -291,7 +406,12 @@ const DriversFullDetail = ({ driver, isOpen, onClose, fetchDrivers }) => {
         <ModalFooter>
           {isEditing ? (
             <>
-              <Button colorScheme="blue" onClick={handleEditDriver} mr="3">
+              <Button
+                colorScheme="blue"
+                onClick={handleEditDriver}
+                mr="3"
+                isLoading={isLoading}
+              >
                 Save
               </Button>
               <Button onClick={() => setIsEditing(false)}>Cancel</Button>
