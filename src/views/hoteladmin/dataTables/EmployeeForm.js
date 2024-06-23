@@ -34,6 +34,8 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
     Employee_healtCard: null,
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [formErrors, setFormErrors] = useState({
     EmployeeName: "",
     EmployeePhoneNumber: "",
@@ -156,6 +158,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
       }));
       return; // Add return to stop form submission if there are errors
     }
+    setIsLoading(true);
 
     try {
       const employeeData = {
@@ -192,6 +195,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
       setTimeout(() => {
         onClose(); // Close the modal after 2 seconds
       }, 2000);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error submitting form data:", error);
     }
@@ -375,6 +379,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
             ml={4}
             mt={4}
             onClick={handleSubmit}
+            isLoading={isLoading}
           >
             Submit
           </Button>
