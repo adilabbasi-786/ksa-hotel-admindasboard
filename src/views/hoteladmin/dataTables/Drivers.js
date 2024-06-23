@@ -31,17 +31,18 @@ const Drivers = () => {
   const [newdriverPhoneNumber, setNewdriverPhoneNumber] = useState("");
   const [newpassportExpiry, setNewpassportExpiry] = useState("");
   const [newiqamaExpiry, setNewiqamaExpiry] = useState("");
+  const [newliscenceExpiryDate, setNewLiscenceExpiryDate] = useState("");
   const [iqamaPicture, setIqamaPicture] = useState(null);
   const [passportPicture, setPassportPicture] = useState(null);
   const [healthCard, sethealthCard] = useState(null);
   const [EmployeePicture, setEmployeePicture] = useState(null);
   const [selectedDriver, setSelectedDriver] = useState(null);
   const [selectedDriverDetails, setSelectedDriverDetails] = useState(null);
-
-  const [token, setToken] = useState("");
+  // const [token, setToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const toast = useToast();
+  const token = localStorage.getItem("token");
 
   const {
     isOpen: isViewModalOpen,
@@ -61,7 +62,7 @@ const Drivers = () => {
 
   const fetchDrivers = async () => {
     try {
-      const response = await axios.get(`${URL}/api/driver-details`, {
+      const response = await axios.get(`${URL}/api/driver-details?populate=*`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -73,8 +74,8 @@ const Drivers = () => {
   };
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    setToken(storedToken);
+    // const storedToken = localStorage.getItem("token");
+    // setToken(storedToken);
     fetchDrivers();
   }, []);
 
@@ -93,6 +94,7 @@ const Drivers = () => {
     if (
       !newDriverName ||
       !newDriverLicenseNumber ||
+      !newliscenceExpiryDate ||
       !newSalary ||
       !newPassportNumber ||
       !newiqamaNumber ||
@@ -112,6 +114,12 @@ const Drivers = () => {
     setError("");
 
     try {
+      const iqamaPictureUpload = await handleFileUpload(iqamaPicture);
+      const passportPictureUpload = await handleFileUpload(passportPicture);
+      const healthCardUpload = await handleFileUpload(healthCard);
+      const employeepicutreUpload = await handleFileUpload(EmployeePicture);
+
+      // Directly assign properties to newDriver object without unnecessary spreading
       const newDriver = {
         driverName: newDriverName,
         driverLisenceNumber: newDriverLicenseNumber,
@@ -120,23 +128,30 @@ const Drivers = () => {
         iqamaNumber: newiqamaNumber,
         driverPhoneNumber: newdriverPhoneNumber,
         passportExpiry: newpassportExpiry,
+        liscenceExpiryDate: newliscenceExpiryDate,
         iqamaExpiry: newiqamaExpiry,
-        iqamaPicture: iqamaPicture,
-        passportImage: passportPicture,
-        healthCard: healthCard,
-        EmployeePicture: EmployeePicture,
+        iqamaPicture: iqamaPictureUpload?.id,
+        passportImage: passportPictureUpload?.id,
+        healthCard: healthCardUpload?.id,
+        EmployeePicture: employeepicutreUpload?.id,
       };
 
       const response = await axios.post(
         `${URL}/api/driver-details`,
         { data: newDriver },
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
-      const AddednewDriver = { ...response.data.data };
-      setDriversData((prevDriversData) => [...prevDriversData, AddednewDriver]);
 
+      setDriversData((prevDriversData) => [
+        ...prevDriversData,
+        response.data.data,
+      ]);
+
+      // Reset form fields
       setNewDriverName("");
       setNewDriverLicenseNumber("");
       setNewSalary("");
@@ -145,6 +160,7 @@ const Drivers = () => {
       setNewdriverPhoneNumber("");
       setNewpassportExpiry("");
       setNewiqamaExpiry("");
+      setNewLiscenceExpiryDate("");
       setIqamaPicture(null);
       setPassportPicture(null);
       sethealthCard(null);
@@ -163,7 +179,24 @@ const Drivers = () => {
       setIsLoading(false);
     }
   };
+  const handleFileUpload = async (file) => {
+    const formData = new FormData();
+    formData.append("files", file);
 
+    try {
+      const response = await axios.post(`${URL}/api/upload`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      return response.data[0];
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      throw error;
+    }
+  };
   const openDetailModal = async (driver) => {
     setSelectedDriver(driver);
     setSelectedDriverDetails(null);
@@ -255,6 +288,14 @@ const Drivers = () => {
               onChange={(e) => setNewDriverLicenseNumber(e.target.value)}
               mb="4"
             />
+            <FormLabel>Driver License Expiry date</FormLabel>
+            <Input
+              type="date"
+              placeholder="License Expriry"
+              value={newliscenceExpiryDate}
+              onChange={(e) => setNewLiscenceExpiryDate(e.target.value)}
+              mb="4"
+            />
             <FormLabel>Driver Salary</FormLabel>
             <Input
               type="number"
@@ -279,6 +320,7 @@ const Drivers = () => {
             />
             <FormLabel>Driver Phone Number</FormLabel>
             <Input
+              type="number"
               placeholder="Phone Number"
               value={newdriverPhoneNumber}
               onChange={(e) => setNewdriverPhoneNumber(e.target.value)}
@@ -303,25 +345,25 @@ const Drivers = () => {
             <FormLabel>Iqama Picture</FormLabel>
             <Input
               type="file"
-              onChange={(e) => handleFileChange(e, setIqamaPicture)}
+              onChange={(e) => setIqamaPicture(e.target.files[0])}
               mb="4"
             />
             <FormLabel>Passport Picture</FormLabel>
             <Input
               type="file"
-              onChange={(e) => handleFileChange(e, setPassportPicture)}
+              onChange={(e) => setPassportPicture(e.target.files[0])}
               mb="4"
             />
             <FormLabel>Health Card</FormLabel>
             <Input
               type="file"
-              onChange={(e) => handleFileChange(e, sethealthCard)}
+              onChange={(e) => sethealthCard(e.target.files[0])}
               mb="4"
             />
             <FormLabel>Employee Picture</FormLabel>
             <Input
               type="file"
-              onChange={(e) => handleFileChange(e, setEmployeePicture)}
+              onChange={(e) => setEmployeePicture(e.target.files[0])}
               mb="4"
             />
           </ModalBody>
