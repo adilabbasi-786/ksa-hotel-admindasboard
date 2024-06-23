@@ -92,12 +92,12 @@ const EmployeesData = () => {
               iqamaExpiry={employee.iqamaExpiry}
               iqamaNumber={employee.iqamaNumber}
               passportExpiry={employee.passportNumber}
-              passportImage={`${URL}${employee?.passportImage?.url}`}
-              iqamaPicture={`${URL}${employee?.iqamaPicture?.url}`}
+              passportImage={employee?.passportImage?.url}
+              iqamaPicture={employee?.iqamaPicture?.url}
               status={employee.status}
               EmployeePhoneNumber={employee.EmployeePhoneNumber}
-              avatar={employee?.employeePicture}
-              healthCard={`${URL}${employee?.Employee_healtCard?.url}`}
+              avatar={employee?.employeePicture?.url}
+              healthCard={employee?.Employee_healtCard?.url}
               banner={banner}
               employeeData={employee}
               fetchEmployeeData={fetchEmployeeData}

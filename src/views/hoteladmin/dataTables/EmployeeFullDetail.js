@@ -85,39 +85,50 @@ const EmployeeFullDetail = ({ employeeData }) => {
         <Box boxShadow={cardShadow}>
           <Text fontWeight="semibold">Employee profile Picture</Text>
           <Box
-            onClick={() => openImageModal(employeeData?.employeePicture)}
+            onClick={() => openImageModal(employeeData?.employeePicture?.url)}
             cursor="pointer"
           >
-            <Image src={employeeData?.employeePicture} alt="Employee Picture" />
+            <Image
+              src={employeeData?.employeePicture?.formats?.thumbnail?.url}
+              alt="Employee Picture"
+            />
           </Box>
         </Box>
         <Box boxShadow={cardShadow}>
           <Text fontWeight="semibold">Iqama Picture</Text>
           <Box
-            onClick={() => openImageModal(employeeData?.iqamaPicture)}
+            onClick={() => openImageModal(employeeData?.iqamaPicture?.url)}
             cursor="pointer"
           >
-            <Image src={employeeData?.iqamaPicture} alt="Iqama Picture" />
+            <Image
+              src={employeeData?.iqamaPicture?.formats?.thumbnail?.url}
+              alt="Iqama Picture"
+            />
           </Box>
         </Box>
         <Box boxShadow={cardShadow}>
           <Text fontWeight="semibold">Passport Picture</Text>
           <Box
-            onClick={() => openImageModal(employeeData?.passportImage)}
+            onClick={() => openImageModal(employeeData?.passportImage?.url)}
             cursor="pointer"
           >
-            <Image src={employeeData?.passportImage} alt="Passport Picture" />
+            <Image
+              src={employeeData?.passportImage?.formats?.thumbnail?.url}
+              alt="Passport Picture"
+            />
           </Box>
         </Box>
         <Box boxShadow={cardShadow}>
           <Text fontWeight="semibold">Employee Health Card Picture</Text>
           <Box
-            onClick={() => openImageModal(employeeData?.Employee_healtCard)}
+            onClick={() =>
+              openImageModal(employeeData?.Employee_healtCard?.url)
+            }
             cursor="pointer"
           >
             <Image
-              src={employeeData?.Employee_healtCard}
-              alt="Passport Picture"
+              src={employeeData?.Employee_healtCard?.formats?.thumbnail?.url}
+              alt="Employee_healtCard"
             />
           </Box>
         </Box>
