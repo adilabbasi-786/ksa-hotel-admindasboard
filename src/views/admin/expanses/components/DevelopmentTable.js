@@ -49,6 +49,7 @@ export default function DevelopmentTable(props) {
   const [editValues, setEditValues] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [editSaleData, setEditSaleData] = useState(null);
 
   const handleTodaySaleModalClose = () => setShowTodaySaleModal(false);
   const handleAdvanceSalaryModalClose = () => setShowAdvanceSalaryModal(false);
@@ -66,6 +67,67 @@ export default function DevelopmentTable(props) {
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
 
   const token = localStorage.getItem("token");
+
+  const handleSaleEditClick = (saleItem) => {
+    setEditSaleData(saleItem);
+  };
+
+  // Function to handle changes in the edit form
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditSaleData((prevData) => {
+      if (!prevData || !prevData.attributes) {
+        console.error("Invalid editSaleData state:", prevData);
+        return prevData;
+      }
+      return {
+        ...prevData,
+        attributes: {
+          ...prevData.attributes,
+          [name]: value,
+        },
+      };
+    });
+  };
+
+  // Function to save edited data
+  const handleSave = async () => {
+    if (!editSaleData || !editSaleData.id || !editSaleData.attributes) {
+      console.error("Invalid editSaleData before saving:", editSaleData);
+      return;
+    }
+
+    const updatedAttributes = {
+      cashSale: editSaleData.attributes.cashSale,
+      creditSale: editSaleData.attributes.creditSale,
+      date: editSaleData.attributes.date,
+    };
+
+    try {
+      const response = await axios.put(
+        `${URL}/api/daily-sales/${editSaleData.id}`,
+        {
+          data: updatedAttributes,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Update the state with the edited data
+      setTodaySaleData((prevData) => ({
+        ...prevData,
+        data: prevData.data.map((saleItem) =>
+          saleItem.id === editSaleData.id ? response.data.data : saleItem
+        ),
+      }));
+      setEditSaleData(null); // Close the edit form
+    } catch (error) {
+      console.error("Error updating sale data:", error);
+    }
+  };
 
   const totalTodayDriverSalary = driverData.reduce((acc, current) => {
     const paidAmounts = current.attributes.driver_salaries.data
@@ -534,19 +596,74 @@ export default function DevelopmentTable(props) {
         <ModalContent>
           <ModalHeader>Today Sale</ModalHeader>
           <ModalBody>
-            {todaySaleData?.data?.map((saleItem, index) => {
-              return (
-                <Text key={index} color={textColorPrimary} fontWeight="bold">
-                  Date: {saleItem?.attributes?.date}
-                  <br />
-                  Cash Sale: {saleItem?.attributes?.cashSale}
-                  <br />
-                  Credit Sale: {saleItem?.attributes?.creditSale}
-                  <br />
-                  Today Total Sale: {totalSale}
-                </Text>
-              );
-            })}
+            {todaySaleData?.data?.map((saleItem, index) => (
+              <div key={index}>
+                {editSaleData?.id === saleItem.id ? (
+                  // Edit form
+                  <div>
+                    Cash Sale:
+                    <Input
+                      type="number"
+                      name="cashSale"
+                      value={editSaleData.attributes.cashSale}
+                      onChange={handleEditChange}
+                    />
+                    Credit Sale:
+                    <Input
+                      type="number"
+                      name="creditSale"
+                      value={editSaleData.attributes.creditSale}
+                      onChange={handleEditChange}
+                    />
+                    <Flex justifyContent="space-between">
+                      <Button colorScheme="green" onClick={handleSave}>
+                        Save
+                      </Button>
+                      <Button
+                        colorScheme="red"
+                        onClick={() => setEditSaleData(null)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        colorScheme="blue"
+                        onClick={handleTodaySaleModalClose}
+                      >
+                        Close
+                      </Button>
+                    </Flex>
+                  </div>
+                ) : (
+                  // Display sale data with edit button
+                  <Text color={textColorPrimary} fontWeight="bold">
+                    Date: {saleItem.attributes.date}
+                    <br />
+                    Cash Sale: {saleItem.attributes.cashSale}
+                    <br />
+                    Credit Sale: {saleItem.attributes.creditSale}
+                    <br />
+                    Today Total Sale:{" "}
+                    {saleItem.attributes.cashSale +
+                      saleItem.attributes.creditSale}
+                    <Flex justifyContent="flex-end">
+                      <Button
+                        colorScheme="blue"
+                        onClick={() => handleSaleEditClick(saleItem)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        colorScheme="blue"
+                        onClick={handleTodaySaleModalClose}
+                        ml="2"
+                      >
+                        Close
+                      </Button>
+                    </Flex>
+                  </Text>
+                )}
+              </div>
+            ))}
             {!todaySaleData?.data?.length && (
               <Flex direction="column" mt="4">
                 <Text>No Record Found</Text>
@@ -554,14 +671,8 @@ export default function DevelopmentTable(props) {
               </Flex>
             )}
           </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" onClick={handleTodaySaleModalClose}>
-              Close
-            </Button>
-          </ModalFooter>
         </ModalContent>
       </Modal>
-
       {/* Advance Salary Modal */}
       <Modal
         isOpen={showAdvanceSalaryModal}
