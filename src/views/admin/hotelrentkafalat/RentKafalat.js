@@ -53,6 +53,7 @@ const RentKafalat = ({ selectedHotel }) => {
   const [hotelRent, setHotelRent] = useState();
   const [kafalat, setKafalat] = useState();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [paidRent, setPaidRent] = useState("");
   const [paidKafalat, setPaidKafalat] = useState("");
   const token = localStorage.getItem("token");
@@ -88,21 +89,39 @@ const RentKafalat = ({ selectedHotel }) => {
     setSelectedMonth(event.target.value);
   };
 
-  const openModal = () => setIsModalOpen(true);
+  const openModal = (editMode = false) => {
+    setIsEditMode(editMode);
+    if (editMode && rentData) {
+      setPaidRent(rentData[0]?.attributes?.hotelRent || "");
+      setPaidKafalat(rentData[0]?.attributes?.kafalat || "");
+    } else {
+      setPaidRent("");
+      setPaidKafalat("");
+    }
+    setIsModalOpen(true);
+  };
+
   const closeModal = () => setIsModalOpen(false);
 
   const handlePayRent = () => {
     openModal();
-    // Fetch the data again if needed
-    // fetchRentKafalatData();
+  };
+
+  const handleEditRent = () => {
+    openModal(true);
   };
 
   const handleSubmitPaidAmounts = async () => {
     try {
-      // Make a POST request to submit paid rent and kafalat
-      await axios.post(
-        `${URL}/api/rents`,
-        {
+      const method = isEditMode ? "put" : "post";
+      const url = isEditMode
+        ? `${URL}/api/rents/${rentData[0]?.id}`
+        : `${URL}/api/rents`;
+
+      await axios({
+        method: method,
+        url: url,
+        data: {
           data: {
             hotelRent: paidRent,
             kafalat: paidKafalat,
@@ -110,13 +129,12 @@ const RentKafalat = ({ selectedHotel }) => {
             month: selectedMonth,
           },
         },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       setIsPaid(true);
       fetchRentKafalatData();
       closeModal();
@@ -199,11 +217,22 @@ const RentKafalat = ({ selectedHotel }) => {
         >
           {isPaid ? "Rent Paid" : "Pay Rent"}
         </Button>
+        {rentData && rentData.length > 0 && (
+          <Button
+            colorScheme="orange"
+            disabled={!rentData || rentData.length === 0}
+            onClick={handleEditRent}
+          >
+            Edit Rent and Kafalat
+          </Button>
+        )}
       </Card>
       <Modal isOpen={isModalOpen} onClose={closeModal}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Pay Rent and Kafalat</ModalHeader>
+          <ModalHeader>
+            {isEditMode ? "Edit" : "Pay"} Rent and Kafalat
+          </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl>
