@@ -148,7 +148,6 @@ const RentKafalat = ({ selectedHotel }) => {
   return (
     <>
       <VStack alignItems="center" mb="10px" width="100%">
-        <Text>Select month</Text>
         <FormControl>
           <FormLabel>Select month</FormLabel>
           <select
