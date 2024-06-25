@@ -53,8 +53,14 @@ const ProfitTable = ({ selectedHotel }) => {
   }, [selectedHotel]);
   const fetchPartnersData = async () => {
     try {
+      const jwt = localStorage.getItem("token");
       const response = await axios.get(
-        `${URL}/api/partners?populate=*&filters[hotel_names][id][$in]=${selectedHotel}`
+        `${URL}/api/partners?populate=*&filters[hotel_names][id][$in]=${selectedHotel}`,
+        {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        }
       );
       const partnersWithProfit = response.data.data.map((partner) => ({
         ...partner,
