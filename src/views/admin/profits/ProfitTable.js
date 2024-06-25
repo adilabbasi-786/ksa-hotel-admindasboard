@@ -28,16 +28,29 @@ const ProfitTable = ({ selectedHotel }) => {
   const [partnerRatio, setPartnerRatio] = useState("");
   const [partnersData, setPartnersData] = useState([]);
   const [totalProfit, setTotalProfit] = useState(0);
-  const [selectedMonth, setSelectedMonth] = useState("1");
+  const [selectedMonth, setSelectedMonth] = useState("");
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [partnerToDelete, setPartnerToDelete] = useState(null);
   const [newlyAddedPartners, setNewlyAddedPartners] = useState([]);
+  const [profit, setProfit] = useState({
+    total_expanse: 0,
+    total_sales: 0,
+    total_advance: 0,
+    total_monthly: 0,
+  });
 
   useEffect(() => {
     fetchPartnersData();
-    fetchTotalProfit();
-  }, [selectedHotel, selectedMonth]);
-
+  }, [selectedMonth]);
+  useEffect(() => {
+    setProfit({
+      total_expanse: 0,
+      total_sales: 0,
+      total_advance: 0,
+      total_monthly: 0,
+    });
+    setSelectedMonth("");
+  }, [selectedHotel]);
   const fetchPartnersData = async () => {
     try {
       const response = await axios.get(
@@ -54,11 +67,26 @@ const ProfitTable = ({ selectedHotel }) => {
     }
   };
 
-  const fetchTotalProfit = async () => {
+  const fetchTotalProfit = async (year, month) => {
     try {
-      // Assuming you fetch total profit from the backend based on selected month
-      const totalProfitFromBackend = 500000; // Fetch total profit from the backend
-      setTotalProfit(totalProfitFromBackend);
+      const jwt = localStorage.getItem("token");
+      const response = await axios.post(
+        `${URL}/api/getprofit`,
+        { hotel_id: selectedHotel, year: year, month },
+        {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        }
+      );
+      setProfit(response.data);
+      const _total =
+        response.data.total_sales -
+        response.data.total_expanse -
+        response.data.total_advance -
+        response.data.total_monthly;
+      setTotalProfit(_total);
+      // setTotalProfit(totalProfitFromBackend);
     } catch (error) {
       console.error("Error fetching total profit:", error);
     }
@@ -137,7 +165,13 @@ const ProfitTable = ({ selectedHotel }) => {
 
   const handleMonthChange = (event) => {
     setSelectedMonth(event.target.value);
-    fetchTotalProfit(); // Update total profit based on the new selected month
+    const year = event.target.value.split("-")[0];
+    const month = event.target.value.split("-")[1];
+
+    console.log("Event", event.target.value);
+    console.log("yearmonth", year, month);
+
+    fetchTotalProfit(year, month); // Update total profit based on the new selected month
   };
 
   const handleDeleteConfirmation = (partner) => {
@@ -238,52 +272,85 @@ const ProfitTable = ({ selectedHotel }) => {
           </Button>
         </Flex>
       </Card>
+
       <Card mb={{ base: "0px", lg: "20px" }}>
         <Flex alignItems="center" mb={{ base: "10px", lg: "0px" }}>
           <FormControl>
             <FormLabel>Select month</FormLabel>
-            <select
-              name="months"
-              onChange={handleMonthChange}
+            <input
+              type="month"
+              id="monthYear"
+              name="monthYear"
               value={selectedMonth}
-            >
-              <option value="1">January</option>
-              <option value="2">February</option>
-              <option value="3">March</option>
-              <option value="4">April</option>
-              <option value="5">May</option>
-              <option value="6">June</option>
-              <option value="7">July</option>
-              <option value="8">August</option>
-              <option value="9">September</option>
-              <option value="10">October</option>
-              <option value="11">November</option>
-              <option value="12">December</option>
-            </select>
+              onChange={handleMonthChange}
+            ></input>
           </FormControl>
         </Flex>
-        <VStack spacing={4}>
-          <Text
-            color={textColorPrimary}
-            fontWeight="bold"
-            fontSize={{ base: "xl", lg: "2xl" }}
-            mt="10px"
-            mb="4px"
-          >
-            Total Profit: {totalProfit}
-          </Text>
-          <SimpleGrid columns={{ base: 1, md: 3 }} gap="20px" w="100%">
-            {partnersData.map((partner) => (
-              <Information
-                key={partner.id}
-                boxShadow={cardShadow}
-                title={partner.attributes.name}
-                value={calculateProfitShare(partner.attributes.ratio)}
-              />
-            ))}
-          </SimpleGrid>
-        </VStack>
+        {selectedMonth != "" && (
+          <VStack spacing={4}>
+            <Text
+              color={textColorPrimary}
+              fontWeight="bold"
+              fontSize={{ base: "xl", lg: "2xl" }}
+              mt="10px"
+              mb="4px"
+            >
+              Total Expanse: {profit.total_expanse}
+            </Text>
+            <Text
+              color={textColorPrimary}
+              fontWeight="bold"
+              fontSize={{ base: "xl", lg: "2xl" }}
+              mt="10px"
+              mb="4px"
+            >
+              Total sale: {profit.total_sales}
+            </Text>
+            <Text
+              color={textColorPrimary}
+              fontWeight="bold"
+              fontSize={{ base: "xl", lg: "2xl" }}
+              mt="10px"
+              mb="4px"
+            >
+              Total Advance salary: {profit.total_advance}
+            </Text>
+            <Text
+              color={textColorPrimary}
+              fontWeight="bold"
+              fontSize={{ base: "xl", lg: "2xl" }}
+              mt="10px"
+              mb="4px"
+            >
+              Total Monthly salary: {profit.total_monthly}
+            </Text>
+            <Text
+              color={textColorPrimary}
+              fontWeight="bold"
+              fontSize={{ base: "xl", lg: "2xl" }}
+              mt="10px"
+              mb="4px"
+            >
+              Total Profit:{" "}
+              {profit.total_sales -
+                profit.total_expanse -
+                profit.total_advance -
+                profit.total_monthly}
+            </Text>
+            <SimpleGrid columns={{ base: 1, md: 3 }} gap="20px" w="100%">
+              {partnersData.map((partner) => (
+                <Information
+                  key={partner.id}
+                  boxShadow={cardShadow}
+                  title={partner.attributes.name}
+                  value={calculateProfitShare(partner.attributes.ratio)}
+                />
+              ))}
+            </SimpleGrid>
+          </VStack>
+        )}
       </Card>
+
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         <ModalOverlay />
         <ModalContent>
