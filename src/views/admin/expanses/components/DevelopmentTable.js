@@ -446,7 +446,7 @@ export default function DevelopmentTable(props) {
               View Advance Salary
             </Button>
           </Text>
-          <Text color={textColorPrimary} fontWeight="bold" mt="10px" mb="4px">
+          {/* <Text color={textColorPrimary} fontWeight="bold" mt="10px" mb="4px">
             <Button
               colorScheme="blue"
               width="fit-content"
@@ -455,7 +455,7 @@ export default function DevelopmentTable(props) {
             >
               View Driver Salary
             </Button>
-          </Text>
+          </Text> */}
         </div>
       </Flex>
       <Center>
@@ -579,12 +579,11 @@ export default function DevelopmentTable(props) {
       <Text fontWeight="bold">Total Expense: {totalExpense}</Text>
       <Text fontWeight="bold">Total Sale: {totalSale}</Text>
       <Text fontWeight="bold">Total Advance: {totalAdvanceSalary} </Text>
-      <Text fontWeight="bold">Total today driver salary:{sumSalary} </Text>
+      {/* <Text fontWeight="bold">Total today driver salary:{sumSalary} </Text> */}
       <Text fontWeight="bold">Total today Sale Tax:{sumofAllTax} </Text>
 
       <Text fontWeight="bold">
-        Total Deposit:{" "}
-        {totalSale - totalExpense - totalAdvanceSalary - sumSalary}
+        Total Deposit: {totalSale - totalExpense - totalAdvanceSalary}
       </Text>
       {/* Today Sale Modal */}
       <Modal
