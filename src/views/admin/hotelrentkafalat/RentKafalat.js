@@ -48,7 +48,7 @@ const getMonthName = (monthNumber) => {
 const RentKafalat = ({ selectedHotel }) => {
   const [rentData, setRentData] = useState(null);
   const [defaultMonth, setDefaultMonth] = useState(getCurrentMonth());
-  const [selectedMonth, setSelectedMonth] = useState("1");
+  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth());
   const [isPaid, setIsPaid] = useState(false);
   const [hotelRent, setHotelRent] = useState();
   const [kafalat, setKafalat] = useState();
@@ -150,24 +150,13 @@ const RentKafalat = ({ selectedHotel }) => {
       <VStack alignItems="center" mb="10px" width="100%">
         <FormControl>
           <FormLabel>Select month</FormLabel>
-          <select
-            name="months"
+          <input
+            type="month"
+            id="monthYear"
+            name="monthYear"
             onChange={handleMonthChange}
             value={selectedMonth}
-          >
-            <option value="1">January</option>
-            <option value="2">February</option>
-            <option value="3">March</option>
-            <option value="4">April</option>
-            <option value="5">May</option>
-            <option value="6">June</option>
-            <option value="7">July</option>
-            <option value="8">August</option>
-            <option value="9">September</option>
-            <option value="10">October</option>
-            <option value="11">November</option>
-            <option value="12">December</option>
-          </select>
+          ></input>
         </FormControl>
       </VStack>
       <Card mb="20px" width="80%">
@@ -185,14 +174,14 @@ const RentKafalat = ({ selectedHotel }) => {
             <>
               <Information
                 boxShadow={cardShadow}
-                title={`Hotel Rent for Month of ${getMonthName(selectedMonth)}`}
+                title={`Hotel Rent for Month of ${selectedMonth}`}
                 value={`${
                   rentData[0]?.attributes?.hotelRent || "Not paid yet"
                 } SAR`}
               />
               <Information
                 boxShadow={cardShadow}
-                title={`Kafalat for Month of ${getMonthName(selectedMonth)}`}
+                title={`Kafalat for Month of ${selectedMonth}`}
                 value={`${
                   rentData[0]?.attributes?.kafalat || "Not paid yet"
                 } SAR`}
