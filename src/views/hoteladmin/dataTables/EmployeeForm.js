@@ -35,6 +35,12 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingStates, setLoadingStates] = useState({
+    employeePicture: false,
+    iqamaPicture: false,
+    passportImage: false,
+    Employee_healtCard: false,
+  });
 
   const [formErrors, setFormErrors] = useState({
     EmployeeName: "",
@@ -53,6 +59,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
   });
   const handleImageChange = async (e, key) => {
     console.log("E, key", e.target.files[0], key);
+    setLoadingStates((prev) => ({ ...prev, [key]: true }));
     const requestFormdata = new FormData();
     requestFormdata.append("files", e.target.files[0]);
 
@@ -68,6 +75,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
       console.log("imgId", imgId);
 
       setFormData({ ...formData, [key]: imgId });
+      setLoadingStates((prev) => ({ ...prev, [key]: false }));
     } catch (error) {
       console.error(error);
     }
@@ -217,6 +225,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
               accept="image/*"
               onChange={(e) => handleImageChange(e, "employeePicture")}
             />
+            {loadingStates.employeePicture && <Text>Loading...</Text>}
             <Text color="red">{formErrors.employeePicture}</Text>
           </FormControl>
           <Flex direction={isMobile ? "column" : "row"}>
@@ -274,7 +283,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
                 onChange={(e) => handleChange(e, "Designation")}
               >
                 <option value="manager">Manager</option>
-                <option value="driver">Driver</option>
+                {/* <option value="driver">Driver</option> */}
                 <option value="hotel employee">Hotel Employee</option>
               </Select>
               <Text color="red">{formErrors.Designation}</Text>
@@ -348,6 +357,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
                 accept="image/*"
                 onChange={(e) => handleImageChange(e, "iqamaPicture")}
               />
+              {loadingStates.iqamaPicture && <Text>Loading...</Text>}
               <Text color="red">{formErrors.iqamaPicture}</Text>
             </FormControl>
             <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
@@ -357,6 +367,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
                 accept="image/*"
                 onChange={(e) => handleImageChange(e, "passportImage")}
               />
+              {loadingStates.passportImage && <Text>Loading...</Text>}
               <Text color="red">{formErrors.passportImage}</Text>
             </FormControl>
             <FormControl mr={!isMobile && 4} mb={isMobile ? 4 : 0}>
@@ -366,6 +377,7 @@ const EmployeeForm = ({ onClose, fetchEmployeeData }) => {
                 accept="image/*"
                 onChange={(e) => handleImageChange(e, "Employee_healtCard")}
               />
+              {loadingStates.Employee_healtCard && <Text>Loading...</Text>}
               <Text color="red">{formErrors.Employee_healtCard}</Text>
             </FormControl>
           </Flex>
