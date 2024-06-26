@@ -86,9 +86,11 @@ const ProfitTable = ({ selectedHotel }) => {
         }
       );
       setProfit(response.data);
-      const _total = response.data.total_sales - response.data.total_expanse;
-      // response.data.total_advance -
-      // response.data.total_monthly;
+      const _total =
+        response.data.total_sales -
+        response.data.total_expanse -
+        response.data.total_advance -
+        response.data.total_monthly;
       setTotalProfit(_total);
       // setTotalProfit(totalProfitFromBackend);
     } catch (error) {
@@ -310,7 +312,7 @@ const ProfitTable = ({ selectedHotel }) => {
             >
               Total sale: {profit.total_sales}
             </Text>
-            {/* <Text
+            <Text
               color={textColorPrimary}
               fontWeight="bold"
               fontSize={{ base: "xl", lg: "2xl" }}
@@ -340,7 +342,7 @@ const ProfitTable = ({ selectedHotel }) => {
                 profit.total_expanse -
                 profit.total_advance -
                 profit.total_monthly}
-            </Text> */}
+            </Text>
             <SimpleGrid columns={{ base: 1, md: 3 }} gap="20px" w="100%">
               {partnersData.map((partner) => (
                 <Information
