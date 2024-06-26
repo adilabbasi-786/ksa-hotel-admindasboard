@@ -576,8 +576,8 @@ export default function DevelopmentTable(props) {
         />
       </Flex>
 
-      <Text fontWeight="bold">Total Expense: {totalExpense}</Text>
       <Text fontWeight="bold">Total Sale: {totalSale}</Text>
+      <Text fontWeight="bold">Total Expense: {totalExpense}</Text>
       <Text fontWeight="bold">Total Advance: {totalAdvanceSalary} </Text>
       {/* <Text fontWeight="bold">Total today driver salary:{sumSalary} </Text> */}
       <Text fontWeight="bold">Total today Sale Tax:{sumofAllTax} </Text>

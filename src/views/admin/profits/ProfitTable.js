@@ -86,11 +86,9 @@ const ProfitTable = ({ selectedHotel }) => {
         }
       );
       setProfit(response.data);
-      const _total =
-        response.data.total_sales -
-        response.data.total_expanse -
-        response.data.total_advance -
-        response.data.total_monthly;
+      const _total = response.data.total_sales - response.data.total_expanse;
+      // response.data.total_advance -
+      // response.data.total_monthly;
       setTotalProfit(_total);
       // setTotalProfit(totalProfitFromBackend);
     } catch (error) {
@@ -301,7 +299,7 @@ const ProfitTable = ({ selectedHotel }) => {
               mt="10px"
               mb="4px"
             >
-              Total Expanse: {profit.total_expanse}
+              Total sale: {profit.total_sales}
             </Text>
             <Text
               color={textColorPrimary}
@@ -310,9 +308,10 @@ const ProfitTable = ({ selectedHotel }) => {
               mt="10px"
               mb="4px"
             >
-              Total sale: {profit.total_sales}
+              Total Expanse: {profit.total_expanse}
             </Text>
-            <Text
+
+            {/* <Text
               color={textColorPrimary}
               fontWeight="bold"
               fontSize={{ base: "xl", lg: "2xl" }}
@@ -329,7 +328,7 @@ const ProfitTable = ({ selectedHotel }) => {
               mb="4px"
             >
               Total Monthly salary: {profit.total_monthly}
-            </Text>
+            </Text> */}
             <Text
               color={textColorPrimary}
               fontWeight="bold"
@@ -337,11 +336,7 @@ const ProfitTable = ({ selectedHotel }) => {
               mt="10px"
               mb="4px"
             >
-              Total Profit:{" "}
-              {profit.total_sales -
-                profit.total_expanse -
-                profit.total_advance -
-                profit.total_monthly}
+              Total Profit: {profit.total_sales - profit.total_expanse}
             </Text>
             <SimpleGrid columns={{ base: 1, md: 3 }} gap="20px" w="100%">
               {partnersData.map((partner) => (
