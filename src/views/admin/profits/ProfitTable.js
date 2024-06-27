@@ -38,7 +38,7 @@ const ProfitTable = ({ selectedHotel }) => {
     total_advance: 0,
     total_monthly: 0,
   });
-
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     fetchPartnersData();
   }, [selectedMonth]);
@@ -75,6 +75,8 @@ const ProfitTable = ({ selectedHotel }) => {
 
   const fetchTotalProfit = async (year, month) => {
     try {
+      setIsLoading(true);
+
       const jwt = localStorage.getItem("token");
       const response = await axios.post(
         `${URL}/api/getprofit`,
@@ -86,6 +88,8 @@ const ProfitTable = ({ selectedHotel }) => {
         }
       );
       setProfit(response.data);
+      setIsLoading(false);
+
       const _total = response.data.total_sales - response.data.total_expanse;
       // response.data.total_advance -
       // response.data.total_monthly;

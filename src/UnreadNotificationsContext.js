@@ -22,6 +22,13 @@ export const UnreadNotificationsProvider = ({ children }) => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          params: {
+            pagination: {
+              page: currentPage,
+              pageSize: perPage,
+              sort: "timestamp:desc",
+            },
+          },
         });
         const totalNotifications = response.data.meta.pagination.total;
         setTotalPages(Math.ceil(totalNotifications / perPage));
@@ -32,7 +39,10 @@ export const UnreadNotificationsProvider = ({ children }) => {
             new Date(b.attributes.timestamp) - new Date(a.attributes.timestamp)
           );
         });
-
+        const paginatedNotifications = sortedNotifications.slice(
+          (currentPage - 1) * perPage,
+          currentPage * perPage
+        );
         // Separate unread and read notifications
         const unreadNotifications = sortedNotifications.filter(
           (notification) => !notification.attributes.read
@@ -61,7 +71,7 @@ export const UnreadNotificationsProvider = ({ children }) => {
     try {
       await axios.put(
         `${URL}/api/notifications/${id}`,
-        { data: { read: true } },
+        { data: { read: true, timestamp: new Date() } },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -93,7 +103,7 @@ export const UnreadNotificationsProvider = ({ children }) => {
       value={{
         unreadCount,
         setUnreadCount,
-        notifications: paginatedNotifications,
+        notifications,
         markAsRead,
         currentPage,
         setCurrentPage,

@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Box, Text, VStack, useToast } from "@chakra-ui/react";
-import { URL } from "Utils";
 import { useUnreadNotifications } from "UnreadNotificationsContext";
 import Pagination from "./Pagination";
 
@@ -10,9 +8,7 @@ const Index = () => {
   const { notifications, markAsRead, currentPage, setCurrentPage, totalPages } =
     useUnreadNotifications();
   const [localNotifications, setLocalNotifications] = useState([]);
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-  };
+
   useEffect(() => {
     // Sort notifications based on timestamp in descending order
     const sortedNotifications = notifications.sort((a, b) => {
@@ -37,6 +33,10 @@ const Index = () => {
 
     setLocalNotifications(combinedNotifications);
   }, [notifications]);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
 
   const handleNotificationClick = async (id, read) => {
     if (read) {
@@ -71,12 +71,13 @@ const Index = () => {
       <h2>All Notifications</h2>
       {localNotifications.length === 0 ? (
         <Text fontWeight="bold" fontSize="xl" mt="100px" ml="300px">
-          No notification
+          No notifications
         </Text>
       ) : (
         <VStack spacing={4} align="start">
           {localNotifications.map((notification) => (
             <Box
+              key={notification.id}
               w="100%"
               p={4}
               bg={notification.attributes.read ? "white" : "gray.200"}
