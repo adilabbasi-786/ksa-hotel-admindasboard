@@ -73,6 +73,7 @@ const HotelForm = () => {
       });
       if (!response.ok) {
         throw new Error("Failed to register manager");
+        setIsLoading(false);
       }
       const responseData = await response.json();
       const userId = responseData.user.id;
@@ -113,7 +114,9 @@ const HotelForm = () => {
         }
       }
     });
-
+    if (formData.managerPassword.length < 6) {
+      messages.managerPassword = "Password must be at least 6 digits.";
+    }
     setValidationMessages(messages);
     return Object.keys(messages).length === 0;
   };
