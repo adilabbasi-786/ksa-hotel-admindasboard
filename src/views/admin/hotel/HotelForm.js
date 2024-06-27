@@ -102,7 +102,15 @@ const HotelForm = () => {
 
     requiredFields.forEach((field) => {
       if (!formData[field]) {
-        messages[field] = "This field is required.";
+        if (
+          field === "liscencePicture" ||
+          field === "TaxVatPicture" ||
+          field === "ComercialCertificate"
+        ) {
+          messages[field] = "Please upload this picture.";
+        } else {
+          messages[field] = "This field is required.";
+        }
       }
     });
 
@@ -112,6 +120,10 @@ const HotelForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) {
+      // If form is not valid, stop the submission
+      return;
+    }
     const managerId = await registerManager();
     setIsLoading(true);
     if (managerId) {
