@@ -11,7 +11,7 @@ import {
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import React, { useState } from "react";
 import axios from "axios";
-
+import { URL } from "Utils";
 const Index = () => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -36,7 +36,7 @@ const Index = () => {
       const jwt = localStorage.getItem("token");
 
       const response = await axios.post(
-        "http://localhost:1337/api/updateAdmin",
+        `${URL}/api/updateAdmin`,
         { newPassword },
         {
           headers: {
