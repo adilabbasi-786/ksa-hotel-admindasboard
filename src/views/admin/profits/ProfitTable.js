@@ -90,9 +90,11 @@ const ProfitTable = ({ selectedHotel }) => {
       setProfit(response.data);
       setIsLoading(false);
 
-      const _total = response.data.total_sales - response.data.total_expanse;
-      // response.data.total_advance -
-      // response.data.total_monthly;
+      const _total =
+        response.data.total_sales -
+        response.data.total_expanse -
+        response.data.total_advance -
+        response.data.total_monthly;
       setTotalProfit(_total);
       // setTotalProfit(totalProfitFromBackend);
     } catch (error) {
@@ -315,7 +317,7 @@ const ProfitTable = ({ selectedHotel }) => {
               Total Expanse: {profit.total_expanse}
             </Text>
 
-            {/* <Text
+            <Text
               color={textColorPrimary}
               fontWeight="bold"
               fontSize={{ base: "xl", lg: "2xl" }}
@@ -332,7 +334,7 @@ const ProfitTable = ({ selectedHotel }) => {
               mb="4px"
             >
               Total Monthly salary: {profit.total_monthly}
-            </Text> */}
+            </Text>
             <Text
               color={textColorPrimary}
               fontWeight="bold"
