@@ -118,21 +118,17 @@ const ProfitTable = ({ selectedHotel }) => {
     setPartnerRatio(event.target.value);
   };
 
-  const handleAddPartner = () => {
-    // Calculate total ratio of existing partners
+  const handleAddPartner = async () => {
     const currentTotalRatio = partnersData.reduce(
       (total, partner) => total + parseFloat(partner.attributes.ratio),
       0
     );
 
-    // Calculate the new partner's ratio
     const newPartnerRatio = parseFloat(partnerRatio);
 
-    // Check if adding the new partner will exceed 100% total ratio
     if (currentTotalRatio + newPartnerRatio <= 100) {
-      // Create new partner data object
       const newPartnerData = {
-        id: Math.random().toString(36).substring(7), // Generate a temporary ID for the new partner
+        id: Math.random().toString(36).substring(7),
         attributes: {
           name: partnerName,
           ratio: partnerRatio,
@@ -141,29 +137,23 @@ const ProfitTable = ({ selectedHotel }) => {
         },
       };
 
-      // Add the new partner to the newlyAddedPartners state
-      setNewlyAddedPartners([...newlyAddedPartners, newPartnerData]);
-
-      // Optionally, you can still post the new partner data to the backend if required
-      axios
-        .post(
+      try {
+        const response = await axios.post(
           `${URL}/api/partners`,
+          { data: newPartnerData.attributes },
           {
-            data: newPartnerData.attributes,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
           }
-        )
-        .then((response) => {
-          console.log("New partner added:", response.data);
-          fetchPartnersData(); // Fetch partners data to update from backend
-        })
-        .catch((error) => {
-          console.error("Error adding new partner:", error);
-        });
+        );
+
+        // Update partnersData with the newly added partner
+        setPartnersData([...partnersData, newPartnerData]);
+        console.log("New partner added:", response.data);
+
+        fetchPartnersData(); // Optionally fetch updated data from the backend
+      } catch (error) {
+        console.error("Error adding new partner:", error);
+      }
 
       setPartnerName("");
       setPartnerRatio("");
