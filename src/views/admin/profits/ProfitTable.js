@@ -138,11 +138,15 @@ const ProfitTable = ({ selectedHotel }) => {
       };
 
       try {
+        const jwt = localStorage.getItem("token");
         const response = await axios.post(
           `${URL}/api/partners`,
           { data: newPartnerData.attributes },
           {
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${jwt}`,
+            },
           }
         );
 
