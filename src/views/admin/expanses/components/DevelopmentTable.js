@@ -15,6 +15,7 @@ import {
   ModalOverlay,
   ModalContent,
   ModalHeader,
+  Select,
   ModalFooter,
   ModalBody,
   Input,
@@ -834,8 +835,7 @@ export default function DevelopmentTable(props) {
                 </Text>
                 <Text color={textColorPrimary} fontWeight="bold">
                   Category:
-                  <Input
-                    type="text"
+                  <Select
                     value={editValues.category || ""}
                     onChange={(e) =>
                       setEditValues({
@@ -843,7 +843,10 @@ export default function DevelopmentTable(props) {
                         category: e.target.value,
                       })
                     }
-                  />
+                  >
+                    <option value="kitchen">kitchen</option>
+                    <option value="others">others</option>
+                  </Select>
                 </Text>
                 <Text color={textColorPrimary} fontWeight="bold">
                   Quantity:
