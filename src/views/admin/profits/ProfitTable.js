@@ -41,7 +41,7 @@ const ProfitTable = ({ selectedHotel }) => {
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     fetchPartnersData();
-  }, [selectedMonth]);
+  }, [selectedMonth, selectedHotel]);
   useEffect(() => {
     setProfit({
       total_expanse: 0,
