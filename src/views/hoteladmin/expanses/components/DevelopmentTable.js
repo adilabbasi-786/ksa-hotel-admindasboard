@@ -53,7 +53,63 @@ export default function DevelopmentTable(props) {
   const handleTodaySaleModalClose = () => setShowTodaySaleModal(false);
   const handleAdvanceSalaryModalClose = () => setShowAdvanceSalaryModal(false);
   const handlePaymentModalClose = () => setShowPaymentModal(false);
-  const { columnsData, tableData, selectedDate, updateTableData } = props;
+  const [previousDaysaleExist, setPreviousDaysaleExist] = useState(true);
+  const [previousDayAdvanceExist, setPreviousDayAdvanceExist] = useState(true);
+  const getPreviousDate = (date) => {
+    const previousDate = new Date(date);
+    previousDate.setDate(previousDate.getDate() - 1);
+    const year = previousDate.getFullYear();
+    const month = String(previousDate.getMonth() + 1).padStart(2, "0");
+    const day = String(previousDate.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+  const checkPreviousDaysale = (date) => {
+    const previousDate = getPreviousDate(date);
+    axios
+      .get(
+        `${URL}/api/daily-sales?populate=*&filters[date][$eq]=${previousDate}`,
+
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((response) => {
+        setPreviousDaysaleExist(response.data.length > 0);
+      })
+      .catch((error) => {
+        console.error("Error checking previous day records:", error);
+        setPreviousDaysaleExist(false);
+      });
+  };
+  const checkPreviousDayAdvance = (date) => {
+    const previousDate = getPreviousDate(date);
+    axios
+      .get(
+        `${URL}/api/advance-salaries?&filters[date][$eq]=${previousDate}`,
+
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((response) => {
+        setPreviousDayAdvanceExist(response.data.length > 0);
+      })
+      .catch((error) => {
+        console.error("Error checking previous day records:", error);
+        setPreviousDayAdvanceExist(false);
+      });
+  };
+  const {
+    columnsData,
+    tableData,
+    selectedDate,
+    updateTableData,
+    previousDayRecordsExist,
+  } = props;
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
 
   const token = localStorage.getItem("token");
@@ -212,6 +268,8 @@ export default function DevelopmentTable(props) {
     payment();
     handleTodaySaleModalOpen(false);
     handleAdvanceSalaryModalOpen();
+    checkPreviousDaysale(selectedDate);
+    checkPreviousDayAdvance(selectedDate);
   }, [selectedDate]);
 
   const dataWithTax = useMemo(() => {
@@ -292,6 +350,7 @@ export default function DevelopmentTable(props) {
             width="fit-content"
             alignSelf="flex-end"
             onClick={handleTodaySaleModalOpen}
+            disabled={!previousDaysaleExist}
           >
             View Today Sale
           </Button>
@@ -301,6 +360,7 @@ export default function DevelopmentTable(props) {
               width="fit-content"
               alignSelf="flex-end"
               onClick={handleAdvanceSalaryModalOpen}
+              disabled={!previousDayAdvanceExist}
             >
               View Advance Salary
             </Button>

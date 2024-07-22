@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Button, Flex, Text, useColorModeValue } from "@chakra-ui/react";
-import { Card, Input } from "@material-ui/core";
+import { Card } from "@material-ui/core";
 import DevelopmentTable from "../expanses/components/DevelopmentTable";
 import AddNewItem from "./AddNewItem";
 import { URL } from "Utils";
@@ -14,23 +14,30 @@ const getCurrentDate = () => {
   return `${year}-${month}-${day}`;
 };
 
+const getPreviousDate = (date) => {
+  const previousDate = new Date(date);
+  previousDate.setDate(previousDate.getDate() - 1);
+  const year = previousDate.getFullYear();
+  const month = String(previousDate.getMonth() + 1).padStart(2, "0");
+  const day = String(previousDate.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 const KitchenExpanses = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(getCurrentDate());
   const [tableData, setTableData] = useState([]);
+  const [previousDayRecordsExist, setPreviousDayRecordsExist] = useState(true);
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const token = localStorage.getItem("token");
 
-  const getData = () => {
+  const getData = (date) => {
     axios
-      .get(
-        `${URL}/api/daily-registers?populate=*&filters[date]=${selectedDate}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      .get(`${URL}/api/daily-registers?populate=*&filters[date]=${date}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
         const mappedData = response?.data?.map((item) => {
           const totalPrice = (item?.quantity * item?.price).toFixed(1);
@@ -45,8 +52,6 @@ const KitchenExpanses = () => {
             tax: item.tax,
           };
         });
-        console.log("response", response.data);
-
         setTableData(mappedData);
       })
       .catch((error) => {
@@ -54,8 +59,29 @@ const KitchenExpanses = () => {
       });
   };
 
+  const checkPreviousDayRecords = (date) => {
+    const previousDate = getPreviousDate(date);
+    axios
+      .get(
+        `${URL}/api/daily-registers?populate=*&filters[date]=${previousDate}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((response) => {
+        setPreviousDayRecordsExist(response.data.length > 0);
+      })
+      .catch((error) => {
+        console.error("Error checking previous day records:", error);
+        setPreviousDayRecordsExist(false);
+      });
+  };
+
   useEffect(() => {
-    getData();
+    getData(selectedDate);
+    checkPreviousDayRecords(selectedDate);
   }, [selectedDate]);
 
   const columnsData = [
@@ -115,6 +141,7 @@ const KitchenExpanses = () => {
             columnsData={columnsData}
             tableData={tableData}
             updateTableData={handleUpdateTableData}
+            previousDayRecordsExist={previousDayRecordsExist}
           />
           <Button
             colorScheme="blue"
@@ -122,9 +149,16 @@ const KitchenExpanses = () => {
             marginTop="10px"
             alignSelf="flex-end"
             onClick={() => setIsModalOpen(true)}
+            disabled={!previousDayRecordsExist}
           >
             Add Daily Expanse Item
           </Button>
+          {!previousDayRecordsExist && (
+            <Text color="red" mt="10px">
+              Please enter records for the previous day before adding today's
+              records.
+            </Text>
+          )}
         </Flex>
       </Card>
       <AddNewItem
@@ -133,7 +167,7 @@ const KitchenExpanses = () => {
         onClose={() => setIsModalOpen(false)}
         onAddItem={handleAddItem}
         updateTableData={handleUpdateTableData}
-        getData={getData}
+        getData={() => getData(selectedDate)}
       />
     </>
   );
