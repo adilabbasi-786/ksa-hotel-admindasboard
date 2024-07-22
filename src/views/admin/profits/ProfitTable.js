@@ -21,6 +21,7 @@ import {
 import Card from "components/card/Card.js";
 import Information from "views/admin/expanses/components/Information";
 import { URL } from "Utils";
+import Delete from "./Delete";
 
 const ProfitTable = ({ selectedHotel }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,8 +30,7 @@ const ProfitTable = ({ selectedHotel }) => {
   const [partnersData, setPartnersData] = useState([]);
   const [totalProfit, setTotalProfit] = useState(0);
   const [selectedMonth, setSelectedMonth] = useState("");
-  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
-  const [partnerToDelete, setPartnerToDelete] = useState(null);
+
   const [newlyAddedPartners, setNewlyAddedPartners] = useState([]);
   const [profit, setProfit] = useState({
     total_expanse: 0,
@@ -178,43 +178,6 @@ const ProfitTable = ({ selectedHotel }) => {
     fetchTotalProfit(year, month); // Update total profit based on the new selected month
   };
 
-  const handleDeleteConfirmation = (partner) => {
-    setPartnerToDelete(partner);
-    setDeleteConfirmationOpen(true);
-  };
-
-  const handleDeletePartner = () => {
-    if (partnerToDelete) {
-      // Check if the partner to delete is a newly added partner
-      const isNewPartner = newlyAddedPartners.some(
-        (partner) => partner.id === partnerToDelete.id
-      );
-
-      if (isNewPartner) {
-        // Remove the partner from the newly added partners state
-        setNewlyAddedPartners(
-          newlyAddedPartners.filter(
-            (partner) => partner.id !== partnerToDelete.id
-          )
-        );
-        setDeleteConfirmationOpen(false);
-      } else {
-        // Make a DELETE request to the backend API to delete the partner
-        axios
-          .delete(`${URL}/${partnerToDelete.id}`)
-          .then((response) => {
-            console.log("Partner deleted:", response.data);
-            // After successful deletion, close the confirmation modal and refresh the partner data
-            setDeleteConfirmationOpen(false);
-            fetchPartnersData();
-          })
-          .catch((error) => {
-            console.error("Error deleting partner:", error);
-          });
-      }
-    }
-  };
-
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const cardShadow = useColorModeValue(
     "0px 18px 40px rgba(112, 144, 176, 0.12)",
@@ -250,7 +213,7 @@ const ProfitTable = ({ selectedHotel }) => {
                 boxShadow={cardShadow}
                 title={partner.attributes.name}
                 value={partner.attributes.ratio}
-                onDelete={() => handleDeleteConfirmation(partner)}
+                // onDelete={() => handleDeleteConfirmation(partner)}
               />
             ))}
           </SimpleGrid>
@@ -266,14 +229,11 @@ const ProfitTable = ({ selectedHotel }) => {
           >
             Add Partner
           </Button>
-          <Button
-            colorScheme="blue"
-            width="fit-content"
-            onClick={handleDeletePartner}
-          >
-            {console.log("Delete")}
-            Delete Partner
-          </Button>
+          <Delete
+            partnersData={partnersData}
+            setPartnersData={setPartnersData}
+            fetchPartnersData={fetchPartnersData}
+          />
         </Flex>
       </Card>
 
@@ -375,36 +335,6 @@ const ProfitTable = ({ selectedHotel }) => {
               Add
             </Button>
             <Button onClick={handleCloseModal}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-      <Modal
-        isOpen={deleteConfirmationOpen}
-        onClose={() => setDeleteConfirmationOpen(false)}
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Delete Partner</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            {partnerToDelete && (
-              <Text>
-                Are you sure you want to delete partner{" "}
-                {partnerToDelete.attributes.name}?
-              </Text>
-            )}
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              colorScheme="blue"
-              width="fit-content"
-              onClick={handleDeletePartner}
-            >
-              Delete Partner
-            </Button>
-            <Button onClick={() => setDeleteConfirmationOpen(false)}>
-              Cancel
-            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
