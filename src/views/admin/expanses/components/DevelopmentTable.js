@@ -76,18 +76,18 @@ export default function DevelopmentTable(props) {
   // Function to handle changes in the edit form
   const handleEditChange = (e) => {
     const { name, value } = e.target;
+    const updatedValue = parseFloat(value) || 0;
     setEditSaleData((prevData) => {
-      if (!prevData || !prevData.attributes) {
-        console.error("Invalid editSaleData state:", prevData);
-        return prevData;
-      }
-      return {
-        ...prevData,
-        attributes: {
-          ...prevData.attributes,
-          [name]: value,
-        },
+      const newAttributes = {
+        ...prevData.attributes,
+        [name]: updatedValue,
       };
+
+      if (name === "cashSale" || name === "creditSale") {
+        newAttributes.sale = newAttributes.cashSale + newAttributes.creditSale;
+      }
+
+      return { ...prevData, attributes: newAttributes };
     });
   };
 
@@ -101,6 +101,7 @@ export default function DevelopmentTable(props) {
     const updatedAttributes = {
       cashSale: editSaleData.attributes.cashSale,
       creditSale: editSaleData.attributes.creditSale,
+      sale: editSaleData.attributes.sale,
       date: editSaleData.attributes.date,
     };
 
@@ -614,6 +615,13 @@ export default function DevelopmentTable(props) {
                       name="creditSale"
                       value={editSaleData.attributes.creditSale}
                       onChange={handleEditChange}
+                    />
+                    Total Sale:
+                    <Input
+                      type="number"
+                      name="sale"
+                      value={editSaleData.attributes.sale}
+                      readOnly
                     />
                     <Flex justifyContent="space-between">
                       <Button colorScheme="green" onClick={handleSave}>
