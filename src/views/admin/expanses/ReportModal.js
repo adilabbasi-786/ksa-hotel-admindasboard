@@ -176,18 +176,18 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
             <>
               {reportType === "dailyRegister" ? (
                 <>
-                  <Box
+                  {/* <Box
                     maxH="400px"
                     overflowY="auto"
                     border="1px solid #e2e8f0"
                     borderRadius="md"
                     mt="4"
-                  >
-                    <DevelopmentTable
-                      columnsData={columnsData}
-                      tableData={filteredData}
-                    />
-                  </Box>
+                  > */}
+                  <DevelopmentTable
+                    columnsData={columnsData}
+                    tableData={filteredData}
+                  />
+                  {/* </Box> */}
                   <Text mt="4" fontWeight="bold">
                     Total Quantity: {totalQuantity}
                   </Text>
@@ -198,18 +198,18 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
               ) : (
                 <>
                   <Flex direction="column">
-                    <Box
+                    {/* <Box
                       maxH="400px"
                       overflowY="auto"
                       border="1px solid #e2e8f0"
                       borderRadius="md"
                       mt="4"
-                    >
-                      <DailySalesTable
-                        columnsData={columnsData}
-                        tableData={filteredData}
-                      />
-                    </Box>
+                    > */}
+                    <DailySalesTable
+                      columnsData={columnsData}
+                      tableData={filteredData}
+                    />
+                    {/* </Box> */}
                     <Text mt="2" fontWeight="bold">
                       Total Credit sale: {totalCreditSale}
                     </Text>
