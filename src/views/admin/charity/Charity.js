@@ -19,6 +19,8 @@ import {
 import Card from "components/card/Card.js";
 import Information from "views/admin/expanses/components/Information";
 import { URL } from "Utils";
+import ReportModal from "./ReportModal";
+import ViewReports from "./ViewReports";
 
 const getCurrentDate = () => {
   const currentDate = new Date();
@@ -35,6 +37,7 @@ const Charity = ({ selectedHotel }) => {
   const [dailyCharity, setDailyCharity] = useState(null);
   const [isCharityPaid, setIsCharityPaid] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   const token = localStorage.getItem("token");
 
@@ -125,6 +128,7 @@ const Charity = ({ selectedHotel }) => {
           fontSize="md" // Adjust the font size for mobile
           width="100%" // Adjust the width for mobile
         />
+        <ViewReports onOpen={() => setIsReportModalOpen(true)} />
       </Flex>
       <Card mb={{ base: "20px", lg: "50px" }} width="80%">
         <VStack spacing={4}>
@@ -202,6 +206,11 @@ const Charity = ({ selectedHotel }) => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      <ReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        selectedHotel={selectedHotel}
+      />
     </>
   );
 };

@@ -123,9 +123,9 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
   const totalCashSale = filteredData
     .reduce((acc, item) => acc + parseFloat(item.cashSale || 0), 0)
     .toFixed(2);
-  const totalAllSale = filteredData
-    .reduce((acc, item) => acc + parseFloat(item.totalSale || 0), 0)
-    .toFixed(2);
+  const totalAllSale = (
+    parseFloat(totalCashSale) + parseFloat(totalCreditSale)
+  ).toFixed(2);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="full">
