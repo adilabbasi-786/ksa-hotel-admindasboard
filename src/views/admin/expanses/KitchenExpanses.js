@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Button, Flex, Text, useColorModeValue } from "@chakra-ui/react";
-import { Card, Input } from "@material-ui/core";
+import { Card } from "@material-ui/core";
 import DevelopmentTable from "../expanses/components/DevelopmentTable";
 import AddNewItem from "./AddNewItem";
 import { URL } from "Utils";
+import ViewReports from "./ViewReports";
+import ReportModal from "./ReportModal";
 
 const getCurrentDate = () => {
   const currentDate = new Date();
@@ -16,6 +18,7 @@ const getCurrentDate = () => {
 
 const KitchenExpanses = ({ selectedHotel }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(getCurrentDate());
   const [tableData, setTableData] = useState([]);
 
@@ -34,7 +37,6 @@ const KitchenExpanses = ({ selectedHotel }) => {
       )
       .then((response) => {
         const mappedData = response?.data?.data?.map((item) => {
-          console.log("item", item.attributes.category);
           const totalPrice = (
             item.attributes.quantity * item.attributes.price
           ).toFixed(1);
@@ -43,9 +45,6 @@ const KitchenExpanses = ({ selectedHotel }) => {
             itemName: item.attributes.itemName,
             category: item?.attributes?.category,
             quantity: item?.attributes?.quantity,
-            //  ${
-            //   item.attributes.quantity === "kitchen" ? "others" : "kg"
-            // }`,
             price: item.attributes.price,
             totalPrice: totalPrice,
             tax: item.attributes.tax,
@@ -91,13 +90,13 @@ const KitchenExpanses = ({ selectedHotel }) => {
   ];
   const handleUpdateTableData = (newItem) => {
     setTableData((prevData) => {
-      console.log("ssss", [...prevData, newItem]);
       return [...prevData, newItem];
     });
   };
   const handleAddItem = (newItem) => {
     console.log("New item added:", newItem);
   };
+
   return (
     <>
       <Flex alignItems="center" mb="10px" width={{ base: "100%", lg: "30%" }}>
@@ -114,6 +113,7 @@ const KitchenExpanses = ({ selectedHotel }) => {
         />
       </Flex>
       <Card>
+        <ViewReports onOpen={() => setIsReportModalOpen(true)} />
         <Flex direction="column" justifyContent="space-between">
           <DevelopmentTable
             selectedHotel={selectedHotel}
@@ -142,6 +142,11 @@ const KitchenExpanses = ({ selectedHotel }) => {
         onAddItem={handleAddItem}
         updateTableData={handleUpdateTableData}
         getData={getData}
+      />
+      <ReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        selectedHotel={selectedHotel}
       />
     </>
   );

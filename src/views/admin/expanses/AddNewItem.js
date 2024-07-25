@@ -67,8 +67,12 @@ const AddNewItem = ({
         }
       )
       .then((response) => {
-        setSuccessMessage("Item added successfully!");
+        alert("Item added successfully");
+        // setSuccessMessage("Item added successfully!");
         onAddItem(newItem);
+        setItemName("");
+        setPrice("");
+        setQuantity("");
         onClose();
         getData();
       })
