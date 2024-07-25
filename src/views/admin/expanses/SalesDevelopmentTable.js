@@ -40,12 +40,12 @@ export default function DailySalesTable(props) {
     getTableProps,
     getTableBodyProps,
     headerGroups,
-    page,
+    rows,
     prepareRow,
     initialState,
   } = tableInstance;
 
-  initialState.pageSize = 11;
+  // initialState.pageSize = 11;
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
 
@@ -94,7 +94,7 @@ export default function DailySalesTable(props) {
           ))}
         </Thead>
         <Tbody {...getTableBodyProps()}>
-          {page.map((row, index) => {
+          {rows.map((row, index) => {
             prepareRow(row);
             return (
               <Tr {...row.getRowProps()} key={index}>
