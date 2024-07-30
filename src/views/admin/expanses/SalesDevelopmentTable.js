@@ -128,6 +128,13 @@ export default function DailySalesTable(props) {
                       </Text>
                     );
                   }
+                  if (cell.column.Header === "Total Expanse") {
+                    data = (
+                      <Text color={textColor} fontSize="sm" fontWeight="700">
+                        {cell.value}
+                      </Text>
+                    );
+                  }
 
                   return (
                     <Td

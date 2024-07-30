@@ -28,6 +28,7 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
   const [tableData, setTableData] = useState([]);
   const [itemNames, setItemNames] = useState([]);
   const [selectedItem, setSelectedItem] = useState("");
+  const [totalExpanseData, setTotalExpanseData] = useState({});
 
   const token = localStorage.getItem("token");
 
@@ -80,6 +81,29 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
       .catch((error) => {
         console.error("Error fetching reports:", error);
       });
+
+    // Fetch total daily expanse data if reportType is dailySale
+    if (reportType === "dailySale") {
+      axios
+        .get(
+          `${URL}/api/daily-total-expanses?filters[hotel_name][id][$in]=${selectedHotel}&filters[date][$gte]=${fromDate}&filters[date][$lte]=${toDate}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((response) => {
+          const expanseData = response?.data?.data?.reduce((acc, item) => {
+            acc[item.attributes.date] = item.attributes.totalexpanse;
+            return acc;
+          }, {});
+          setTotalExpanseData(expanseData);
+        })
+        .catch((error) => {
+          console.error("Error fetching total expanse data:", error);
+        });
+    }
   };
 
   useEffect(() => {
@@ -92,6 +116,15 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
     reportType === "dailyRegister" && selectedItem
       ? tableData.filter((item) => item.itemName === selectedItem)
       : tableData;
+
+  // Merge total expanse data with the sales data
+  const mergedData =
+    reportType === "dailySale"
+      ? filteredData.map((item) => ({
+          ...item,
+          totalExpanse: totalExpanseData[item.date] || 0,
+        }))
+      : filteredData;
 
   const columnsData =
     reportType === "dailyRegister"
@@ -109,6 +142,7 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
           { Header: "Cash Sale", accessor: "cashSale" },
           { Header: "Credit Sale", accessor: "creditSale" },
           { Header: "Total Sale", accessor: "totalSale" },
+          { Header: "Total Expanse", accessor: "totalExpanse" },
         ];
 
   const totalAmount = filteredData
@@ -126,6 +160,9 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
   const totalAllSale = (
     parseFloat(totalCashSale) + parseFloat(totalCreditSale)
   ).toFixed(2);
+  const totalExpanse = mergedData
+    .reduce((acc, item) => acc + parseFloat(item.totalExpanse || 0), 0)
+    .toFixed(2);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="full">
@@ -172,22 +209,14 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
               </Select>
             </Flex>
           )}
-          {filteredData.length > 0 && (
+          {mergedData.length > 0 && (
             <>
               {reportType === "dailyRegister" ? (
                 <>
-                  {/* <Box
-                    maxH="400px"
-                    overflowY="auto"
-                    border="1px solid #e2e8f0"
-                    borderRadius="md"
-                    mt="4"
-                  > */}
                   <DevelopmentTable
                     columnsData={columnsData}
                     tableData={filteredData}
                   />
-                  {/* </Box> */}
                   <Text mt="4" fontWeight="bold">
                     Total Quantity: {totalQuantity}
                   </Text>
@@ -198,18 +227,10 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
               ) : (
                 <>
                   <Flex direction="column">
-                    {/* <Box
-                      maxH="400px"
-                      overflowY="auto"
-                      border="1px solid #e2e8f0"
-                      borderRadius="md"
-                      mt="4"
-                    > */}
                     <DailySalesTable
                       columnsData={columnsData}
-                      tableData={filteredData}
+                      tableData={mergedData}
                     />
-                    {/* </Box> */}
                     <Text mt="2" fontWeight="bold">
                       Total Credit sale: {totalCreditSale}
                     </Text>
@@ -218,6 +239,9 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
                     </Text>
                     <Text mt="2" fontWeight="bold">
                       Total over All sale: {totalAllSale}
+                    </Text>
+                    <Text mt="2" fontWeight="bold">
+                      Total Expanse: {totalExpanse}
                     </Text>
                   </Flex>
                 </>

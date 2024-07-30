@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -36,25 +36,29 @@ const AddNewItem = ({
 
   const token = localStorage.getItem("token");
 
-  const handleAddItem = () => {
+  const handleAddItem = async () => {
     // Validation logic
     if (!itemName || !quantity || !price || !category) {
       setErrorMessage("All fields are required.");
       return;
     }
+
+    const dailyExpanse = price * quantity;
+
     setIsLoading(true);
 
-    const newItem = {
-      itemName,
-      quantity,
-      price,
-      category,
-      hotel_name: selectedHotel,
-      date: selectedDate,
-    };
+    try {
+      const newItem = {
+        itemName,
+        quantity,
+        price,
+        category,
+        hotel_name: selectedHotel,
+        date: selectedDate,
+      };
 
-    axios
-      .post(
+      // Add the new item to daily-register
+      await axios.post(
         `${URL}/api/daily-registers`,
         {
           data: newItem,
@@ -65,21 +69,74 @@ const AddNewItem = ({
             Authorization: `Bearer ${token}`,
           },
         }
-      )
-      .then((response) => {
-        alert("Item added successfully");
-        // setSuccessMessage("Item added successfully!");
-        onAddItem(newItem);
-        setItemName("");
-        setPrice("");
-        setQuantity("");
-        onClose();
-        getData();
-      })
-      .catch((error) => {
-        console.error(error);
-        setErrorMessage("Failed to add item. Please try again.");
-      });
+      );
+
+      // Fetch the existing daily total expanse for the selected date
+      const totalExpanseResponse = await axios.get(
+        `${URL}/api/daily-total-expanses`,
+        {
+          params: {
+            filters: { date: selectedDate },
+          },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const totalExpanseData = totalExpanseResponse.data.data;
+      if (totalExpanseData.length > 0) {
+        // Update the existing total daily expanse
+        const existingRecordId = totalExpanseData[0].id;
+        const existingTotalExpanse =
+          totalExpanseData[0].attributes.totalexpanse;
+
+        await axios.put(
+          `${URL}/api/daily-total-expanses/${existingRecordId}`,
+          {
+            data: {
+              totalexpanse: existingTotalExpanse + dailyExpanse,
+            },
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      } else {
+        // Create a new total daily expanse record
+        await axios.post(
+          `${URL}/api/daily-total-expanses`,
+          {
+            data: {
+              date: selectedDate,
+              totalexpanse: dailyExpanse,
+              hotel_name: selectedHotel,
+            },
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      }
+
+      alert("Item added successfully");
+      onAddItem(newItem);
+      setItemName("");
+      setPrice("");
+      setQuantity("");
+      onClose();
+      getData();
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("Failed to add item. Please try again.");
+    }
+
     setIsLoading(false);
   };
 
