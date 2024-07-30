@@ -205,49 +205,6 @@ export default function DevelopmentTable(props) {
           })}
         </Tbody>
       </Table>
-      <Flex
-        justify="space-between"
-        align="center"
-        fontSize="sm"
-        color="gray.400"
-        mt="20px"
-      >
-        <Text>
-          Showing {pageIndex * pageSize + 1} to{" "}
-          {pageIndex * pageSize + rows.length} of {data.length} entries
-        </Text>
-        <Flex>
-          <Button
-            onClick={() => gotoPage(0)}
-            disabled={!canPreviousPage}
-            mr="4"
-          >
-            {"<<"}
-          </Button>
-          <Button onClick={previousPage} disabled={!canPreviousPage} mr="4">
-            Previous
-          </Button>
-          <Button onClick={nextPage} disabled={!canNextPage} mr="4">
-            Next
-          </Button>
-          <Button
-            onClick={() => gotoPage(pageCount - 1)}
-            disabled={!canNextPage}
-          >
-            {">>"}
-          </Button>
-        </Flex>
-        <Select
-          value={pageSize}
-          onChange={(e) => setPageSize(Number(e.target.value))}
-        >
-          {[10, 25, 50, 100, 200, 300, 400, 500].map((pageSize) => (
-            <option key={pageSize} value={pageSize}>
-              Show {pageSize}
-            </option>
-          ))}
-        </Select>
-      </Flex>
     </Card>
   );
 }

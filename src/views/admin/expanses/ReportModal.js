@@ -14,11 +14,11 @@ import {
   Flex,
   Text,
   Select,
-  Box,
 } from "@chakra-ui/react";
 import axios from "axios";
 import DevelopmentTable from "./ReportsDevelopmentTable";
-import DailySalesTable from "./SalesDevelopmentTable"; // Import the new table component
+import DailySalesTable from "./SalesDevelopmentTable";
+import Pagination from "./Pagination"; // Import the Pagination component
 import { URL } from "Utils";
 
 const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
@@ -30,14 +30,21 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
   const [selectedItem, setSelectedItem] = useState("");
   const [totalExpanseData, setTotalExpanseData] = useState({});
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [perPage] = useState(20); // Define how many items per page
+
   const token = localStorage.getItem("token");
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
 
   const fetchReports = () => {
     const endpoint =
       reportType === "dailyRegister" ? "daily-registers" : "daily-sales";
     axios
       .get(
-        `${URL}/api/${endpoint}?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date][$gte]=${fromDate}&filters[date][$lte]=${toDate}`,
+        `${URL}/api/${endpoint}?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date][$gte]=${fromDate}&filters[date][$lte]=${toDate}&pagination[page]=${currentPage}&pagination[pageSize]=${perPage}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -77,6 +84,9 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
           const names = Array.from(new Set(data.map((item) => item.itemName)));
           setItemNames(names);
         }
+
+        const totalNotifications = response.data.meta.pagination.total;
+        setTotalPages(Math.ceil(totalNotifications / perPage));
       })
       .catch((error) => {
         console.error("Error fetching reports:", error);
@@ -110,7 +120,7 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
     if (fromDate && toDate) {
       fetchReports();
     }
-  }, [reportType, fromDate, toDate, selectedItem]);
+  }, [reportType, fromDate, toDate, selectedItem, currentPage]);
 
   const filteredData =
     reportType === "dailyRegister" && selectedItem
@@ -248,6 +258,11 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
               )}
             </>
           )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         </ModalBody>
         <ModalFooter>
           <Button colorScheme="blue" mr={3} onClick={onClose}>
