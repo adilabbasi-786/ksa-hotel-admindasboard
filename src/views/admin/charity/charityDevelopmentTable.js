@@ -27,22 +27,16 @@ export default function DevelopmentTable({ columnsData, tableData }) {
     {
       columns,
       data,
+      initialState: { pageSize: 20 }, // Ensure this matches the perPage value
     },
     useGlobalFilter,
     useSortBy,
     usePagination
   );
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    page,
-    prepareRow,
-    initialState,
-  } = tableInstance;
+  const { getTableProps, getTableBodyProps, headerGroups, page, prepareRow } =
+    tableInstance;
 
-  initialState.pageSize = 11;
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
 

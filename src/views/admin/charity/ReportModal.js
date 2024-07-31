@@ -16,20 +16,29 @@ import {
 } from "@chakra-ui/react";
 import DevelopmentTable from "./charityDevelopmentTable";
 import { URL } from "Utils";
+import Pagination from "./Pagination";
 
 const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [tableData, setTableData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalCharity, setTotalCharity] = useState(0);
+  const [perPage] = useState(20);
 
   const token = localStorage.getItem("token");
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
 
   const fetchCharityReports = () => {
     setIsLoading(true);
     axios
       .get(
-        `${URL}/api/charities?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date][$gte]=${fromDate}&filters[date][$lte]=${toDate}`,
+        `${URL}/api/charities?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date][$gte]=${fromDate}&filters[date][$lte]=${toDate}&pagination[page]=${currentPage}&pagination[pageSize]=${perPage}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -43,6 +52,13 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
           dailyCharity: item.attributes.dailycharity,
         }));
         setTableData(data);
+        setTotalPages(response.data.meta.pagination.pageCount);
+
+        // Calculate total charity across all pages
+        if (currentPage === 1) {
+          const totalItems = response.data.meta.pagination.total;
+          setTotalCharity(totalItems * perPage);
+        }
       })
       .catch((error) => {
         console.error("Error fetching charity reports:", error);
@@ -56,7 +72,7 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
     if (fromDate && toDate) {
       fetchCharityReports();
     }
-  }, [fromDate, toDate, selectedHotel]);
+  }, [fromDate, toDate, selectedHotel, currentPage]);
 
   const columnsData = [
     { Header: "Date", accessor: "date" },
@@ -100,7 +116,15 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
               />
             </Box>
           )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         </ModalBody>
+        <Text mt="4" fontWeight="bold">
+          Total charity: {totalCharity}
+        </Text>
         <ModalFooter>
           <Button colorScheme="blue" mr={3} onClick={onClose}>
             Close
