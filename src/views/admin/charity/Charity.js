@@ -128,10 +128,11 @@ const Charity = ({ selectedHotel }) => {
           fontSize="md" // Adjust the font size for mobile
           width="100%" // Adjust the width for mobile
         />
-        <ViewReports onOpen={() => setIsReportModalOpen(true)} />
       </Flex>
       <Card mb={{ base: "20px", lg: "50px" }} width="80%">
         <VStack spacing={4}>
+          <ViewReports onOpen={() => setIsReportModalOpen(true)} />
+
           <Text
             color={textColorPrimary}
             fontWeight="bold"

@@ -19,6 +19,8 @@ import {
 import Card from "components/card/Card.js";
 import Information from "views/admin/expanses/components/Information";
 import { URL } from "Utils";
+import ViewReports from "./ViewReports";
+import ReportModal from "./ReportModal";
 
 const getCurrentMonth = () => {
   const currentDate = new Date();
@@ -57,6 +59,7 @@ const RentKafalat = ({ selectedHotel }) => {
   const [paidRent, setPaidRent] = useState("");
   const [paidKafalat, setPaidKafalat] = useState("");
   const token = localStorage.getItem("token");
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   useEffect(() => {
     fetchRentKafalatData();
@@ -160,6 +163,8 @@ const RentKafalat = ({ selectedHotel }) => {
         </FormControl>
       </VStack>
       <Card mb="20px" width="80%">
+        <ViewReports onOpen={() => setIsReportModalOpen(true)} />
+
         <VStack spacing={4}>
           <Text
             color={textColorPrimary}
@@ -250,6 +255,11 @@ const RentKafalat = ({ selectedHotel }) => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      <ReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        selectedHotel={selectedHotel}
+      />
     </>
   );
 };
