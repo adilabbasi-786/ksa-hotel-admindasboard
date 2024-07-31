@@ -76,7 +76,7 @@ const AddNewItem = ({
         `${URL}/api/daily-total-expanses`,
         {
           params: {
-            filters: { date: selectedDate },
+            filters: { date: selectedDate, hotel_name: selectedHotel },
           },
           headers: {
             Authorization: `Bearer ${token}`,
