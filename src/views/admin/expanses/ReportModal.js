@@ -29,22 +29,20 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
   const [itemNames, setItemNames] = useState([]);
   const [selectedItem, setSelectedItem] = useState("");
   const [totalExpanseData, setTotalExpanseData] = useState({});
-
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [perPage] = useState(20); // Define how many items per page
+  const [perPage] = useState(10); // Define how many items per page
 
   const token = localStorage.getItem("token");
+
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
 
-  const fetchReports = () => {
-    const endpoint =
-      reportType === "dailyRegister" ? "daily-registers" : "daily-sales";
+  const fetchItemNames = () => {
     axios
       .get(
-        `${URL}/api/${endpoint}?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date][$gte]=${fromDate}&filters[date][$lte]=${toDate}&pagination[page]=${currentPage}&pagination[pageSize]=${perPage}`,
+        `${URL}/api/daily-registers?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date][$gte]=${fromDate}&filters[date][$lte]=${toDate}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -52,7 +50,30 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
         }
       )
       .then((response) => {
-        const data = response?.data?.data?.map((item) => {
+        const names = Array.from(
+          new Set(response.data.data.map((item) => item.attributes.itemName))
+        );
+        setItemNames(names);
+      })
+      .catch((error) => {
+        console.error("Error fetching item names:", error);
+      });
+  };
+
+  const fetchReports = () => {
+    const endpoint =
+      reportType === "dailyRegister" ? "daily-registers" : "daily-sales";
+    axios
+      .get(
+        `${URL}/api/${endpoint}?populate=*&filters[hotel_name][id][$in]=${selectedHotel}&filters[date][$gte]=${fromDate}&filters[date][$lte]=${toDate}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((response) => {
+        let data = response?.data?.data?.map((item) => {
           if (reportType === "dailyRegister") {
             const totalPrice = (
               item.attributes.quantity * item.attributes.price
@@ -77,16 +98,9 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
             };
           }
         });
+
         setTableData(data);
-
-        // Extract item names if reportType is dailyRegister
-        if (reportType === "dailyRegister") {
-          const names = Array.from(new Set(data.map((item) => item.itemName)));
-          setItemNames(names);
-        }
-
-        const totalNotifications = response.data.meta.pagination.total;
-        setTotalPages(Math.ceil(totalNotifications / perPage));
+        setTotalPages(Math.ceil(data.length / perPage));
       })
       .catch((error) => {
         console.error("Error fetching reports:", error);
@@ -119,22 +133,34 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
   useEffect(() => {
     if (fromDate && toDate) {
       fetchReports();
+      if (reportType === "dailyRegister") {
+        fetchItemNames();
+      }
     }
-  }, [reportType, fromDate, toDate, selectedItem, currentPage]);
+  }, [reportType, fromDate, toDate]);
+
+  useEffect(() => {
+    setCurrentPage(1); // Reset to first page when filter changes
+  }, [reportType, selectedItem, fromDate, toDate]);
 
   const filteredData =
     reportType === "dailyRegister" && selectedItem
       ? tableData.filter((item) => item.itemName === selectedItem)
       : tableData;
 
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * perPage,
+    currentPage * perPage
+  );
+
   // Merge total expanse data with the sales data
   const mergedData =
     reportType === "dailySale"
-      ? filteredData.map((item) => ({
+      ? paginatedData.map((item) => ({
           ...item,
           totalExpanse: totalExpanseData[item.date] || 0,
         }))
-      : filteredData;
+      : paginatedData;
 
   const columnsData =
     reportType === "dailyRegister"
@@ -225,7 +251,7 @@ const ReportModal = ({ isOpen, onClose, selectedHotel }) => {
                 <>
                   <DevelopmentTable
                     columnsData={columnsData}
-                    tableData={filteredData}
+                    tableData={paginatedData}
                   />
                   <Text mt="4" fontWeight="bold">
                     Total Quantity: {totalQuantity}
