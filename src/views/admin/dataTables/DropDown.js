@@ -27,7 +27,7 @@ const DropDown = ({ onSelectHotel }) => {
     try {
       const response = await axios.get(`${URL}/api/hotel-names`, {
         headers: {
-          Authorization: `Bearar${token}`,
+          Authorization: `Bearar ${token}`,
         },
       });
       setHotels(response.data);
