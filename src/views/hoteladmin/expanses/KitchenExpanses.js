@@ -28,6 +28,7 @@ const KitchenExpanses = () => {
   const [selectedDate, setSelectedDate] = useState(getCurrentDate());
   const [tableData, setTableData] = useState([]);
   const [previousDayRecordsExist, setPreviousDayRecordsExist] = useState(true);
+  const [hotelPublishDate, setHotelPublishDate] = useState("");
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const token = localStorage.getItem("token");
 
@@ -132,6 +133,7 @@ const KitchenExpanses = () => {
           fontSize="md"
           width="100%"
           max={getCurrentDate()}
+          min={hotelPublishDate ? hotelPublishDate.split("T")[0] : ""}
         />
       </Flex>
       <Card>
@@ -142,6 +144,7 @@ const KitchenExpanses = () => {
             tableData={tableData}
             updateTableData={handleUpdateTableData}
             previousDayRecordsExist={previousDayRecordsExist}
+            onPublishDateLoad={(date) => setHotelPublishDate(date)}
           />
           <Button
             colorScheme="blue"

@@ -48,9 +48,14 @@ export default function DevelopmentTable(props) {
   const [sumofAllTax, setSumofAllTax] = useState(0);
   const [driverSalaryReport, setDriverSalaryReport] = useState("");
   const [sumSalary, setSumSalary] = useState("");
+  const [hotelPublishDate, setHotelPublishDate] = useState(null);
 
   const handleDriverSalaryModalClose = () => setShowDriverSalaryModal(false);
-  const handleTodaySaleModalClose = () => setShowTodaySaleModal(false);
+  const handleTodaySaleModalClose = () => {
+    setShowTodaySaleModal(false);
+    setCashSaleAmount("");
+    setCreditSaleAmount("");
+  };
   const handleAdvanceSalaryModalClose = () => setShowAdvanceSalaryModal(false);
   const handlePaymentModalClose = () => setShowPaymentModal(false);
   const [previousDaysaleExist, setPreviousDaysaleExist] = useState(true);
@@ -179,7 +184,9 @@ export default function DevelopmentTable(props) {
       );
       // Refresh sale data
       handleTodaySaleModalOpen();
-      setNewSaleAmount("");
+      // Reset input fields
+      setCashSaleAmount("");
+      setCreditSaleAmount("");
     } catch (error) {
       console.error("Error adding sale:", error);
     }
@@ -272,6 +279,55 @@ export default function DevelopmentTable(props) {
     checkPreviousDayAdvance(selectedDate);
   }, [selectedDate]);
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(`${URL}/api/users/me?populate=*`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+        const publishDate = new Date(data.hotel_name.publishedAt);
+        setHotelPublishDate(publishDate);
+        props.onPublishDateLoad?.(data.hotel_name.publishedAt);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, [token]);
+
+  useEffect(() => {
+    setCashSaleAmount("");
+    setCreditSaleAmount("");
+  }, [selectedDate]);
+
+  const canEnterTodaySale = useMemo(() => {
+    if (!hotelPublishDate) return false;
+
+    // Convert dates to YYYY-MM-DD format to ignore time
+    const selectedDateObj = new Date(selectedDate);
+    const selectedDateString = selectedDateObj.toISOString().split("T")[0];
+
+    const publishDate = new Date(hotelPublishDate);
+    const publishDateString = publishDate.toISOString().split("T")[0];
+
+    // If selected date is before publish date, don't allow entry
+    if (selectedDateString < publishDateString) {
+      return false;
+    }
+
+    // If selected date is publish date, allow entry
+    if (selectedDateString === publishDateString) {
+      return true;
+    }
+
+    // For any date after publish date, require previous day's sale
+    return previousDaysaleExist;
+  }, [previousDaysaleExist, hotelPublishDate, selectedDate]);
+
   const dataWithTax = useMemo(() => {
     let cumulativeTax = 0;
 
@@ -336,6 +392,19 @@ export default function DevelopmentTable(props) {
   );
 
   const totalSale = totalCashSale + totalCreditSale;
+
+  const isDateDisabled = (date) => {
+    if (!hotelPublishDate) return true;
+
+    const dateToCheck = new Date(date);
+    dateToCheck.setHours(0, 0, 0, 0);
+
+    const publishDate = new Date(hotelPublishDate);
+    publishDate.setHours(0, 0, 0, 0);
+
+    return dateToCheck < publishDate;
+  };
+
   return (
     <Card
       direction="column"
@@ -350,7 +419,7 @@ export default function DevelopmentTable(props) {
             width="fit-content"
             alignSelf="flex-end"
             onClick={handleTodaySaleModalOpen}
-            disabled={!previousDaysaleExist}
+            disabled={!canEnterTodaySale}
           >
             View Today Sale
           </Button>
